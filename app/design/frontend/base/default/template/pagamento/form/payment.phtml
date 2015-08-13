@@ -1,0 +1,115 @@
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl('css/pagamento/application.css') ?>" type="text/css" />
+<script type="text/javascript" src="<?php echo $this->getJsUrl('bcash/pagamento/frontend/form/payment.js') ?>"></script>
+
+<!-- <h1>Bcash</h1> -->
+<?php 
+
+$code = $this->getCode();
+$paymentMethods = $this->getPaymentMethods();
+$size = count($paymentMethods);
+
+$paymentGroupName = array(
+    'CARD' => "Cartão de cr&eacute;dito",
+    'BANKSLIP' => "Boleto Banc&aacute;rio",
+    'ONLINE_TRANSFER' => "Transfer&ecirc;ncia Banc&aacute;ria"
+);
+?>
+
+<div id="payment-<?php echo $code; ?>">
+    <?php foreach ($paymentMethods as $paymentType => $payments): ?>
+     <div class="payment-group">
+        <div>
+            <h3><?php echo $paymentGroupName[$paymentType] ?></h3>
+            <ul>
+                <?php foreach ($payments as $payment): ?>
+                    <li>
+                        <input type="radio" id="payment-method-<?php echo $payment->id ?>" name="payment-method" value="<?php echo $payment->id ?>" />
+                        <label class="bandeira band-<?php echo $payment->id ?>" for="payment-method-<?php echo $payment->id ?>"></label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <?php if ($paymentType == 'CARD'): ?>
+
+            <div id="card-conteiner" class="b-form-group b-hide">
+              <div class="b-row">
+                <div class="b-form-group b-col-xs-5">
+                  <label>N&uacute;mero do cart&atilde;o</label>
+                  <input type="number" class="b-form-control" maxlength="20" value="">
+                </div>
+
+                <div class="b-form-group b-col-xs-4">
+                  <label class="b-l-margin">Validade</label>
+                  <div class="b-form-group">
+                    <div class="b-col-xs-1">
+                      <input type="month" class="b-form-control"  min="1" max="12" maxlength="2" value="">
+                    </div>
+                    <div class="b-col-xs-1">
+                      <input type="month" class="b-form-control"  min="1" max="12" maxlength="2" value="">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="b-row">
+                <div class="b-form-group b-col-xs-5">
+                  <label>Nome titular</label>
+                  <input type="text" class="b-form-control" value="">
+                </div>
+
+                <div class="b-form-group b-col-xs-4">
+                  <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
+                  <div class="b-col-xs-4">
+                    <input type="number" class="b-form-control"  maxlength="4" value="">
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="b-row">
+                <div class="b-form-group b-col-xs-7">
+                  <label>Parcelas</label>
+                  <select class="b-form-control">
+                    <option value="">...</option>
+                    <option value="1">1</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr>
+
+              <div class="b-row">
+                <div class="b-form-group b-col-xs-3">
+                  <label>CPF do titular</label>
+                  <input type="text" class="b-form-control" value="">
+                </div>
+
+                <div class="b-form-group b-col-xs-4">
+                  <label class="b-l-margin">Telefone do titular</label>
+                  <div class="b-form-group">
+                    <div class="b-col-xs-1">
+                      <input type="number" class="b-form-control"  maxlength="2" value="">
+                    </div>
+                    <div class="b-col-xs-6">
+                      <input type="number" class="b-form-control"  maxlength="9" value="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div> <!-- card-conteiner -->
+                
+        <?php endif; ?>
+
+        <?php if ($size > 1): ?>
+            <hr>
+        <?php endif ?>
+
+    </div> <!-- payment-group -->
+
+    <?php 
+        $size--;
+    endforeach; ?>
+</div> <!-- div b-col-xs-4 -->

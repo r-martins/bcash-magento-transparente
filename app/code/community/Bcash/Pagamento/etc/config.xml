@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Bcash_Pagamento>
+            <version>1.0.0</version>
+        </Bcash_Pagamento>
+    </modules>
+
+    <global>
+   
+    	<helpers>
+    		<pagamento>
+    			<class>Bcash_Pagamento_Helper</class>
+    		</pagamento>
+    	</helpers>
+
+    	<blocks>
+    		<pagamento>
+    			<class>Bcash_Pagamento_Block</class>
+    		</pagamento>
+    	</blocks>
+
+    	<models>
+    		<pagamento>
+    			<class>Bcash_Pagamento_Model</class>
+    		</pagamento>
+    	</models>
+    	
+    </global>
+
+    <default>
+    	<payment>
+    		<pagamento>
+    			<active>1</active>
+    			<model>pagamento/paymentMethod</model>
+    			<title>Bcash</title>
+    			<allowspecific>0</allowspecific>
+    		</pagamento>
+    	</payment>
+    </default>
+
+    <frontend>
+	    <routers>
+	      	<pagamento>
+	        	<use>standard</use>
+	        	<args>
+	          		<module>Bcash_Pagamento</module>
+	          		<frontName>pagamento</frontName>
+	        	</args>
+	      	</pagamento>
+	    </routers>
+  	</frontend>
+
+</config>
+
