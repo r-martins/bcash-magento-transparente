@@ -22,7 +22,6 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 		return $this;
 	}
 
-
 	public function assignData(mixed $data) {
 		/* atribuir informacoes do pagamento para a info */
 		return $this;

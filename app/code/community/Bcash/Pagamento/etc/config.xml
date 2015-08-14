@@ -8,48 +8,51 @@
 
     <global>
    
-    	<helpers>
-    		<pagamento>
-    			<class>Bcash_Pagamento_Helper</class>
-    		</pagamento>
-    	</helpers>
+        <helpers>
+            <pagamento>
+                <class>Bcash_Pagamento_Helper</class>
+            </pagamento>
+        </helpers>
 
-    	<blocks>
-    		<pagamento>
-    			<class>Bcash_Pagamento_Block</class>
-    		</pagamento>
-    	</blocks>
+        <blocks>
+            <pagamento>
+                <class>Bcash_Pagamento_Block</class>
+            </pagamento>
+            <pagamento_adminhtml>
+                <class>Bcash_Pagamento_Block_Adminhtml</class>
+            </pagamento_adminhtml>
+        </blocks>
 
-    	<models>
-    		<pagamento>
-    			<class>Bcash_Pagamento_Model</class>
-    		</pagamento>
-    	</models>
-    	
+        <models>
+            <pagamento>
+                <class>Bcash_Pagamento_Model</class>
+            </pagamento>
+        </models>
+        
     </global>
 
     <default>
-    	<payment>
-    		<pagamento>
-    			<active>1</active>
-    			<model>pagamento/paymentMethod</model>
-    			<title>Bcash</title>
-    			<allowspecific>0</allowspecific>
-    		</pagamento>
-    	</payment>
+        <payment>
+            <pagamento>
+                <active>1</active>
+                <model>pagamento/paymentMethod</model>
+                <title>Bcash</title>
+                <allowspecific>0</allowspecific>
+            </pagamento>
+        </payment>
     </default>
 
     <frontend>
-	    <routers>
-	      	<pagamento>
-	        	<use>standard</use>
-	        	<args>
-	          		<module>Bcash_Pagamento</module>
-	          		<frontName>pagamento</frontName>
-	        	</args>
-	      	</pagamento>
-	    </routers>
-  	</frontend>
+        <routers>
+            <pagamento>
+                <use>standard</use>
+                <args>
+                    <module>Bcash_Pagamento</module>
+                    <frontName>pagamento</frontName>
+                </args>
+            </pagamento>
+        </routers>
+    </frontend>
 
 </config>
 
