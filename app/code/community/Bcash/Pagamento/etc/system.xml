@@ -75,6 +75,39 @@
                             <show_in_store>0</show_in_store>
                             <can_be_empty>0</can_be_empty>
                         </transacao_dependente>
+                        
+                        <desconto_boleto translate="label">
+                            <label>Percentual Desconto Boleto</label>
+                            <tooltip>Percentual de desconto em pagamentos via Boleto.</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>7</sort_order>
+                            <validate>validate-number validate-number-range number-range-0-100</validate>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </desconto_boleto>
+
+                        <desconto_tef translate="label">
+                            <label>Percentual Desconto TEF</label>
+                            <tooltip>Percentual de desconto em pagamentos via TEF.</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-number-range number-range-0-100</validate>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </desconto_tef>
+
+                        <desconto_credito_1x translate="label">
+                            <label>Percentual Desconto Cartão de Crédito 1x</label>
+                            <tooltip>Percentual de desconto em pagamentos via Cartão de crédito à vista.</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-number-range number-range-0-100</validate>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </desconto_credito_1x>
 
                     </fields>
 

@@ -49,8 +49,8 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
            . '<input style="width:200px;" class="validate-email" name="' . $this->getElement()->getName() . '[dependente][]"'
            .' value="' . $this->_getValue('dependente/' . $rowIndex) . '" ' . $this->_getDisabled() . '/> ';
        $html .= '<label style="width:80px;float: left;">Percentual:</label>'
-           . '<input style="width:70px;" onblur="if(this.value > 5){ this.value = \'\' };if (this.value.indexOf(\',\') > -1) {  this.value = this.value.replace(\',\',\'.\') }" maxlength="4" name="'
-           . $this->getElement()->getName() . '[percentual][]" value="'
+           . '<input style="width:70px;" onblur="if (this.value.indexOf(\',\') > -1) {  this.value = this.value.replace(\',\',\'.\') }" maxlength="4" name="'
+           . $this->getElement()->getName() . '[percentual][]" class="validate-number validate-number-range number-range-0-10" value="'
            . $this->_getValue('percentual/' . $rowIndex) . '" ' . $this->_getDisabled() . '/> ';
        $html .= $this->_getRemoveRowButtonHtml();
        $html .= '</div>';
