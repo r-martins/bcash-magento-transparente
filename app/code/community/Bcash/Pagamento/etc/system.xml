@@ -47,6 +47,7 @@
                             <label>Email cadstrado no Bcash</label>
                             <comment>Clique &lt;a href=&quot;https://www.bcash.com.br/criar-conta-comprador/&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se.</comment>
                             <frontend_type>text</frontend_type>
+                            <validate>validate-email</validate>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -72,7 +73,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
+                            <can_be_empty>0</can_be_empty>
                         </transacao_dependente>
 
                     </fields>

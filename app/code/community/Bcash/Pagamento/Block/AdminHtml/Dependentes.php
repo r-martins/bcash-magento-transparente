@@ -45,9 +45,9 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
        $html = '<li>';
  
        $html .= '<div style="margin:5px 0 10px;width:100%;">';
-       $html .= '<label style="width:80px;float: left;">Email:</label><input style="width:200px;" name="'
-           . $this->getElement()->getName() . '[dependente][]" value="'
-           . $this->_getValue('dependente/' . $rowIndex) . '" ' . $this->_getDisabled() . '/> ';
+       $html .= '<label style="width:80px;float: left;">Email:</label>'
+           . '<input style="width:200px;" class="validate-email" name="' . $this->getElement()->getName() . '[dependente][]"'
+           .' value="' . $this->_getValue('dependente/' . $rowIndex) . '" ' . $this->_getDisabled() . '/> ';
        $html .= '<label style="width:80px;float: left;">Percentual:</label>'
            . '<input style="width:70px;" onblur="if(this.value > 5){ this.value = \'\' };if (this.value.indexOf(\',\') > -1) {  this.value = this.value.replace(\',\',\'.\') }" maxlength="4" name="'
            . $this->getElement()->getName() . '[percentual][]" value="'
