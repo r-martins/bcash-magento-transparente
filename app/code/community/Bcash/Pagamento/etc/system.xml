@@ -4,7 +4,7 @@
         <payment>
             <groups>
                 <pagamento translate="label" module="pagamento">
-                    <label>Bcash</label>
+                    <label>Bcash - Pagamento Transparente</label>
                     <sort_order>1</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -44,7 +44,7 @@
                         </title>
 
                         <email translate="label">
-                            <label>Email cadstrado no Bcash</label>
+                            <label>Email cadastrado no Bcash</label>
                             <comment>Clique &lt;a href=&quot;https://www.bcash.com.br/criar-conta-comprador/&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-email</validate>

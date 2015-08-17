@@ -7,7 +7,6 @@
     </modules>
 
     <global>
-   
         <helpers>
             <pagamento>
                 <class>Bcash_Pagamento_Helper</class>
@@ -29,6 +28,18 @@
             </pagamento>
         </models>
         
+        <events>
+            <sales_order_save_commit_after> 
+                <observers>
+                    <sales_order_save_commit_after_handler> 
+                        <type>model</type> 
+                        <class>pagamento/observer</class> 
+                        <method>checkOrderState</method> 
+                        <args></args>
+                    </sales_order_save_commit_after_handler>
+                </observers>
+            </sales_order_save_commit_after>
+        </events>        
     </global>
 
     <default>
