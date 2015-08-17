@@ -1,20 +1,18 @@
-<link rel="stylesheet" href="<?php echo $this->getSkinUrl('css/pagamento/application.css') ?>" type="text/css" />
-<script type="text/javascript" src="<?php echo $this->getJsUrl('bcash/pagamento/frontend/form/payment.js') ?>"></script>
-
 <!-- <h1>Bcash</h1> -->
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>" type="text/css" />
+<!-- Script Start -->
+<!--<script type="text/javascript" src="<?php echo $this->getSkinUrl('bcash/pagamento/js/payment.js');?>"></script>//-->
+<!-- Script End -->
 <?php 
-
 $code = $this->getCode();
 $paymentMethods = $this->getPaymentMethods();
 $size = count($paymentMethods);
-
 $paymentGroupName = array(
     'CARD' => "Cartão de cr&eacute;dito",
     'BANKSLIP' => "Boleto Banc&aacute;rio",
     'ONLINE_TRANSFER' => "Transfer&ecirc;ncia Banc&aacute;ria"
 );
 ?>
-
 <div id="payment-<?php echo $code; ?>">
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
      <div class="payment-group">
@@ -23,30 +21,30 @@ $paymentGroupName = array(
             <ul>
                 <?php foreach ($payments as $payment): ?>
                     <li>
-                        <input type="radio" id="payment-method-<?php echo $payment->id ?>" name="payment-method" value="<?php echo $payment->id ?>" />
+                        <input type="radio" class="payment-method-bcash" id="payment-method-<?php echo $payment->id ?>" name="payment-method" value="<?php echo $payment->id ?>" />
                         <label class="bandeira band-<?php echo $payment->id ?>" for="payment-method-<?php echo $payment->id ?>"></label>
                     </li>
                 <?php endforeach; ?>
             </ul>
         </div>
-
+        
         <?php if ($paymentType == 'CARD'): ?>
 
             <div id="card-conteiner" class="b-form-group b-hide">
               <div class="b-row">
                 <div class="b-form-group b-col-xs-5">
                   <label>N&uacute;mero do cart&atilde;o</label>
-                  <input type="number" class="b-form-control" maxlength="20" value="">
+                  <input type="number" class="b-form-control" maxlength="20" value="" name="card_number_bcash">
                 </div>
 
                 <div class="b-form-group b-col-xs-4">
                   <label class="b-l-margin">Validade</label>
                   <div class="b-form-group">
-                    <div class="b-col-xs-1">
-                      <input type="month" class="b-form-control"  min="1" max="12" maxlength="2" value="">
+                    <div class="b-col-xs-6">
+                      <input type="text" class="b-form-control"  min="1" max="12" maxlength="2" value="" name="month_bcash">
                     </div>
-                    <div class="b-col-xs-1">
-                      <input type="month" class="b-form-control"  min="1" max="12" maxlength="2" value="">
+                    <div class="b-col-xs-6">
+                      <input type="text" class="b-form-control"  min="1" max="12" maxlength="2" value="" name="year_bcash">
                     </div>
                   </div>
                 </div>
@@ -56,13 +54,13 @@ $paymentGroupName = array(
               <div class="b-row">
                 <div class="b-form-group b-col-xs-5">
                   <label>Nome titular</label>
-                  <input type="text" class="b-form-control" value="">
+                  <input type="text" class="b-form-control" value="" name="name_card_bcash">
                 </div>
 
                 <div class="b-form-group b-col-xs-4">
                   <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
-                  <div class="b-col-xs-4">
-                    <input type="number" class="b-form-control"  maxlength="4" value="">
+                  <div class="b-col-xs-6">
+                    <input type="number" class="b-form-control"  maxlength="4" value="" name="cvv_bcash">
                   </div>
                 </div>
 
@@ -71,9 +69,11 @@ $paymentGroupName = array(
               <div class="b-row">
                 <div class="b-form-group b-col-xs-7">
                   <label>Parcelas</label>
-                  <select class="b-form-control">
+                  <select class="b-form-control" name="installments_bcash">
                     <option value="">...</option>
-                    <option value="1">1</option>
+                    <option value="1">1 - R$ 1,00</option>
+                    <option value="2">2 - R$ 1,00</option>
+                    <option value="3">3 - R$ 1,00</option>
                   </select>
                 </div>
               </div>
@@ -82,18 +82,18 @@ $paymentGroupName = array(
 
               <div class="b-row">
                 <div class="b-form-group b-col-xs-3">
-                  <label>CPF do titular</label>
-                  <input type="text" class="b-form-control" value="">
+                  <label>CPF/CNPJ do titular</label>
+                  <input type="text" class="b-form-control" name="cpf_cnpj_bcash" value="">
                 </div>
 
                 <div class="b-form-group b-col-xs-4">
                   <label class="b-l-margin">Telefone do titular</label>
                   <div class="b-form-group">
-                    <div class="b-col-xs-1">
-                      <input type="number" class="b-form-control"  maxlength="2" value="">
+                    <div class="b-col-xs-4">
+                      <input type="number" class="b-form-control"  maxlength="2" value="" name="ddd_bcash">
                     </div>
-                    <div class="b-col-xs-6">
-                      <input type="number" class="b-form-control"  maxlength="9" value="">
+                    <div class="b-col-xs-8">
+                      <input type="number" class="b-form-control"  maxlength="9" value="" name="phone_bcash">
                     </div>
                   </div>
                 </div>
@@ -108,8 +108,85 @@ $paymentGroupName = array(
         <?php endif ?>
 
     </div> <!-- payment-group -->
-
     <?php 
         $size--;
     endforeach; ?>
 </div> <!-- div b-col-xs-4 -->
+<script type="text/javascript">
+//<![CDATA[
+   var initBcashPagamento = (function () {
+      var cards = [ '1', '2', '37', '45', '55', '56', '63'];
+
+      function clickFlag(e) {
+        
+        var elem, evt = e ? e:event;
+        if (evt.srcElement) {
+          elem = evt.srcElement;
+        } else if (evt.target) {
+          elem = evt.target;
+        }
+
+        var paymentMethodBcash = elem.attributes['for'].value;
+        var paymentRadio = document.getElementById(paymentMethodBcash);
+        document.getElementById(paymentMethodBcash).disabled = true;
+        document.getElementById(paymentMethodBcash).checked  = true;
+
+        var cardConteiner = document.getElementById('card-conteiner');
+        if (isCard(paymentRadio) && hasClass(cardConteiner, 'b-hide')) {
+          cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/,'');
+          enableCardForm();
+        } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
+          cardConteiner.className = cardConteiner.className + " b-hide";
+          disableCardForm();
+        }
+        disableUnunsed(paymentRadio);
+      }
+
+      function enableCardForm(){
+          var formCardBcash = document.getElementsByClassName("b-form-control");
+          for (i in formCardBcash) {
+            formCardBcash[i].disabled = false;
+          }
+      }
+
+      function disableCardForm(){
+          var formCardBcash = document.getElementsByClassName("b-form-control");
+          for (i in formCardBcash) {
+            formCardBcash[i].disabled = true;
+          }
+      }
+
+      function disableUnunsed(paymentRadio){
+          var paymentRadios   = document.getElementsByClassName("payment-method-bcash");
+          for (var i = paymentRadios.length - 1; i >= 0; i--) {          
+             paymentRadios[i].disabled = true;
+          };
+          paymentRadio.disabled = false;
+      }
+
+      function isCard(element) {
+        return cards.indexOf(element.value) > -1;
+      }
+
+      function hasClass(element, cls) {
+        return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+      }
+
+      function init() {
+        var paymentsOptions = document.getElementsByClassName("bandeira");
+        //var paymentRadios   = document.getElementsByClassName("payment-method-bcash");
+        for (var i = paymentsOptions.length - 1; i >= 0; i--) {          
+          var paymentFlags = paymentsOptions[i];
+          paymentFlags.onclick = clickFlag;
+        };
+        //for (var i = paymentRadios.length - 1; i >= 0; i--) {          
+        //  paymentRadios[i].disabled = false;
+        //};        
+      }
+
+      init();
+  });
+    
+  initBcashPagamento();
+//]]>
+</script>

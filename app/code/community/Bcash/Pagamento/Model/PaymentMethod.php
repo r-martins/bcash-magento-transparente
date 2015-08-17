@@ -7,7 +7,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 	protected $_formBlockType = 'pagamento/form_payment';
 
 
-	public function authorize($payment, Varien_Object $invoicePayment)
+	public function authorize(Varien_Object $payment, $amount)
 	{
 		/* implementar a achamada a api bcash*/
 
@@ -15,14 +15,14 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 		return $this;
 	}
 
-	public function validate(Varien_Object $info)
+	public function validate()
 	{
 		/* validar dados antes de processar */
 
 		return $this;
 	}
 
-	public function assignData(mixed $data) {
+	public function assignData($data) {
 		/* atribuir informacoes do pagamento para a info */
 		return $this;
 	}

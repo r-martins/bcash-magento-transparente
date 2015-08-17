@@ -30,7 +30,7 @@
 
 .bandeira {
     display: inline-block;
-    background: url(../../images/pagamento/application-sprite.png) no-repeat;
+    background: url(../images/application-sprite.png) no-repeat;
     width: 70px;
     height: 46px;
     text-indent: -9999px;

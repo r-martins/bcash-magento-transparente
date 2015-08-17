@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layout>
+    <checkout_onepage_paymentmethod>
+        <reference name="head">
+            <action method="addJs">
+                <script>bcash/pagamentos/js/payment.js</script>
+            </action>
+        </reference>
+    </checkout_onepage_paymentmethod>
+</layout>
