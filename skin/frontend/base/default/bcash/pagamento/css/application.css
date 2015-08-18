@@ -291,6 +291,9 @@
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
 }
 
+.b-form-control .error{
+  border-color: red;
+}
 
 .b-form-control:focus {
   border-color: #66afe9;

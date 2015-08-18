@@ -1,9 +1,9 @@
 <!-- <h1>Bcash</h1> -->
-<link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>" type="text/css"/>
 <!-- Script Start -->
-<!--<script type="text/javascript" src="<?php echo $this->getSkinUrl('bcash/pagamento/js/payment.js');?>"></script>//-->
+<!--<script type="text/javascript" src="<?php echo $this->getSkinUrl('bcash/pagamento/js/payment.js'); ?>"></script>//-->
 <!-- Script End -->
-<?php 
+<?php
 $code = $this->getCode();
 $paymentMethods = $this->getPaymentMethods();
 $size = count($paymentMethods);
@@ -15,178 +15,461 @@ $paymentGroupName = array(
 ?>
 <div id="payment-<?php echo $code; ?>">
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
-     <div class="payment-group">
-        <div>
-            <h3><?php echo $paymentGroupName[$paymentType] ?></h3>
-            <ul>
-                <?php foreach ($payments as $payment): ?>
-                    <li>
-                        <input type="radio" class="payment-method-bcash" id="payment-method-<?php echo $payment->id ?>" name="payment-method" value="<?php echo $payment->id ?>" />
-                        <label class="bandeira band-<?php echo $payment->id ?>" for="payment-method-<?php echo $payment->id ?>"></label>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-        
-        <?php if ($paymentType == 'CARD'): ?>
+        <div class="payment-group">
+            <div>
+                <h3><?php echo $paymentGroupName[$paymentType] ?></h3>
+                <ul>
+                    <?php foreach ($payments as $payment): ?>
+                        <li>
+                            <input type="radio" class="payment-method-bcash validate-one-required-by-name"
+                                   id="payment-method-<?php echo $payment->id ?>" name="payment-method"
+                                   value="<?php echo $payment->id ?>"/>
+                            <label class="bandeira band-<?php echo $payment->id ?>"
+                                   for="payment-method-<?php echo $payment->id ?>"></label>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
 
-            <div id="card-conteiner" class="b-form-group b-hide">
-              <div class="b-row">
-                <div class="b-form-group b-col-xs-5">
-                  <label>N&uacute;mero do cart&atilde;o</label>
-                  <input type="number" class="b-form-control" maxlength="20" value="" name="card_number_bcash">
-                </div>
+            <?php if ($paymentType == 'CARD'): ?>
 
-                <div class="b-form-group b-col-xs-4">
-                  <label class="b-l-margin">Validade</label>
-                  <div class="b-form-group">
-                    <div class="b-col-xs-6">
-                      <input type="text" class="b-form-control"  min="1" max="12" maxlength="2" value="" name="month_bcash">
+                <div id="card-conteiner" class="b-form-group b-hide">
+                    <div class="b-row">
+                        <div class="b-form-group b-col-xs-5">
+                            <label>N&uacute;mero do cart&atilde;o</label>
+                            <input type="text" class="b-form-control validate-number-card" maxlength="20" value="" id="card_number_bcash"
+                                   name="card_number_bcash"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="b-form-group b-col-xs-6">
+                            <label class="b-l-margin">Validade</label>
+
+                            <div class="b-form-group">
+                                <div class="b-col-xs-6">
+                                    <select class="b-form-control validate-month-bcash" id="month_bcash" name="month_bcash">
+                                        <option value=""></option>
+                                        <?php
+                                        for ($i = 1; $i < 13; $i++) :
+                                            $month = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                            ?>
+                                            <option value="<?php echo $month ?>"><?php echo $month ?></option>
+                                            <?php
+                                        endfor;
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="b-col-xs-6">
+                                    <select class="b-form-control validate-year-bcash" id="year_bcash" name="year_bcash">
+                                        <option value=""></option>
+                                        <?php
+                                        $year = date("Y");
+                                        $endYear = $year + 10;
+                                        for ($i = $year; $i < $endYear; $i++) :
+                                            $month = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                            ?>
+                                            <option value="<?php echo $month ?>"><?php echo $month ?></option>
+                                            <?php
+                                        endfor;
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="b-col-xs-6">
-                      <input type="text" class="b-form-control"  min="1" max="12" maxlength="2" value="" name="year_bcash">
+
+                    <div class="b-row">
+                        <div class="b-form-group b-col-xs-5">
+                            <label>Nome titular</label>
+                            <input type="text" class="b-form-control validate-name-card" value="" name="name_card_bcash"
+                                   id="name_card_bcash" maxlength="100"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="b-form-group b-col-xs-4">
+                            <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
+
+                            <div class="b-col-xs-6">
+                                <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value="" name="cvv_bcash"
+                                       id="cvv_bcash">
+                            </div>
+                        </div>
+
                     </div>
-                  </div>
-                </div>
 
-              </div>
-
-              <div class="b-row">
-                <div class="b-form-group b-col-xs-5">
-                  <label>Nome titular</label>
-                  <input type="text" class="b-form-control" value="" name="name_card_bcash">
-                </div>
-
-                <div class="b-form-group b-col-xs-4">
-                  <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
-                  <div class="b-col-xs-6">
-                    <input type="number" class="b-form-control"  maxlength="4" value="" name="cvv_bcash">
-                  </div>
-                </div>
-
-              </div>
-
-              <div class="b-row">
-                <div class="b-form-group b-col-xs-7">
-                  <label>Parcelas</label>
-                  <select class="b-form-control" name="installments_bcash">
-                    <option value="">...</option>
-                    <option value="1">1 - R$ 1,00</option>
-                    <option value="2">2 - R$ 1,00</option>
-                    <option value="3">3 - R$ 1,00</option>
-                  </select>
-                </div>
-              </div>
-
-              <hr>
-
-              <div class="b-row">
-                <div class="b-form-group b-col-xs-3">
-                  <label>CPF/CNPJ do titular</label>
-                  <input type="text" class="b-form-control" name="cpf_cnpj_bcash" value="">
-                </div>
-
-                <div class="b-form-group b-col-xs-4">
-                  <label class="b-l-margin">Telefone do titular</label>
-                  <div class="b-form-group">
-                    <div class="b-col-xs-4">
-                      <input type="number" class="b-form-control"  maxlength="2" value="" name="ddd_bcash">
+                    <div class="b-row">
+                        <div class="b-form-group b-col-xs-7">
+                            <label>Parcelas</label>
+                            <select class="b-form-control" name="installments_bcash" id="installments_bcash">
+                                <option value="1">1x - R$ 1,00</option>
+                                <option value="2">2x - R$ 1,00</option>
+                                <option value="3">3x - R$ 1,00</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="b-col-xs-8">
-                      <input type="number" class="b-form-control"  maxlength="9" value="" name="phone_bcash">
+
+                    <hr>
+
+                    <div class="b-row">
+                        <div class="b-form-group b-col-xs-4">
+                            <label>CPF/CNPJ do titular</label>
+                            <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash" name="cpf_cnpj_bcash" value=""
+                                   maxlength="18" autocomplete="off">
+                        </div>
+
+                        <div class="b-form-group b-col-xs-6">
+                            <label class="b-l-margin">Telefone do titular</label>
+                            <div class="b-form-group">
+                                <div class="b-col-xs-4">
+                                    <input type="text" class="b-form-control validate-ddd" maxlength="2" value="" name="ddd_bcash"
+                                           id="ddd_bcash">
+                                </div>
+                                <div class="b-col-xs-8">
+                                    <input type="text" class="b-form-control validate-phone" maxlength="9" value="" name="phone_bcash"
+                                           id="phone_bcash">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                </div>
-              </div>
 
-            </div> <!-- card-conteiner -->
-                
-        <?php endif; ?>
+                </div> <!-- card-conteiner -->
 
-        <?php if ($size > 1): ?>
-            <hr>
-        <?php endif ?>
+            <?php endif; ?>
 
-    </div> <!-- payment-group -->
-    <?php 
+            <?php if ($size > 1): ?>
+                <hr>
+            <?php endif ?>
+
+        </div> <!-- payment-group -->
+        <?php
         $size--;
     endforeach; ?>
 </div> <!-- div b-col-xs-4 -->
 <script type="text/javascript">
-//<![CDATA[
-   var initBcashPagamento = (function () {
-      var cards = [ '1', '2', '37', '45', '55', '56', '63'];
+    //<![CDATA[
+    var initBcashPagamento = (function () {
 
-      function clickFlag(e) {
-        
-        var elem, evt = e ? e:event;
-        if (evt.srcElement) {
-          elem = evt.srcElement;
-        } else if (evt.target) {
-          elem = evt.target;
+        function checkIsCardSelected(){
+            var ElementPaymentMethod = [];
+            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+                if( element.checked ){
+                    ElementPaymentMethod = element;
+                }
+            });
+            var $isCard = isCard(ElementPaymentMethod);
+            console.log($isCard);
+            return $isCard;
         }
 
-        var paymentMethodBcash = elem.attributes['for'].value;
-        var paymentRadio = document.getElementById(paymentMethodBcash);
-        document.getElementById(paymentMethodBcash).disabled = true;
-        document.getElementById(paymentMethodBcash).checked  = true;
+        Validation.add('validate-cpf-cnpj', 'Documento inválido.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return isCpfCnpj(v);
+            }
+            return true;
+        });
 
-        var cardConteiner = document.getElementById('card-conteiner');
-        if (isCard(paymentRadio) && hasClass(cardConteiner, 'b-hide')) {
-          cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/,'');
-          enableCardForm();
-        } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
-          cardConteiner.className = cardConteiner.className + " b-hide";
-          disableCardForm();
+        Validation.add('validate-ddd', 'Preencha o ddd.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length == 2;
+            }
+            return true;
+        });
+
+        Validation.add('validate-phone', 'Preencha o telefone.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length == 8 || v.length == 9;
+            }
+            return true;
+        });
+
+        Validation.add('validate-name-card', 'Preencha o nome do titular.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        Validation.add('validate-number-card', 'Preencha o número do cartãor.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        Validation.add('validate-ccv-card', 'Preencha o código de segurança.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        Validation.add('validate-year-bcash', 'Preencha o ano de validade do cartão.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        Validation.add('validate-month-bcash', 'Preencha o mês de vencimento do cartão.', function(v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        var cards = ['1', '2', '37', '45', '55', '56', '63'];
+
+        function clickFlag(e) {
+
+            var elem, evt = e ? e : event;
+            if (evt.srcElement) {
+                elem = evt.srcElement;
+            } else if (evt.target) {
+                elem = evt.target;
+            }
+
+            var paymentMethodBcash = elem.attributes['for'].value;
+            var paymentRadio = document.getElementById(paymentMethodBcash);
+            document.getElementById(paymentMethodBcash).disabled = true;
+            document.getElementById(paymentMethodBcash).checked = true;
+
+            var cardConteiner = document.getElementById('card-conteiner');
+            if (isCard(paymentRadio) && hasClass(cardConteiner, 'b-hide')) {
+                cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/, '');
+                enableCardForm();
+            } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
+                cardConteiner.className = cardConteiner.className + " b-hide";
+                disableCardForm();
+            }
+            disableUnunsed(paymentRadio);
         }
-        disableUnunsed(paymentRadio);
-      }
 
-      function enableCardForm(){
-          var formCardBcash = document.getElementsByClassName("b-form-control");
-          for (i in formCardBcash) {
-            formCardBcash[i].disabled = false;
-          }
-      }
+        function enableCardForm() {
+            var formCardBcash = document.getElementsByClassName("b-form-control");
+            for (i in formCardBcash) {
+                formCardBcash[i].disabled = false;
+            }
+        }
 
-      function disableCardForm(){
-          var formCardBcash = document.getElementsByClassName("b-form-control");
-          for (i in formCardBcash) {
-            formCardBcash[i].disabled = true;
-          }
-      }
+        function disableCardForm() {
+            var formCardBcash = document.getElementsByClassName("b-form-control");
+            for (i in formCardBcash) {
+                formCardBcash[i].disabled = true;
+            }
+        }
 
-      function disableUnunsed(paymentRadio){
-          var paymentRadios   = document.getElementsByClassName("payment-method-bcash");
-          for (var i = paymentRadios.length - 1; i >= 0; i--) {          
-             paymentRadios[i].disabled = true;
-          };
-          paymentRadio.disabled = false;
-      }
+        function disableUnunsed(paymentRadio) {
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            for (var i = paymentRadios.length - 1; i >= 0; i--) {
+                paymentRadios[i].disabled = true;
+            };
+            paymentRadio.disabled = false;
+        }
 
-      function isCard(element) {
-        return cards.indexOf(element.value) > -1;
-      }
+        function isCard(element) {
+            console.log(element);
+            return cards.indexOf(element.value) > -1;
+        }
 
-      function hasClass(element, cls) {
-        return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
-      }
+        function hasClass(element, cls) {
+            return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+        }
 
-      function init() {
-        var paymentsOptions = document.getElementsByClassName("bandeira");
-        //var paymentRadios   = document.getElementsByClassName("payment-method-bcash");
-        for (var i = paymentsOptions.length - 1; i >= 0; i--) {          
-          var paymentFlags = paymentsOptions[i];
-          paymentFlags.onclick = clickFlag;
-        };
-        //for (var i = paymentRadios.length - 1; i >= 0; i--) {          
-        //  paymentRadios[i].disabled = false;
-        //};        
-      }
+        function mascaraCpfCnpj() {
+            var str = document.getElementById('cpf_cnpj_bcash');
+            var $value = str.value.replace(/\D/g, "");
+            /* Caso passe de 14 caracteres será formatado como CNPJ */
+            if ($value.length < 12)
+                str.value = cpf($value);
+            else if ($value.length > 11 && $value.length < 15)
+                str.value = cnpj($value);
+            else
+                str.value = cnpj(cut($value));
+        }
 
-      init();
-  });
-    
-  initBcashPagamento();
-//]]>
+        function cut(str) {
+            return str.substring(0, 14);
+        }
+
+        /* Funcao de formatacao CPF */
+        function cpf(valor) {
+            /* Remove qualquer caracter digitado que não seja numero */
+            valoralor = valor.replace(/\D/g, "");
+            /* Adiciona um ponto entre o terceiro e o quarto digito */
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            /* Adiciona um ponto entre o terceiro e o quarto dígitos */
+            /* desta vez para o segundo bloco */
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            /* Adiciona um hifen entre o terceiro e o quarto dígitos */
+            valor = valor.replace(/(\d{3})(\d)$/, "$1-$2");
+            return valor;
+        }
+
+        // Funcao de formatacao CNPJ
+        function cnpj(valor) {
+            /* Remove qualquer caracter digitado que não seja numero */
+            valor = valor.replace(/\D/g, "");
+            /* Adiciona um ponto entre o segundo e o terceiro dígitos */
+            valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+            /* Adiciona um ponto entre o quinto e o sexto dígitos */
+            valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+            /* Adiciona uma barra entre o oitavaloro e o nono dígitos */
+            valor = valor.replace(/\.(\d{3})(\d)/, ".$1/$2");
+            /* Adiciona um hífen depois do bloco de quatro dígitos */
+            valor = valor.replace(/(\d{4})(\d)/, "$1-$2");
+            return valor;
+        }
+
+        function onlyNumber(key) {
+            return key >= 48 && key <= 57;
+        }
+
+        function unformatNumber(pNum)
+        {
+            return String(pNum).replace(/\D/g, "").replace(/^0+/, "");
+        }
+
+        function isCpf(cpf) {
+            var soma;
+            var resto;
+            var i;
+            if ( (cpf.length != 11) ||
+                (cpf == "00000000000") || (cpf == "11111111111") ||
+                (cpf == "22222222222") || (cpf == "33333333333") ||
+                (cpf == "44444444444") || (cpf == "55555555555") ||
+                (cpf == "66666666666") || (cpf == "77777777777") ||
+                (cpf == "88888888888") || (cpf == "99999999999") ) {
+                return false;
+            }
+            soma = 0;
+            for (i = 1; i <= 9; i++) {
+                soma += Math.floor(cpf.charAt(i-1)) * (11 - i);
+            }
+            resto = 11 - (soma - (Math.floor(soma / 11) * 11));
+            if ( (resto == 10) || (resto == 11) ) {
+                resto = 0;
+            }
+            if ( resto != Math.floor(cpf.charAt(9)) ) {
+                return false;
+            }
+            soma = 0;
+            for (i = 1; i<=10; i++) {
+                soma += cpf.charAt(i-1) * (12 - i);
+            }
+            resto = 11 - (soma - (Math.floor(soma / 11) * 11));
+            if ( (resto == 10) || (resto == 11) ) {
+                resto = 0;
+            }
+            if (resto != Math.floor(cpf.charAt(10)) ) {
+                return false;
+            }
+            return true;
+        }
+
+        function isCnpj(s){
+            var i;
+            var c = s.substr(0,12);
+            var dv = s.substr(12,2);
+            var d1 = 0;
+            for (i = 0; i < 12; i++){
+                d1 += c.charAt(11-i)*(2+(i % 8));
+            }
+            if (d1 == 0) return false;
+            d1 = 11 - (d1 % 11);
+            if (d1 > 9) d1 = 0;
+            if (dv.charAt(0) != d1){
+                return false;
+            }
+            d1 *= 2;
+            for (i = 0; i < 12; i++){
+                d1 += c.charAt(11-i)*(2+((i+1) % 8));
+            }
+            d1 = 11 - (d1 % 11);
+            if (d1 > 9) d1 = 0;
+            if (dv.charAt(1) != d1){
+                return false;
+            }
+            return true;
+        }
+
+        function isCpfCnpj(valor) {
+            var retorno = false;
+            var numero  = valor;
+            numero = unformatNumber(numero);
+            if (numero.length > 11){
+                if (isCnpj(numero)) {
+                    retorno = true;
+                }
+            } else {
+                if (isCpf(numero)) {
+                    retorno = true;
+                }
+            }
+            return retorno;
+        }
+
+        function validateNumber(event){
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
+            }
+        }
+
+        /* Inicialização de comportamentos referentes ao checkout Bcash */
+        function init() {
+
+            var paymentsOptions = document.getElementsByClassName("bandeira");
+            for (var i = paymentsOptions.length - 1; i >= 0; i--) {
+                var paymentFlags = paymentsOptions[i];
+                paymentFlags.onclick = clickFlag;
+            }
+
+            document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
+                var key = event.which || event.keyCode || event.charCode;
+                if (!onlyNumber(key)) {
+                    return false;
+                }
+                mascaraCpfCnpj();
+            };
+
+            document.getElementById("cpf_cnpj_bcash").onkeydown = function (event) {
+                var key = event.which || event.keyCode || event.charCode;
+                if (key == 8)
+                    mascaraCpfCnpj();
+                else if (!onlyNumber(key))
+                    return false;
+            };
+
+            document.getElementById("cpf_cnpj_bcash").onblur = function (event) {
+                mascaraCpfCnpj();
+            };
+
+            document.getElementById("ddd_bcash").onkeypress = function (event) {
+                return validateNumber(event);
+            };
+
+            document.getElementById("phone_bcash").onkeypress = function (event) {
+                return validateNumber(event);
+            };
+
+            document.getElementById("card_number_bcash").onkeypress = function (event) {
+                return validateNumber(event);
+            };
+
+        }
+
+        init();
+    });
+
+    initBcashPagamento();
+    //]]>
 </script>
