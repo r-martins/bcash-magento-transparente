@@ -9,22 +9,23 @@ class Bcash_Pagamento_Model_Observer
 		$origOrderData = $observer->getEvent()->getData('data_object')->getOrigData();
 		$newOrderData = $observer->getEvent()->getData('data_object')->getData();
 
+		Mage::log($origOrderData);
+
 		if (($origOrderData['state'] !== $newOrderData['state']) && 
 			($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED))
 		{
         	// TODO: Código de transação do pedido
         	//$orderTransaction = $newOrderData['some_attribute_value'];
-			$orderTransaction = "blablabla"; 
+			$orderTransaction = "a32ad4asdf435asdf435435as76"; 
 
+			//Mage::log($observer->getEvent()->getPayment()->getMethodInstance()->getCode());	
+			//Mage::log($observer->getEvent()->getTransaction());
 			if(!is_null($orderTransaction) && !empty($orderTransaction))
 			{
-				self::cancelOrderTransaction($orderTransaction);     
-			}        	          
-		}              
-	}
-
-	private function cancelOrderTransaction($transactionId) 
-	{
-		Mage::log('Ok - ' . $transactionId);
+				//Mage::model();
+				$pagamentoOrderModel = Mage::getModel('pagamento/order');
+				$pagamentoOrderModel->cancellation($orderTransaction);
+			}
+		}          
 	}
 }
