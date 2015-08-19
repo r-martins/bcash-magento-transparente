@@ -158,7 +158,7 @@ $paymentGroupName = array(
                 }
             });
             var $isCard = isCard(ElementPaymentMethod);
-            console.log($isCard);
+           // console.log($isCard);
             return $isCard;
         }
 
@@ -276,7 +276,7 @@ $paymentGroupName = array(
         }
 
         function isCard(element) {
-            console.log(element);
+            //console.log(element);
             return cards.indexOf(element.value) > -1;
         }
 
@@ -290,7 +290,7 @@ $paymentGroupName = array(
             /* Caso passe de 14 caracteres será formatado como CNPJ */
             if ($value.length < 12)
                 str.value = cpf($value);
-            else if ($value.length > 11 && $value.length < 15)
+            else if ($value.length >= 12 && $value.length < 15)
                 str.value = cnpj($value);
             else
                 str.value = cnpj(cut($value));
