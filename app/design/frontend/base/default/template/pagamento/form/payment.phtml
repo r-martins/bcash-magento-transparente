@@ -148,6 +148,8 @@ $paymentGroupName = array(
 </div> <!-- div b-col-xs-4 -->
 <script type="text/javascript">
     //<![CDATA[
+    var requestUrl = '<?php echo Mage::getUrl('pagamento/payment/dados') ?>';
+
     var initBcashPagamento = (function () {
 
         function checkIsCardSelected(){
@@ -246,9 +248,20 @@ $paymentGroupName = array(
             if (isCard(paymentRadio) && hasClass(cardConteiner, 'b-hide')) {
                 cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/, '');
                 enableCardForm();
+
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'input=cartao&tipo='+ paymentRadio.value
+                });
+
             } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
                 cardConteiner.className = cardConteiner.className + " b-hide";
                 disableCardForm();
+
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'input=boleto&tipo='+ paymentRadio.value
+                });
             }
             disableUnunsed(paymentRadio);
         }
@@ -303,14 +316,14 @@ $paymentGroupName = array(
         /* Funcao de formatacao CPF */
         function cpf(valor) {
             /* Remove qualquer caracter digitado que não seja numero */
-            valoralor = valor.replace(/\D/g, "");
+            valor = valor.replace(/\D/g, "");
             /* Adiciona um ponto entre o terceiro e o quarto digito */
             valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
             /* Adiciona um ponto entre o terceiro e o quarto dígitos */
             /* desta vez para o segundo bloco */
             valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
             /* Adiciona um hifen entre o terceiro e o quarto dígitos */
-            valor = valor.replace(/(\d{3})(\d)$/, "$1-$2");
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
             return valor;
         }
 
@@ -330,7 +343,7 @@ $paymentGroupName = array(
         }
 
         function onlyNumber(key) {
-            return key >= 48 && key <= 57;
+            return !((key > 31 && (key < 48 || key > 57)) || key == 8 );
         }
 
         function unformatNumber(pNum)
@@ -441,14 +454,6 @@ $paymentGroupName = array(
                 mascaraCpfCnpj();
             };
 
-            document.getElementById("cpf_cnpj_bcash").onkeydown = function (event) {
-                var key = event.which || event.keyCode || event.charCode;
-                if (key == 8)
-                    mascaraCpfCnpj();
-                else if (!onlyNumber(key))
-                    return false;
-            };
-
             document.getElementById("cpf_cnpj_bcash").onblur = function (event) {
                 mascaraCpfCnpj();
             };
@@ -468,6 +473,109 @@ $paymentGroupName = array(
         }
 
         init();
+
+        var initBcashPagamentoAjax = function () {
+
+            function getCardSelected(){
+                var ElementPaymentMethod = [];
+                document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+                    if( element.checked ){
+                        ElementPaymentMethod = element;
+                    }
+                });
+                var $isCard = isCard(ElementPaymentMethod);
+                // console.log($isCard);
+                return {'element': ElementPaymentMethod, 'isCard': $isCard};
+            }
+
+            $('cpf_cnpj_bcash').observe('blur', function(e) {
+                var RegExp = /^[0-9]{11,14}$/;
+                var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
+                var valor = cpf_cnpj_bcash.value.replace(/\D/g, "");
+                if (RegExp.test(valor) == false && valor.length > 0) {
+                    alert('Informe corretamente seu CPF/CNPJ ');
+                    cpf_cnpj_bcash.value='';
+                }
+                else if(valor.length > 0){
+                    var id = document.getElementById("cpf_cnpj_bcash").value;
+                    new Ajax.Request(requestUrl, {
+                        method : 'POST',
+                        parameters  : 'pid='+id+'&input=cpf'
+                    });
+                }
+            });
+
+            $('card_number_bcash').observe('blur', function(e) {
+                var id = document.getElementById("card_number_bcash").value;
+                var $elem = getCardSelected();
+                var tipo = $elem.element.value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=cartao&tipo='+tipo
+                });
+            });
+
+            $('name_card_bcash').observe('blur', function(e) {
+                var id = document.getElementById("name_card_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=name'
+                });
+            });
+
+            $('month_bcash').observe('blur', function(e) {
+                var id = document.getElementById("month_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=mes'
+                });
+            });
+
+            $('year_bcash').observe('blur', function(e) {
+                var id = document.getElementById("year_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=ano'
+                });
+            });
+
+            $('installments_bcash').observe('blur', function(e) {
+                var id = document.getElementById("installments_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=parcelas'
+                });
+            });
+
+            $('cvv_bcash').observe('blur', function(e) {
+                var id = document.getElementById("cvv_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=cvv'
+                });
+            });
+
+            $('ddd_bcash').observe('blur', function(e) {
+                var id = document.getElementById("ddd_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=ddd'
+                });
+            });
+
+            $('phone_bcash').observe('blur', function(e) {
+                var id = document.getElementById("phone_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method : 'POST',
+                    parameters  : 'pid='+id+'&input=telefone'
+                });
+            });
+
+        };
+
+        initBcashPagamentoAjax();
+
+
     });
 
     initBcashPagamento();
