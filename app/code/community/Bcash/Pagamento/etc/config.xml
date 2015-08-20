@@ -17,30 +17,52 @@
             <pagamento>
                 <class>Bcash_Pagamento_Block</class>
             </pagamento>
+
             <pagamento_adminhtml>
                 <class>Bcash_Pagamento_Block_Adminhtml</class>
             </pagamento_adminhtml>
+
+            <adminhtml>
+                <rewrite>
+                    <sales_order_view>Bcash_Pagamento_Block_Adminhtml_Sales_Order_View</sales_order_view>
+                    <sales_order_grid>Bcash_Pagamento_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
 
         <models>
             <pagamento>
                 <class>Bcash_Pagamento_Model</class>
             </pagamento>
-        </models>
-        
+        </models>                
+    </global>
+    
+    <admin>
+        <routers>
+            <pagamento>
+                <use>admin</use>
+                <args>
+                    <module>Bcash_Pagamento</module>
+                    <frontName>pagamento</frontName>
+                </args>
+            </pagamento>
+        </routers>
+    </admin>
+
+    <adminhtml>
         <events>
-            <sales_order_save_commit_after> 
+            <nothing_to_do_here_yet> 
                 <observers>
-                    <sales_order_save_commit_after_handler> 
+                    <pagamento> 
                         <type>model</type> 
                         <class>pagamento/observer</class> 
                         <method>checkOrderState</method> 
                         <args></args>
-                    </sales_order_save_commit_after_handler>
+                    </pagamento>
                 </observers>
-            </sales_order_save_commit_after>
-        </events>        
-    </global>
+            </nothing_to_do_here_yet>
+        </events>
+    </adminhtml> 
 
     <default>
         <payment>

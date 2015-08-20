@@ -11,6 +11,10 @@ class Bcash_Pagamento_Model_Observer
 
 		Mage::log($origOrderData);
 
+		echo "<pre>";
+		print_r($observer->getEvent());
+
+		die('desobserver');
 		if (($origOrderData['state'] !== $newOrderData['state']) && 
 			($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED))
 		{
@@ -23,8 +27,8 @@ class Bcash_Pagamento_Model_Observer
 			if(!is_null($orderTransaction) && !empty($orderTransaction))
 			{
 				//Mage::model();
-				$pagamentoOrderModel = Mage::getModel('pagamento/order');
-				$pagamentoOrderModel->cancellation($orderTransaction);
+				//$pagamentoOrderModel = Mage::getModel('pagamento/order');
+				//$pagamentoOrderModel->cancellation($orderTransaction);
 			}
 		}          
 	}

@@ -15,20 +15,20 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 {
 
 	private $email;
-	private $consumer_key;
+	private $token;
 	private $obj;
 
 	public function __construct()
 	{
 		$this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
 		$this->email = $this->obj->getConfigData('email');
-		$this->consumer_key = $this->obj->getConfigData('consumer_key');
+		$this->token = $this->obj->getConfigData('token');
 	}
 
 	public function cancellation($transactionId)
 	{
 
-		$cancellation = new Cancellation($this->email, $this->consumer_key);
+		$cancellation = new Cancellation($this->email, $this->token);
 		$cancellation->enableSandBox(true);
 
 		try {
@@ -39,16 +39,12 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 		    echo "</pre>";
 
 		} catch (ValidationException $e) {
-		    echo "ValidationException: " . $e->getMessage() . "\n";
-		    echo "<pre>";
-		    var_dump($e->getErrors());die;
-		    echo "</pre>";
+			Mage::getSingleton('core/session')->addError('Erro API Bcash:' . $e->getMessage());
+		    Mage::log($e->getErrors());	
 
 		} catch (ConnectionException $e) {
-		    echo "ConnectionException: " . $e->getMessage() . "\n";
-		    echo "<pre>";
-		    var_dump($e->getErrors());die;
-		    echo "</pre>";
+			Mage::getSingleton('core/session')->addError('Erro API Bcash:' . $e->getMessage() . ' (Confirme se o serviço de cancelamento está habilitado para sua conta Bcash)');
+		    Mage::log($e->getErrors());			    
 		}
 	}
 }
