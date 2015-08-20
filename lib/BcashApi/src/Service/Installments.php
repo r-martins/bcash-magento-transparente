@@ -15,7 +15,7 @@ use Bcash\Http\Connection;
  */
 class Installments implements IEnvironmentManager
 {
-	const route = "/seller/%s/installments";
+	const route = "/installments";
 	private $email;
 	private $token;
 	private $url;
@@ -26,7 +26,7 @@ class Installments implements IEnvironmentManager
 		$this->token = $token;
 		$this->url = Config::host . self::route;
 	}
-	
+
 	/**
 	 * Chama o serviço de cálculo de parcelas.
 	 *
@@ -38,47 +38,53 @@ class Installments implements IEnvironmentManager
 	 * @throws InstallmentException
 	 *             exceção em caso de na consulta.
 	 */
-	public function calculate($amount, $max, $id_vendedor)
+	public function calculate($amount, $max = null, $ignoreScheduledDiscount = null)
 	{
-		$request = $this->generateRequest($amount, $max, $id_vendedor);
+		$request = $this->generateRequest($amount, $max, $ignoreScheduledDiscount);
 		$response = $this->send($request);
-	
+
 		return HttpHelper::fromJson($response->getContent());
 	}
-	
-	private function generateRequest($amount, $max, $id_vendedor)
+
+	private function generateRequest($amount, $max, $ignoreScheduledDiscount)
 	{
 		$request = new GetRequest($this->url);
-	
+
 		$basic = new Basic();
 		$request->addHeader($basic->generateHeader($this->email, $this->token));
 		$request->addHeader("Content-Type:application/x-www-form-urlencoded;charset=" . Config::charset);
 		$request->addParam("amount", $amount);
-		$request->addParam("maxInstallments", $max);
-		
-// 		$url = vsprintf($this->url, $this->email);
-		$url = vsprintf($this->url, $id_vendedor);
-		$url = $url . "?" . http_build_query($request->getParams(), '', '&'); 
 
-		$request->setUrl($url);
+		if ($max != null) {
+			$request->addParam("maxInstallments", $max);
+		}
+
+		$request->addParam("ignoreScheduledDiscount", 0);
+
+		if ($ignoreScheduledDiscount === true){
+			$request->addParam("ignoreScheduledDiscount", 1);
+		}
+
+		$request->setUrl($this->url . "?" . http_build_query($request->getParams(), '', '&')); 
+
 		return $request;
 	}
-	
+
 	private function send($request)
 	{
 		$connection = new Connection(Config::timeout);
 		$response = $connection->get($request);
-	
+
 		return $response;
 	}
-	
+
 	public function enableSandBox($bool)
 	{
 		$this->url = Config::host . self::route;
-	
+
 		if ($bool) {
 			$this->url = Config::hostSandBox . self::route;
 		}
 	}
-	
+
 }
