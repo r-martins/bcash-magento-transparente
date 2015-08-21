@@ -2,7 +2,10 @@
 
 class Bcash_Pagamento_Model_Observer
 {
-	
+
+	/**
+	 * @param Varien_Event_Observer $observer
+     */
 	public function checkOrderState(Varien_Event_Observer $observer)
 	{
 
@@ -11,10 +14,9 @@ class Bcash_Pagamento_Model_Observer
 
 		Mage::log($origOrderData);
 
-		echo "<pre>";
+		echo '<pre>';
 		print_r($observer->getEvent());
-
-		die('desobserver');
+		echo '</pre>';
 		if (($origOrderData['state'] !== $newOrderData['state']) && 
 			($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED))
 		{

@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Class Bcash_Pagamento_Admin_Sales_OrderController
+ */
 class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Controller_Action
 {
 
+    /**
+     *
+     */
     public function canceltransactionAction()
     {        
         $orderId = $this->getRequest()->getParam('order_id');
@@ -14,9 +20,12 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
         }
     }
 
+    /**
+     *
+     */
     public function masscanceltransactionAction()
     {
-        $ordersIds = $this->getRequest()->getParam('orders_id');
+        $ordersIds = $this->getRequest()->getParam('order_ids');
 
         if(!is_array($ordersIds)) {
             //Mage::getSingleton('adminhtml/session')->addError(Mage::helper('order')->__('Please select order(s).'));
@@ -24,10 +33,11 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
         else {
             try {               
                 foreach ($ordersIds as $orderId) {
-                    $this->cancelBcashTransaction($orderId);
+                    //$this->cancelBcashTransaction($orderId);
+                    echo $orderId . " <hr/>";
                 }
                 Mage::getSingleton('adminhtml/session')->addSuccess(
-                    Mage::helper('order')->__(
+                    Mage::helper('adminhtml')->__(
                         'Total de %d pedido(s) cancelados com Bcash.', count($ordersIds)
                         )
                     );
@@ -37,8 +47,11 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
         }
 
         $this->_redirect('adminhtml/sales_order');
-    }	
+    }
 
+    /**
+     * @param $orderId
+     */
     private function cancelBcashTransaction($orderId) {
         $order = Mage::getModel('sales/order')->load($orderId);
 
@@ -57,6 +70,10 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
                     //$pagamentoOrderModel->cancellation($orderTransaction);
                 }
 
+                // TODO: Registrar informações no histórico do pedido
+
+
+                // TODO: 
                 // $order->cancel()
                 //     ->save();
                 // $this->_getSession()->addSuccess(
