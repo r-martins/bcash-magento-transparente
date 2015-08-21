@@ -268,7 +268,7 @@ $paymentGroupName = array(
             var iscard = checkIsCardSelected();
             if (iscard) {
                 if (v.length > 0) {
-                    return validarCardNumber();
+                    return validateCardNumber();
                 }
             }
             return true;
@@ -642,7 +642,7 @@ $paymentGroupName = array(
         });
 
 
-        function validarCardNumber() {
+        function validateCardNumber() {
 
             var RegExpHipercard = /^(3841\d{10}(\d{3})?)|(3841\d{15})$/;
             var RegExpElo = /^((((636368)|(438935)|(504175)|(451416)|(636297)|(509048)|(509067)|(509049)|(509069)|(509050)|(509074)|(509068)|(509040)|(509045)|(509051)|(509046)|(509066)|(509047)|(509042)|(509052)|(509043)|(509064)|(509040))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/;
