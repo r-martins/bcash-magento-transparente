@@ -5,7 +5,7 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
 
    protected $_addRowButtonHtml = array();
    protected $_removeRowButtonHtml = array();
- 
+
    /**
     * Returns html part of the setting
     *
@@ -15,11 +15,11 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
    {
        $this->setElement($element);
- 
+
        $html = '<div id="email_dependentes_template" style="display:none">';
        $html .= $this->_getRowTemplateHtml();
        $html .= '</div>';
- 
+
        $html .= '<ul id="email_dependentes_container" style="width:100%;">';
        if ($this->_getValue('dependente')) {
            foreach ($this->_getValue('dependente') as $i => $f) {
@@ -30,10 +30,10 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
        }
        $html .= '</ul>';
        $html .= $this->_getAddRowButtonHtml('email_dependentes_container', 'email_dependentes_template', $this->__('Adicionar nova Transação dependente'));
- 
+
        return $html;
    }
- 
+
    /**
     * Retrieve html template for setting
     *
@@ -43,7 +43,7 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
    protected function _getRowTemplateHtml($rowIndex = 0)
    {
        $html = '<li>';
- 
+
        $html .= '<div style="margin:5px 0 10px;width:100%;">';
        $html .= '<label style="width:80px;float: left;">Email:</label>'
            . '<input style="width:200px;" class="validate-email" name="' . $this->getElement()->getName() . '[dependente][]"'
@@ -55,25 +55,25 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
        $html .= $this->_getRemoveRowButtonHtml();
        $html .= '</div>';
        $html .= '</li>';
- 
+
        return $html;
    }
- 
+
    protected function _getDisabled()
    {
        return $this->getElement()->getDisabled() ? ' disabled' : '';
    }
- 
+
    protected function _getValue($key)
    {
        return $this->getElement()->getData('value/' . $key);
    }
- 
+
    protected function _getSelected($key, $value)
    {
        return $this->getElement()->getData('value/' . $key) == $value ? 'selected="selected"' : '';
    }
- 
+
    protected function _getAddRowButtonHtml($container, $template, $title='Add')
    {
        if (!isset($this->_addRowButtonHtml[$container])) {
@@ -88,7 +88,7 @@ class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_S
        }
        return $this->_addRowButtonHtml[$container];
    }
- 
+
    protected function _getRemoveRowButtonHtml($selector = 'li', $title = 'Delete')
    {
        if (!$this->_removeRowButtonHtml) {

@@ -37,7 +37,8 @@ $paymentGroupName = array(
                     <div class="b-row">
                         <div class="b-form-group b-col-xs-5">
                             <label>N&uacute;mero do cart&atilde;o</label>
-                            <input type="text" class="b-form-control validate-number-card" maxlength="20" value="" id="card_number_bcash"
+                            <input type="text" class="b-form-control validate-number-card" maxlength="20" value=""
+                                   id="card_number_bcash"
                                    name="card_number_bcash"
                                    autocomplete="off">
                         </div>
@@ -47,7 +48,8 @@ $paymentGroupName = array(
 
                             <div class="b-form-group">
                                 <div class="b-col-xs-6">
-                                    <select class="b-form-control validate-month-bcash" id="month_bcash" name="month_bcash">
+                                    <select class="b-form-control validate-month-bcash" id="month_bcash"
+                                            name="month_bcash">
                                         <option value=""></option>
                                         <?php
                                         for ($i = 1; $i < 13; $i++) :
@@ -60,7 +62,8 @@ $paymentGroupName = array(
                                     </select>
                                 </div>
                                 <div class="b-col-xs-6">
-                                    <select class="b-form-control validate-year-bcash" id="year_bcash" name="year_bcash">
+                                    <select class="b-form-control validate-year-bcash" id="year_bcash"
+                                            name="year_bcash">
                                         <option value=""></option>
                                         <?php
                                         $year = date("Y");
@@ -91,7 +94,8 @@ $paymentGroupName = array(
                             <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
 
                             <div class="b-col-xs-6">
-                                <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value="" name="cvv_bcash"
+                                <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value=""
+                                       name="cvv_bcash"
                                        id="cvv_bcash">
                             </div>
                         </div>
@@ -114,19 +118,23 @@ $paymentGroupName = array(
                     <div class="b-row">
                         <div class="b-form-group b-col-xs-4">
                             <label>CPF/CNPJ do titular</label>
-                            <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash" name="cpf_cnpj_bcash" value=""
+                            <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash"
+                                   name="cpf_cnpj_bcash" value=""
                                    maxlength="18" autocomplete="off">
                         </div>
 
                         <div class="b-form-group b-col-xs-6">
                             <label class="b-l-margin">Telefone do titular</label>
+
                             <div class="b-form-group">
                                 <div class="b-col-xs-4">
-                                    <input type="text" class="b-form-control validate-ddd" maxlength="2" value="" name="ddd_bcash"
+                                    <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
+                                           name="ddd_bcash"
                                            id="ddd_bcash">
                                 </div>
                                 <div class="b-col-xs-8">
-                                    <input type="text" class="b-form-control validate-phone" maxlength="9" value="" name="phone_bcash"
+                                    <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
+                                           name="phone_bcash"
                                            id="phone_bcash">
                                 </div>
                             </div>
@@ -150,21 +158,81 @@ $paymentGroupName = array(
     //<![CDATA[
     var requestUrl = '<?php echo Mage::getUrl('pagamento/payment/dados') ?>';
 
-    var initBcashPagamento = (function () {
+    function in_array(needle, haystack, argStrict) {
+        /*
+         //  discuss at: http://phpjs.org/functions/in_array/
+         // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+         // improved by: vlado houba
+         // improved by: Jonas Sciangula Street (Joni2Back)
+         //    input by: Billy
+         // bugfixed by: Brett Zamir (http://brett-zamir.me)
+         //   example 1: in_array('van', ['Kevin', 'van', 'Zonneveld']);
+         //   returns 1: true
+         //   example 2: in_array('vlado', {0: 'Kevin', vlado: 'van', 1: 'Zonneveld'});
+         //   returns 2: false
+         //   example 3: in_array(1, ['1', '2', '3']);
+         //   example 3: in_array(1, ['1', '2', '3'], false);
+         //   returns 3: true
+         //   returns 3: true
+         //   example 4: in_array(1, ['1', '2', '3'], true);
+         //   returns 4: false
+         */
+        var key = '',
+            strict = !!argStrict;
+        /*
+         //we prevent the double check (strict && arr[key] === ndl) || (!strict && arr[key] == ndl)
+         //in just one for, in order to improve the performance
+         //deciding wich type of comparation will do before walk array
+         */
+        if (strict) {
+            for (key in haystack) {
+                if (haystack[key] === needle) {
+                    return true;
+                }
+            }
+        } else {
+            for (key in haystack) {
+                if (haystack[key] == needle) {
+                    return true;
+                }
+            }
+        }
 
-        function checkIsCardSelected(){
+        return false;
+    }
+
+    /*Bandeiras*/
+    var visa = 1;
+    var master = 2;
+    var american_express = 37;
+    var aura = 45;
+    var dinners = 55;
+    var hipercard = 56;
+    var elo = 63;
+    var cards = [visa, master, american_express, aura, dinners, hipercard, elo];
+    var boleto = 10;
+    var banco_brasil = 58;
+    var banco_bradesco = 59;
+    var banco_itau = 60;
+    var banco_banrisul = 61;
+    var banco_hsbc = 62;
+    var tefs = [banco_brasil, banco_bradesco, banco_itau, banco_banrisul, banco_hsbc];
+
+    var initBcashPagamento = function () {
+
+        function checkIsCardSelected() {
             var ElementPaymentMethod = [];
             document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
-                if( element.checked ){
+                if (element.checked) {
                     ElementPaymentMethod = element;
                 }
             });
             var $isCard = isCard(ElementPaymentMethod);
-           // console.log($isCard);
+            // console.log($isCard);
             return $isCard;
         }
 
-        Validation.add('validate-cpf-cnpj', 'Documento inválido.', function(v) {
+        Validation.add('validate-cpf-cnpj', 'Documento inválido.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return isCpfCnpj(v);
@@ -172,7 +240,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-ddd', 'Preencha o ddd.', function(v) {
+        Validation.add('validate-ddd', 'Preencha o ddd.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length == 2;
@@ -180,7 +248,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-phone', 'Preencha o telefone.', function(v) {
+        Validation.add('validate-phone', 'Preencha o telefone.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length == 8 || v.length == 9;
@@ -188,7 +256,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-name-card', 'Preencha o nome do titular.', function(v) {
+        Validation.add('validate-name-card', 'Preencha o nome do titular.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -196,7 +264,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-number-card', 'Preencha o número do cartãor.', function(v) {
+        Validation.add('validate-number-card', 'Preencha o número do cartão.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -204,7 +272,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-ccv-card', 'Preencha o código de segurança.', function(v) {
+        Validation.add('validate-ccv-card', 'Preencha o código de segurança.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -212,7 +280,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-year-bcash', 'Preencha o ano de validade do cartão.', function(v) {
+        Validation.add('validate-year-bcash', 'Preencha o ano de validade do cartão.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -220,7 +288,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-month-bcash', 'Preencha o mês de vencimento do cartão.', function(v) {
+        Validation.add('validate-month-bcash', 'Preencha o mês de vencimento do cartão.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -250,8 +318,8 @@ $paymentGroupName = array(
                 enableCardForm();
 
                 new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'input=cartao&tipo='+ paymentRadio.value
+                    method: 'POST',
+                    parameters: 'input=cartao&tipo=' + paymentRadio.value
                 });
 
             } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
@@ -259,8 +327,8 @@ $paymentGroupName = array(
                 disableCardForm();
 
                 new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'input=boleto&tipo='+ paymentRadio.value
+                    method: 'POST',
+                    parameters: 'input=boleto&tipo=' + paymentRadio.value
                 });
             }
             disableUnunsed(paymentRadio);
@@ -284,7 +352,8 @@ $paymentGroupName = array(
             var paymentRadios = document.getElementsByClassName("payment-method-bcash");
             for (var i = paymentRadios.length - 1; i >= 0; i--) {
                 paymentRadios[i].disabled = true;
-            };
+            }
+            ;
             paymentRadio.disabled = false;
         }
 
@@ -327,7 +396,7 @@ $paymentGroupName = array(
             return valor;
         }
 
-        // Funcao de formatacao CNPJ
+        /* Funcao de formatacao CNPJ */
         function cnpj(valor) {
             /* Remove qualquer caracter digitado que não seja numero */
             valor = valor.replace(/\D/g, "");
@@ -346,8 +415,7 @@ $paymentGroupName = array(
             return !((key > 31 && (key < 48 || key > 57)) || key == 8 );
         }
 
-        function unformatNumber(pNum)
-        {
+        function unformatNumber(pNum) {
             return String(pNum).replace(/\D/g, "").replace(/^0+/, "");
         }
 
@@ -355,60 +423,60 @@ $paymentGroupName = array(
             var soma;
             var resto;
             var i;
-            if ( (cpf.length != 11) ||
+            if ((cpf.length != 11) ||
                 (cpf == "00000000000") || (cpf == "11111111111") ||
                 (cpf == "22222222222") || (cpf == "33333333333") ||
                 (cpf == "44444444444") || (cpf == "55555555555") ||
                 (cpf == "66666666666") || (cpf == "77777777777") ||
-                (cpf == "88888888888") || (cpf == "99999999999") ) {
+                (cpf == "88888888888") || (cpf == "99999999999")) {
                 return false;
             }
             soma = 0;
             for (i = 1; i <= 9; i++) {
-                soma += Math.floor(cpf.charAt(i-1)) * (11 - i);
+                soma += Math.floor(cpf.charAt(i - 1)) * (11 - i);
             }
             resto = 11 - (soma - (Math.floor(soma / 11) * 11));
-            if ( (resto == 10) || (resto == 11) ) {
+            if ((resto == 10) || (resto == 11)) {
                 resto = 0;
             }
-            if ( resto != Math.floor(cpf.charAt(9)) ) {
+            if (resto != Math.floor(cpf.charAt(9))) {
                 return false;
             }
             soma = 0;
-            for (i = 1; i<=10; i++) {
-                soma += cpf.charAt(i-1) * (12 - i);
+            for (i = 1; i <= 10; i++) {
+                soma += cpf.charAt(i - 1) * (12 - i);
             }
             resto = 11 - (soma - (Math.floor(soma / 11) * 11));
-            if ( (resto == 10) || (resto == 11) ) {
+            if ((resto == 10) || (resto == 11)) {
                 resto = 0;
             }
-            if (resto != Math.floor(cpf.charAt(10)) ) {
+            if (resto != Math.floor(cpf.charAt(10))) {
                 return false;
             }
             return true;
         }
 
-        function isCnpj(s){
+        function isCnpj(s) {
             var i;
-            var c = s.substr(0,12);
-            var dv = s.substr(12,2);
+            var c = s.substr(0, 12);
+            var dv = s.substr(12, 2);
             var d1 = 0;
-            for (i = 0; i < 12; i++){
-                d1 += c.charAt(11-i)*(2+(i % 8));
+            for (i = 0; i < 12; i++) {
+                d1 += c.charAt(11 - i) * (2 + (i % 8));
             }
             if (d1 == 0) return false;
             d1 = 11 - (d1 % 11);
             if (d1 > 9) d1 = 0;
-            if (dv.charAt(0) != d1){
+            if (dv.charAt(0) != d1) {
                 return false;
             }
             d1 *= 2;
-            for (i = 0; i < 12; i++){
-                d1 += c.charAt(11-i)*(2+((i+1) % 8));
+            for (i = 0; i < 12; i++) {
+                d1 += c.charAt(11 - i) * (2 + ((i + 1) % 8));
             }
             d1 = 11 - (d1 % 11);
             if (d1 > 9) d1 = 0;
-            if (dv.charAt(1) != d1){
+            if (dv.charAt(1) != d1) {
                 return false;
             }
             return true;
@@ -416,9 +484,9 @@ $paymentGroupName = array(
 
         function isCpfCnpj(valor) {
             var retorno = false;
-            var numero  = valor;
+            var numero = valor;
             numero = unformatNumber(numero);
-            if (numero.length > 11){
+            if (numero.length > 11) {
                 if (isCnpj(numero)) {
                     retorno = true;
                 }
@@ -430,7 +498,7 @@ $paymentGroupName = array(
             return retorno;
         }
 
-        function validateNumber(event){
+        function validateNumber(event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
                 return false;
@@ -438,146 +506,149 @@ $paymentGroupName = array(
         }
 
         /* Inicialização de comportamentos referentes ao checkout Bcash */
-        function init() {
+        /* function init() { */
 
-            var paymentsOptions = document.getElementsByClassName("bandeira");
-            for (var i = paymentsOptions.length - 1; i >= 0; i--) {
-                var paymentFlags = paymentsOptions[i];
-                paymentFlags.onclick = clickFlag;
+        var paymentsOptions = document.getElementsByClassName("bandeira");
+        for (var i = paymentsOptions.length - 1; i >= 0; i--) {
+            var paymentFlags = paymentsOptions[i];
+            paymentFlags.onclick = clickFlag;
+        }
+
+        document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
             }
+            mascaraCpfCnpj();
+        };
 
-            document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
-                var key = event.which || event.keyCode || event.charCode;
-                if (!onlyNumber(key)) {
-                    return false;
+        document.getElementById("cpf_cnpj_bcash").onblur = function (event) {
+            mascaraCpfCnpj();
+        };
+
+        document.getElementById("ddd_bcash").onkeypress = function (event) {
+            return validateNumber(event);
+        };
+
+        document.getElementById("phone_bcash").onkeypress = function (event) {
+            return validateNumber(event);
+        };
+
+        document.getElementById("card_number_bcash").onkeypress = function (event) {
+            return validateNumber(event);
+        };
+
+        /*  } */
+
+        /*  init();*/
+
+        /* var initBcashPagamentoAjax = function () { */
+
+        function getCardSelected() {
+            var ElementPaymentMethod = [];
+            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+                if (element.checked) {
+                    ElementPaymentMethod = element;
                 }
-                mascaraCpfCnpj();
-            };
+            });
+            var $isCard = isCard(ElementPaymentMethod);
+            // console.log($isCard);
+            return {'element': ElementPaymentMethod, 'isCard': $isCard};
+        }
 
-            document.getElementById("cpf_cnpj_bcash").onblur = function (event) {
-                mascaraCpfCnpj();
-            };
+        $('cpf_cnpj_bcash').observe('blur', function (e) {
+            var RegExp = /^[0-9]{11,14}$/;
+            var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
+            var valor = cpf_cnpj_bcash.value.replace(/\D/g, "");
+            if (RegExp.test(valor) == false && valor.length > 0) {
+                alert('Informe corretamente seu CPF/CNPJ ');
+                cpf_cnpj_bcash.value = '';
+            }
+            else if (valor.length > 0) {
+                var id = document.getElementById("cpf_cnpj_bcash").value;
+                new Ajax.Request(requestUrl, {
+                    method: 'POST',
+                    parameters: 'pid=' + id + '&input=cpf'
+                });
+            }
+        });
 
-            document.getElementById("ddd_bcash").onkeypress = function (event) {
-                return validateNumber(event);
-            };
+        $('card_number_bcash').observe('blur', function (e) {
+            var id = document.getElementById("card_number_bcash").value;
+            var $elem = getCardSelected();
+            var tipo = $elem.element.value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=cartao&tipo=' + tipo
+            });
+        });
 
-            document.getElementById("phone_bcash").onkeypress = function (event) {
-                return validateNumber(event);
-            };
+        $('name_card_bcash').observe('blur', function (e) {
+            var id = document.getElementById("name_card_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=name'
+            });
+        });
 
-            document.getElementById("card_number_bcash").onkeypress = function (event) {
-                return validateNumber(event);
-            };
+        $('month_bcash').observe('blur', function (e) {
+            var id = document.getElementById("month_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=mes'
+            });
+        });
+
+        $('year_bcash').observe('blur', function (e) {
+            var id = document.getElementById("year_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=ano'
+            });
+        });
+
+        $('installments_bcash').observe('blur', function (e) {
+            var id = document.getElementById("installments_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=parcelas'
+            });
+        });
+
+        $('cvv_bcash').observe('blur', function (e) {
+            var id = document.getElementById("cvv_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=cvv'
+            });
+        });
+
+        $('ddd_bcash').observe('blur', function (e) {
+            var id = document.getElementById("ddd_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=ddd'
+            });
+        });
+
+        $('phone_bcash').observe('blur', function (e) {
+            var id = document.getElementById("phone_bcash").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=telefone'
+            });
+        });
+
+
+        function validarCardNumber() {
+
 
         }
 
-        init();
 
-        var initBcashPagamentoAjax = function () {
-
-            function getCardSelected(){
-                var ElementPaymentMethod = [];
-                document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
-                    if( element.checked ){
-                        ElementPaymentMethod = element;
-                    }
-                });
-                var $isCard = isCard(ElementPaymentMethod);
-                // console.log($isCard);
-                return {'element': ElementPaymentMethod, 'isCard': $isCard};
-            }
-
-            $('cpf_cnpj_bcash').observe('blur', function(e) {
-                var RegExp = /^[0-9]{11,14}$/;
-                var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
-                var valor = cpf_cnpj_bcash.value.replace(/\D/g, "");
-                if (RegExp.test(valor) == false && valor.length > 0) {
-                    alert('Informe corretamente seu CPF/CNPJ ');
-                    cpf_cnpj_bcash.value='';
-                }
-                else if(valor.length > 0){
-                    var id = document.getElementById("cpf_cnpj_bcash").value;
-                    new Ajax.Request(requestUrl, {
-                        method : 'POST',
-                        parameters  : 'pid='+id+'&input=cpf'
-                    });
-                }
-            });
-
-            $('card_number_bcash').observe('blur', function(e) {
-                var id = document.getElementById("card_number_bcash").value;
-                var $elem = getCardSelected();
-                var tipo = $elem.element.value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=cartao&tipo='+tipo
-                });
-            });
-
-            $('name_card_bcash').observe('blur', function(e) {
-                var id = document.getElementById("name_card_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=name'
-                });
-            });
-
-            $('month_bcash').observe('blur', function(e) {
-                var id = document.getElementById("month_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=mes'
-                });
-            });
-
-            $('year_bcash').observe('blur', function(e) {
-                var id = document.getElementById("year_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=ano'
-                });
-            });
-
-            $('installments_bcash').observe('blur', function(e) {
-                var id = document.getElementById("installments_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=parcelas'
-                });
-            });
-
-            $('cvv_bcash').observe('blur', function(e) {
-                var id = document.getElementById("cvv_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=cvv'
-                });
-            });
-
-            $('ddd_bcash').observe('blur', function(e) {
-                var id = document.getElementById("ddd_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=ddd'
-                });
-            });
-
-            $('phone_bcash').observe('blur', function(e) {
-                var id = document.getElementById("phone_bcash").value;
-                new Ajax.Request(requestUrl, {
-                    method : 'POST',
-                    parameters  : 'pid='+id+'&input=telefone'
-                });
-            });
-
-        };
-
-        initBcashPagamentoAjax();
-
-
-    });
-
+        /*}*/
+        /* initBcashPagamentoAjax(); */
+    };
     initBcashPagamento();
     //]]>
 </script>
