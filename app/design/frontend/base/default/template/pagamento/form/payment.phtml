@@ -23,7 +23,7 @@ $paymentGroupName = array(
                         <li>
                             <input type="radio" class="payment-method-bcash validate-one-required-by-name"
                                    id="payment-method-<?php echo $payment->id ?>" name="payment-method"
-                                   value="<?php echo $payment->id ?>"/>
+                                   value="<?php echo $payment->id ?>" class/>
                             <label class="bandeira band-<?php echo $payment->id ?>"
                                    for="payment-method-<?php echo $payment->id ?>"></label>
                         </li>
@@ -264,7 +264,7 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-number-card', 'Preencha o número do cartão.', function (v) {
+        Validation.add('validate-number-card', 'Preencha o número do cartão corretamente.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 if (v.length > 0) {
@@ -332,6 +332,17 @@ $paymentGroupName = array(
                     method: 'POST',
                     parameters: 'input=boleto&tipo=' + paymentRadio.value
                 });
+            } else {
+                var option = paymentRadio.value;
+                var typePayment = 'boleto';
+                if (!in_array(option, cards)) {
+                    new Ajax.Request(requestUrl, {
+                        method: 'POST',
+                        parameters: 'input=' + typePayment + '&tipo=' + option
+                    });
+                } else {
+                    saveCardNumber();
+                }
             }
             disableUnunsed(paymentRadio);
         }
@@ -575,7 +586,7 @@ $paymentGroupName = array(
             }
         });
 
-        $('card_number_bcash').observe('blur', function (e) {
+        function saveCardNumber(){
             var id = document.getElementById("card_number_bcash").value;
             var $elem = getCardSelected();
             var tipo = $elem.element.value;
@@ -583,6 +594,10 @@ $paymentGroupName = array(
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=cartao&tipo=' + tipo
             });
+        }
+
+        $('card_number_bcash').observe('blur', function (e) {
+            saveCardNumber();
         });
 
         $('name_card_bcash').observe('blur', function (e) {
@@ -641,7 +656,6 @@ $paymentGroupName = array(
             });
         });
 
-
         function validateCardNumber() {
 
             var RegExpHipercard = /^(3841\d{10}(\d{3})?)|(3841\d{15})$/;
@@ -656,7 +670,7 @@ $paymentGroupName = array(
 
             if (paymentRadio.isCard) {
                 var codeCard = paymentRadio.element.value;
-                switch (codeCard) {
+                switch (parseInt(codeCard)) {
                     case visa:
                         RegexFinal = RegExpVisa;
                         break;
@@ -685,7 +699,7 @@ $paymentGroupName = array(
                     return false;
                 }
 
-                if (RegExp.test(cardNumber.value) == false) {
+                if (RegexFinal.test(cardNumber) == false) {
                     alert('cartão não corresponde a bandeira selecionada ou está incorreto');
                     cardNumber.value = '';
                     return false;
