@@ -1,35 +1,22 @@
 <?php
 
+/**
+ * Class Bcash_Pagamento_Model_Observer
+ */
 class Bcash_Pagamento_Model_Observer
 {
-	
-	public function checkOrderState(Varien_Event_Observer $observer)
-	{
+    /**
+     * Método para verificar alteração de status do pedido
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function checkOrderState(Varien_Event_Observer $observer)
+    {
+        $origOrderData = $observer->getEvent()->getData('data_object')->getOrigData();
+        $newOrderData = $observer->getEvent()->getData('data_object')->getData();
 
-		$origOrderData = $observer->getEvent()->getData('data_object')->getOrigData();
-		$newOrderData = $observer->getEvent()->getData('data_object')->getData();
-
-		Mage::log($origOrderData);
-
-		echo "<pre>";
-		print_r($observer->getEvent());
-
-		die('desobserver');
-		if (($origOrderData['state'] !== $newOrderData['state']) && 
-			($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED))
-		{
-        	// TODO: Código de transação do pedido
-        	//$orderTransaction = $newOrderData['some_attribute_value'];
-			$orderTransaction = "a32ad4asdf435asdf435435as76"; 
-
-			//Mage::log($observer->getEvent()->getPayment()->getMethodInstance()->getCode());	
-			//Mage::log($observer->getEvent()->getTransaction());
-			if(!is_null($orderTransaction) && !empty($orderTransaction))
-			{
-				//Mage::model();
-				//$pagamentoOrderModel = Mage::getModel('pagamento/order');
-				//$pagamentoOrderModel->cancellation($orderTransaction);
-			}
-		}          
-	}
+        if (($origOrderData['state'] !== $newOrderData['state']) && ($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED)) {
+            // TODO: Verificar se pedido possui transação Bcash e registrar em histórico
+        }
+    }
 }

@@ -88,16 +88,16 @@
 
     <adminhtml>
         <events>
-            <nothing_to_do_here_yet> 
+            <sales_order_save_commit_after>
                 <observers>
-                    <pagamento> 
+                    <sales_order_save_commit_after_handler>
                         <type>model</type> 
                         <class>pagamento/observer</class> 
-                        <method>checkOrderState</method> 
+                        <method>checkOrderState</method>
                         <args></args>
-                    </pagamento>
+                    </sales_order_save_commit_after_handler>
                 </observers>
-            </nothing_to_do_here_yet>
+            </sales_order_save_commit_after>
         </events>
     </adminhtml> 
 
