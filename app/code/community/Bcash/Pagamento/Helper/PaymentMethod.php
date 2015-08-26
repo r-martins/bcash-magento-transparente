@@ -34,7 +34,7 @@ class Bcash_Pagamento_Helper_PaymentMethod
 			$this->createPayment(62, 'HSBC', self::ONLINE_TRANSFER_TYPE, 0.01, 1)
 		);
 	}
-	
+
 	private function createPayment($id, $title, $type, $minimunValue, $maxInstallments) {
 		$payment = new stdClass();
 
@@ -42,9 +42,13 @@ class Bcash_Pagamento_Helper_PaymentMethod
 		$payment->title = $title;
 		$payment->type = $type;
 		$payment->minimunValue = $minimunValue;
-		$payment->maxInstallments = $maxInstallments; 
+		$payment->maxInstallments = $maxInstallments;
 		
 		return $payment;
+	}
+
+	public function makePaymentApi(){
+		die('makePaymentApi');
 	}
 
 	public function getPaymentMethods() {
