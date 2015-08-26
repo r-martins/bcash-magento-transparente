@@ -4,7 +4,7 @@ Módulo do Magento para a API Bcash
 
 ## Instalando pelo Magento Connect
 
-    * Download: [http://www.magentocommerce.com/magento-connect/magento-transparente.html](http://www.magentocommerce.com/magento-connect)
+   *Download:* [http://www.magentocommerce.com/magento-connect/magento-transparente.html](http://www.magentocommerce.com/magento-connect)
 
 ## Instalando manualmente
 
