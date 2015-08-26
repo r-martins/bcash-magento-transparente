@@ -7,6 +7,25 @@
     </modules>
 
     <global>
+        <fieldsets>
+            <sales_convert_quote_payment>
+                <bcash_transaction_id>
+                    <to_order_payment>*</to_order_payment>
+                </bcash_transaction_id>
+                <installments_bcash>
+                    <to_quote_payment>*</to_quote_payment>
+                </installments_bcash>
+            </sales_convert_quote_payment>
+            <sales_convert_order_payment>
+                <bcash_transaction_id>
+                    <to_quote_payment>*</to_quote_payment>
+                </bcash_transaction_id>
+                <installments_bcash>
+                    <to_quote_payment>*</to_quote_payment>
+                </installments_bcash>
+            </sales_convert_order_payment>
+        </fieldsets>
+
         <helpers>
             <pagamento>
                 <class>Bcash_Pagamento_Helper</class>
@@ -34,7 +53,25 @@
             <pagamento>
                 <class>Bcash_Pagamento_Model</class>
             </pagamento>
-        </models>                
+        </models>
+
+        <resources>
+            <pagamento_setup>
+                <setup>
+                    <module>Bcash_Pagamento</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </pagamento_setup>
+            <pagamento_write>
+                <use>core_write</use>
+            </pagamento_write>
+            <pagamento_read>
+                <use>core_read</use>
+            </pagamento_read>
+        </resources>
+
     </global>
     
     <admin>
@@ -67,8 +104,16 @@
     <default>
         <payment>
             <pagamento>
+                <order_status_approved>processing</order_status_approved>
+                <order_status_refunded>pending</order_status_refunded>
+                <order_status_in_process>pending</order_status_in_process>
+                <order_status_in_mediation>pending</order_status_in_mediation>
+                <order_status_rejected>pending</order_status_rejected>
+                <order_status_cancelled>pending</order_status_cancelled>
+                <order_status_chargeback>pending</order_status_chargeback>
                 <active>1</active>
                 <model>pagamento/paymentMethod</model>
+                <payment_action>order</payment_action>
                 <title>Bcash</title>
                 <allowspecific>0</allowspecific>
             </pagamento>
