@@ -98,12 +98,21 @@
                     </sales_order_save_commit_after_handler>
                 </observers>
             </sales_order_save_commit_after>
+            <checkout_type_onepage_save_order_after>
+                <observers>
+                    <bcash_pagamento_observer>
+                        <class>Bcash_Pagamento_Model_Observer</class>
+                        <method>saveOrderQuoteToSession</method>
+                    </bcash_pagamento_observer>
+                </observers>
+            </checkout_type_onepage_save_order_after>
         </events>
     </adminhtml> 
 
     <default>
         <payment>
             <pagamento>
+                <title>Bcash</title>
                 <order_status_approved>processing</order_status_approved>
                 <order_status_refunded>pending</order_status_refunded>
                 <order_status_in_process>pending</order_status_in_process>
@@ -113,8 +122,7 @@
                 <order_status_chargeback>pending</order_status_chargeback>
                 <active>1</active>
                 <model>pagamento/paymentMethod</model>
-                <payment_action>order</payment_action>
-                <title>Bcash</title>
+                <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
             </pagamento>
         </payment>

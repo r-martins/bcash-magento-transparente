@@ -35,22 +35,6 @@ class Bcash_Pagamento_Helper_PaymentMethod
 		);
 	}
 
-	private function createPayment($id, $title, $type, $minimunValue, $maxInstallments) {
-		$payment = new stdClass();
-
-		$payment->id = $id;
-		$payment->title = $title;
-		$payment->type = $type;
-		$payment->minimunValue = $minimunValue;
-		$payment->maxInstallments = $maxInstallments;
-		
-		return $payment;
-	}
-
-	public function makePaymentApi(){
-		die('makePaymentApi');
-	}
-
 	public function getPaymentMethods() {
 		return array(
 			self::CARD_TYPE => self::$cards,

@@ -47,4 +47,12 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
         return $response;
     }
+
+    public function setTransaction()
+    {
+        //Create Transaction with Bcash
+
+        die('setTransaction');
+
+    }
 }
