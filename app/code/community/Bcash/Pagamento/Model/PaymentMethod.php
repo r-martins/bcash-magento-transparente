@@ -36,6 +36,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     private $items;
     private $billingData;
     private $grandTotal;
+    private $subTotal;
     private $transactionRequest;
     private $quoteIdTransaction;
     private $dependents;
@@ -76,6 +77,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         Mage::log('Payment visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         $this->email = $this->getConfigData('email');
         $this->consumer_key = $this->getConfigData('consumer_key');
+        $this->dependents = $this->getConfigData('transacao_dependente');
         $this->sandbox = $this->getConfigData('sandbox');
         parent::initialize($paymentAction, $stateObject);
         //Payment is also used for refund and other backend functions.
@@ -115,12 +117,11 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         //If you need it, save it to the session yourself.
         $sessionCheckout->setData('QuoteId', $quoteId);
         $this->quote = Mage::getModel("sales/quote")->load($quoteId);
-        $grandTotal = floatval($this->quote->getData('grand_total'));
-        $subTotal = floatval($this->quote->getSubtotal());
-        $shippingHandling = floatval($grandTotal - $subTotal);
+        $this->grandTotal = floatval($this->quote->getData('grand_total'));
+        $this->subTotal = floatval($this->quote->getSubtotal());
+        $shippingHandling = floatval($this->grandTotal -$this->subTotal);
         //Set required items.
         $this->billingData = $this->quote->getBillingAddress()->getData();
-        $this->grandTotal = $grandTotal;
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
         //Retrieve items from the quote.
         $this->items = $this->quote->getItemsCollection()->getItems();
@@ -135,11 +136,13 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         try {
             $response = $payment->create($this->transactionRequest);
             //Tratar retorno
+
             $response['transactionId'];//224
             $response['orderId'];//000000700
             $response['status'];//1
             $response['descriptionStatus'];//Em+andamento
             $response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
+
         } catch (ValidationException $e) {
             Mage::throwException($e->getErrors());
         } catch (ConnectionException $e) {
@@ -164,15 +167,22 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
     public function createAddress()
     {
-        $address = $this->quote->getShippingAddress()->getData();
+        $address = $this->quote->getShippingAddress();
+
+        $street      = $address->getStreet(1);
+        $numero      = $address->getStreet(2);
+        $complemento = $address->getStreet(3);
+        $bairro      = $address->getStreet(4);
+
         $addressObj = new Address();
-        $addressObj->setAddress($address['street']);
-        $addressObj->setNumber('SN');
-        $addressObj->setComplement('');
-        $addressObj->setNeighborhood('');
-        $addressObj->setCity($address['city']);
-        $addressObj->setState($address['region']);
-        $addressObj->setZipCode($address['postcode']);
+        $addressObj->setAddress($street);
+        $addressObj->setNumber($numero ? $numero : 'SN');
+        $addressObj->setComplement($complemento);
+        $addressObj->setNeighborhood($bairro);
+        $addressObj->setCity($address->getCity());
+        $addressObj->setState($this->parseState($address->getRegion()));
+        $addressObj->setZipCode($address->getPostcode());
+
         return $addressObj;
     }
 
@@ -181,12 +191,12 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $customer_id = $this->quote->getCustomerId();
         $customer = Mage::getModel('customer/customer')->load($customer_id);
         $customerData = $customer->getData();
-        $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
+        $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
         $buyer = new Customer();
         $buyer->setMail($customerData['email']);
-        $name = $customerData['firstname'];
-        $name .= $customerData['middlename'] ? ' ' . $customerData['middlename'] : '';
-        $name .= $customerData['lastname'] ? ' ' . $customerData['lastname'] : '';
+        $name  = ($customerData['firstname']);
+        $name .= isset($customerData['middlename']) ? ' ' . $customerData['middlename'] : '';
+        $name .= isset($customerData['lastname'])   ? ' ' . $customerData['lastname']   : '';
         $buyer->setName($name);
         $buyer->setCpf($cpf_cnpj_bcash);
         $buyer->setPhone($this->completePhone());
@@ -279,12 +289,64 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     public function createDependentTransactions()
     {
         $deps = array();
-        foreach ($this->dependents as $dep) {
-            $dependent = new DependentTransaction();
-            $dependent->setEmail($dep['email']);
-            $dependent->setValue(floatval($dep['percentual']));
-            array_push($deps, $dependent);
+        $unserialezedDeps = unserialize($this->dependents);
+        foreach ($unserialezedDeps['dependente'] as $key => $obj ) {
+            if($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0 ) {
+                $dependent = new DependentTransaction();
+                $dependent->setEmail($obj);
+                $value = ( $this->subTotal / 100 ) * floatval($unserialezedDeps['percentual'][$key]);
+                $dependent->setValue(floatval($value));
+                array_push($deps, $dependent);
+            }
         }
         return $deps;
+    }
+
+
+    /**
+     * Replace language-specific characters by ASCII-equivalents.
+     * @see http://stackoverflow.com/a/16427125/529403
+     * @param string $s
+     * @return string
+     */
+    public static function normalizeChars($s) {
+        $replace = array(
+            'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ă'=>'A',
+            'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'ă'=>'a', 'æ'=>'ae',
+            'þ'=>'b', 'Þ'=>'B',
+            'Ç'=>'C', 'ç'=>'c',
+            'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
+            'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e',
+            'Ğ'=>'G', 'ğ'=>'g',
+            'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'İ'=>'I', 'ı'=>'i', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i',
+            'Ñ'=>'N',
+            'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'Oe', 'Ø'=>'O', 'ö'=>'oe', 'ø'=>'o',
+            'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
+            'Š'=>'S', 'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ß'=>'ss',
+            'ț'=>'t', 'Ț'=>'T',
+            'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'Ue',
+            'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'ue',
+            'Ý'=>'Y',
+            'ý'=>'y', 'ý'=>'y', 'ÿ'=>'y',
+            'Ž'=>'Z', 'ž'=>'z'
+        );
+        return strtr($s, $replace);
+    }
+
+
+    public function parseState($state)
+    {
+        if (strlen($state) == 2 && is_string($state)) {
+            return strtoupper($state);
+        } else if (strlen($state) > 2 && is_string($state)) {
+            $state = $this->normalizeChars($state);
+            $state = trim($state);
+            $state = strtoupper($state);
+            $codes = array("AC" => "ACRE", "AL" => "ALAGOAS", "AM" => "AMAZONAS", "AP" => "AMAPA", "BA" => "BAHIA", "CE" => "CEARA", "DF" => "DISTRITO FEDERAL", "ES" => "ESPIRITO SANTO", "GO" => "GOIAS", "MA" => "MARANHAO", "MT" => "MATO GROSSO", "MS" => "MATO GROSSO DO SUL", "MG" => "MINAS GERAIS", "PA" => "PARA", "PB" => "PARAIBA", "PR" => "PARANA", "PE" => "PERNAMBUCO", "PI" => "PIAUI", "RJ" => "RIO DE JANEIRO", "RN" => "RIO GRANDE DO NORTE", "RO" => "RONDONIA", "RS" => "RIO GRANDE DO SUL", "RR" => "RORAIMA", "SC" => "SANTA CATARINA", "SE" => "SERGIPE", "SP" => "SAO PAULO", "TO" => "TOCANTINS");
+            if ($code = array_search($state, $codes)) {
+                return $code;
+            }
+        }
+        return $state;
     }
 }
