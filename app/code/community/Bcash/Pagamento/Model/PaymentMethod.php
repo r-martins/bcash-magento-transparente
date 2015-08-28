@@ -137,16 +137,29 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $response = $payment->create($this->transactionRequest);
             //Tratar retorno
 
-            $response['transactionId'];//224
-            $response['orderId'];//000000700
-            $response['status'];//1
-            $response['descriptionStatus'];//Em+andamento
-            $response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
+            $responseTransaction = $response;
+            //$response['transactionId'];//224
+            //$response['orderId'];//000000700
+            //$response['status'];//1
+            //$response['descriptionStatus'];//Em+andamento
+            //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
 
         } catch (ValidationException $e) {
-            Mage::throwException($e->getErrors());
+            $errorsArr = $e->getErrors();
+            $errorsList = $errorsArr->list;
+            $messages  = array();
+            foreach($errorsList as $err){
+                $messages[] = $err['code'] . " - " . $err['description'];
+            }
+            Mage::throwException(implode("\n", $messages));
         } catch (ConnectionException $e) {
-            Mage::throwException($e->getErrors());
+            $errorsArr = $e->getErrors();
+            $errorsList = $errorsArr->list;
+            $messages  = array();
+            foreach($errorsList as $err){
+                $messages[] = $err['code'] . " - " . $err['description'];
+            }
+            Mage::throwException(implode("\n", $messages));
         }
 
         return $this;
