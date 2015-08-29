@@ -17,35 +17,92 @@ use Bcash\Service\Payment;
 use Bcash\Exception\ConnectionException;
 use Bcash\Exception\ValidationException;
 
+/**
+ * Class Bcash_Pagamento_Model_PaymentMethod
+ */
 class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 {
+    /**
+     * @var string
+     */
     protected $_code = 'pagamento';
+    /**
+     * @var bool
+     */
     protected $_isGateway = true;
+    /**
+     * @var bool
+     */
     protected $_canCapture = true;
+    /**
+     * @var bool
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var bool
+     */
     protected $_canOrder = true;
+    /**
+     * @var string
+     */
     protected $_formBlockType = 'pagamento/form_payment';
 
     //Flag executa o método initalize() com o checkout completo.
+    /**
+     * @var bool
+     */
     protected $_isInitializeNeeded = true;
 
     //Variaveis de Transação
+    /**
+     * @var
+     */
     private $email;
+    /**
+     * @var
+     */
     private $consumer_key;
+    /**
+     * @var
+     */
     private $sandbox;
+    /**
+     * @var
+     */
     private $items;
+    /**
+     * @var
+     */
     private $billingData;
+    /**
+     * @var
+     */
     private $grandTotal;
+    /**
+     * @var
+     */
     private $subTotal;
+    /**
+     * @var
+     */
     private $transactionRequest;
+    /**
+     * @var
+     */
     private $quoteIdTransaction;
+    /**
+     * @var
+     */
     private $dependents;
+    /**
+     * @var
+     */
     private $quote;
 
     /**
-     * Return URL to redirect the customer to.
-     * Called after 'place order' button is clicked.
-     * Called after order is created and saved.
+     * Retornar URL para redirecionar o cliente.
+     * Chamado depois que o botão é clicado.
+     * Chamado após a criação e registro do pedido "Order".
      * @return string
      */
     public function getOrderPlaceRedirectUrl()
@@ -62,9 +119,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
     /**
      *
-     * <payment_action>Sale</payment_action>
-     * Initialize payment method. Called when purchase is complete.
-     * Order is created after this method is called.
+     * <payment_action>sale</payment_action>
+     * Inicializa o método de pagamento. Chamado quando a compra é completa.
+     * Objeto "Order" será criado após a chamada deste método.
      *
      * @param string $paymentAction
      * @param Varien_Object $stateObject
@@ -80,17 +137,13 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $this->dependents = $this->getConfigData('transacao_dependente');
         $this->sandbox = $this->getConfigData('sandbox');
         parent::initialize($paymentAction, $stateObject);
-        //Payment is also used for refund and other backend functions.
-        //Verify this is a sale before continuing.
         if ($paymentAction != 'sale') {
             return $this;
         }
-        //Set the default state of the new order.
         $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT; // state now = 'pending_payment'
         $stateObject->setState($state);
         $stateObject->setStatus('pending_payment');
         $stateObject->setIsNotified(false);
-        //Extract order details and send to mockpay api. Get api token and save it to checkout/session.
         try {
             $this->_customBeginPayment();
         } catch (Exception $e) {
@@ -101,8 +154,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     }
 
     /**
-     *
-     * Extract cart/quote details and send to api.
+     * Inicializa a transação atual via SDK Api Bcash.
      * Respond with token
      * @throws SoapFault
      * @throws Mage_Exception
@@ -110,20 +162,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     protected function _customBeginPayment()
     {
-        //Retrieve cart/quote information.
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
-        //The quoteId will be removed from the session once the order is placed.
-        //If you need it, save it to the session yourself.
         $sessionCheckout->setData('QuoteId', $quoteId);
         $this->quote = Mage::getModel("sales/quote")->load($quoteId);
         $this->grandTotal = floatval($this->quote->getData('grand_total'));
         $this->subTotal = floatval($this->quote->getSubtotal());
         $shippingHandling = floatval($this->grandTotal -$this->subTotal);
-        //Set required items.
         $this->billingData = $this->quote->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
-        //Retrieve items from the quote.
         $this->items = $this->quote->getItemsCollection()->getItems();
         $this->transactionRequest = $this->createTransactionRequest();
         $this->setShipping();
@@ -132,23 +179,20 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         if ($this->sandbox) {
             $payment->enableSandBox(true);
         }
-
         try {
             $response = $payment->create($this->transactionRequest);
-            //Tratar retorno
-
+            //TODO: Tratar retorno
             $responseTransaction = $response;
             //$response['transactionId'];//224
             //$response['orderId'];//000000700
             //$response['status'];//1
             //$response['descriptionStatus'];//Em+andamento
             //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
-
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = array();
-            foreach($errorsList as $err){
+            foreach ($errorsList as $err) {
                 $messages[] = $err['code'] . " - " . $err['description'];
             }
             Mage::throwException(implode("\n", $messages));
@@ -156,15 +200,17 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = array();
-            foreach($errorsList as $err){
+            foreach ($errorsList as $err) {
                 $messages[] = $err['code'] . " - " . $err['description'];
             }
             Mage::throwException(implode("\n", $messages));
         }
-
         return $this;
     }
 
+    /**
+     * Adiciona o método de pagamento a transação atual.
+     */
     public function setPaymentMethod()
     {
         $cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
@@ -178,15 +224,17 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     }
 
 
+    /**
+     * Adiciona o endereço a transação atual.
+     * @return Address
+     */
     public function createAddress()
     {
         $address = $this->quote->getShippingAddress();
-
         $street      = $address->getStreet(1);
         $numero      = $address->getStreet(2);
         $complemento = $address->getStreet(3);
         $bairro      = $address->getStreet(4);
-
         $addressObj = new Address();
         $addressObj->setAddress($street);
         $addressObj->setNumber($numero ? $numero : 'SN');
@@ -195,10 +243,13 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $addressObj->setCity($address->getCity());
         $addressObj->setState($this->parseState($address->getRegion()));
         $addressObj->setZipCode($address->getPostcode());
-
         return $addressObj;
     }
 
+    /**
+     * Adiciona o comprador a transação atual
+     * @return Customer
+     */
     public function createBuyer()
     {
         $customer_id = $this->quote->getCustomerId();
@@ -217,22 +268,40 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return $buyer;
     }
 
+    /**
+     * Adiciona o telefone a transação atual.
+     * @return string
+     */
     public function completePhone()
     {
         $address  = $this->quote->getBillingAddress()->getData();
         $ddd_bcash = Mage::app()->getRequest()->getPost('ddd_bcash');
         $phone_bcash = Mage::app()->getRequest()->getPost('phone_bcash');
-        $full_phone = $ddd_bcash . $phone_bcash;
-        if (!$ddd_bcash) {
-            $length = strlen($address['telephone']);
-            if ($length > 11) {
-                $address['telephone'] = substr($address['telephone'], -11);
-            }
-            $full_phone = $address['telephone'];
+        $full_phone = "";
+        if (!$address['telephone'] && $ddd_bcash && $full_phone) {
+            $full_phone = $ddd_bcash . $full_phone;
         }
-        return $full_phone;
+        return $this->parsePhone($full_phone);
     }
 
+    /**
+     * Retorna somente 11 dígitos do telefone.
+     * @param $phone
+     * @return string
+     */
+    public function parsePhone($phone)
+    {
+        $phone = preg_replace('/[^0-9]+/', '', $phone);
+        if (strlen($phone) > 11) {
+            return substr($phone, -11);
+        }
+        return $phone;
+    }
+
+    /**
+     * Adiciona os produtos do carrinho de compras a transação atual.
+     * @return array
+     */
     public function createProduct()
     {
         $products = array();
@@ -251,6 +320,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return $products;
     }
 
+    /**
+     * Cria o objeto Transaction via SDK Api Bcash.
+     * @return TransactionRequest
+     */
     public function createTransactionRequest()
     {
         $url = Mage::getUrl('pagamento/notification/request');
@@ -266,6 +339,11 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return $transactionRequest;
     }
 
+    /**
+     * Adiciona valor adicional e/ou desconto a transação atual.
+     * @param null $addition
+     * @param null $discount
+     */
     public function setAdditionAndDiscont($addition = null, $discount = null)
     {
         if ($addition) {
@@ -276,6 +354,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         }
     }
 
+    /**
+     * Adiciona o tipo de Frete e valor definido para o mesmo a transação atual.
+     * @return void
+     */
     public function setShipping()
     {
         $shipping = $this->quote->getShippingAddress()->getData();
@@ -283,6 +365,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $this->transactionRequest->setShippingType($shipping['shipping_description']);
     }
 
+    /**
+     * Adiciona o cartão de crédito a transação atual quando solicitado a transação atual.
+     * @return CreditCard
+     */
     public function createCreditCard()
     {
         $card_number_bcash = Mage::app()->getRequest()->getPost('card_number_bcash');
@@ -299,15 +385,19 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return $creditCard;
     }
 
+    /**
+     * Adiciona as transações dependentes a transação atual.
+     * @return array
+     */
     public function createDependentTransactions()
     {
         $deps = array();
         $unserialezedDeps = unserialize($this->dependents);
-        foreach ($unserialezedDeps['dependente'] as $key => $obj ) {
-            if($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0 ) {
+        foreach ($unserialezedDeps['dependente'] as $key => $obj) {
+            if ($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0) {
                 $dependent = new DependentTransaction();
                 $dependent->setEmail($obj);
-                $value = ( $this->subTotal / 100 ) * floatval($unserialezedDeps['percentual'][$key]);
+                $value = ($this->subTotal / 100) * floatval($unserialezedDeps['percentual'][$key]);
                 $dependent->setValue(floatval($value));
                 array_push($deps, $dependent);
             }
@@ -315,14 +405,14 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return $deps;
     }
 
-
     /**
-     * Replace language-specific characters by ASCII-equivalents.
+     * Substitui os caracteres especificos da linguagem por caracteres ASCII equivalentes.
      * @see http://stackoverflow.com/a/16427125/529403
      * @param string $s
      * @return string
      */
-    public static function normalizeChars($s) {
+    public static function normalizeChars($s)
+    {
         $replace = array(
             'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ă'=>'A',
             'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'ă'=>'a', 'æ'=>'ae',
@@ -346,12 +436,16 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         return strtr($s, $replace);
     }
 
-
+    /**
+     * Realiza a identificação do Estado preenchido pelo usuário.
+     * @param $state
+     * @return mixed|string
+     */
     public function parseState($state)
     {
         if (strlen($state) == 2 && is_string($state)) {
             return strtoupper($state);
-        } else if (strlen($state) > 2 && is_string($state)) {
+        } elseif (strlen($state) > 2 && is_string($state)) {
             $state = $this->normalizeChars($state);
             $state = trim($state);
             $state = strtoupper($state);

@@ -14,12 +14,10 @@ class Bcash_Pagamento_Model_Observer
     {
         $origOrderData = $observer->getEvent()->getData('data_object')->getOrigData();
         $newOrderData = $observer->getEvent()->getData('data_object')->getData();
-
         if (($origOrderData['state'] !== $newOrderData['state']) && ($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED)) {
             // TODO: Verificar se pedido possui transação Bcash e registrar em histórico
         }
     }
-
 
     /**
      * See etc/config.xml
@@ -33,7 +31,6 @@ class Bcash_Pagamento_Model_Observer
         $order = $event->getOrder();
         /* @var $quote Mage_Sales_Model_Quote */
         $quote = $event->getQuote();
-
         $session = Mage::getSingleton('checkout/session');
         $quoteId = $quote->getId();
         $orderId = $order->getId();
@@ -42,12 +39,10 @@ class Bcash_Pagamento_Model_Observer
         $session->setData('OrderId',$orderId);
         $session->setData('OrderIncrementId',$incrId);
         $session->setData('QuoteId',$quoteId);
-
         unset($event);
         unset($order);
         unset($quote);
         unset($session);
-
         return $this;
     }
 }
