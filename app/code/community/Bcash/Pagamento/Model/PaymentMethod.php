@@ -98,6 +98,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * @var
      */
     private $quote;
+    /**
+     * @var
+     */
+    private $discount;
 
     /**
      * Retornar URL para redirecionar o cliente.
@@ -209,6 +213,25 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     }
 
     /**
+     * Cria o objeto TransactionRequest via SDK Api Bcash.
+     * @return TransactionRequest
+     */
+    public function createTransactionRequest()
+    {
+        $url = Mage::getUrl('pagamento/notification/request');
+        $transactionRequest = new TransactionRequest();
+        $transactionRequest->setSellerMail($this->email);
+        $transactionRequest->setOrderId($this->quoteIdTransaction);
+        $transactionRequest->setBuyer($this->createBuyer());
+        $transactionRequest->setUrlNotification($url);
+        $transactionRequest->setProducts($this->createProduct());
+        $transactionRequest->setAcceptedContract("S");
+        $transactionRequest->setViewedContract("S");
+        $transactionRequest->setDependentTransactions($this->createDependentTransactions());
+        return $transactionRequest;
+    }
+
+    /**
      * Adiciona o método de pagamento a transação atual.
      */
     public function setPaymentMethod()
@@ -217,12 +240,28 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $boleto = PaymentMethodEnum::BANK_SLIP;
         $tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
         $payment_method = Mage::app()->getRequest()->getPost('payment-method');
+        $installments = Mage::app()->getRequest()->getPost('installments_bcash');
         $this->transactionRequest->setPaymentMethod($payment_method);
         if (in_array($payment_method, $cards)) {
             $this->transactionRequest->setCreditCard($this->createCreditCard());
+            $this->transactionRequest->setInstallments($installments);
+        }
+        if ($installments == 1) {
+            $discount = 0;
+            if (in_array($payment_method, $cards)) {
+                $percent = $this->getConfigData('desconto_credito_1x');
+            } elseif (in_array($payment_method, $tefs)) {
+                $percent = $this->getConfigData('desconto_tef');
+            } else {
+                $percent = $this->getConfigData('desconto_boleto');
+            }
+            if ($percent) {
+                $discount = floatval(($this->subTotal / 100) * $percent);
+                $this->setDiscount($discount);
+                //TODO: Adicionar Desconto ao Pedido do Magento.
+            }
         }
     }
-
 
     /**
      * Adiciona o endereço a transação atual.
@@ -321,37 +360,24 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     }
 
     /**
-     * Cria o objeto Transaction via SDK Api Bcash.
-     * @return TransactionRequest
-     */
-    public function createTransactionRequest()
-    {
-        $url = Mage::getUrl('pagamento/notification/request');
-        $transactionRequest = new Bcash\Domain\TransactionRequest();
-        $transactionRequest->setSellerMail($this->email);
-        $transactionRequest->setOrderId($this->quoteIdTransaction);
-        $transactionRequest->setBuyer($this->createBuyer());
-        $transactionRequest->setUrlNotification($url);
-        $transactionRequest->setProducts($this->createProduct());
-        $transactionRequest->setAcceptedContract("S");
-        $transactionRequest->setViewedContract("S");
-        $transactionRequest->setDependentTransactions($this->createDependentTransactions());
-        return $transactionRequest;
-    }
-
-    /**
-     * Adiciona valor adicional e/ou desconto a transação atual.
+     * Adiciona valor adicional a transação atual.
      * @param null $addition
      * @param null $discount
      */
-    public function setAdditionAndDiscont($addition = null, $discount = null)
+    public function setAddition($addition = 0)
     {
-        if ($addition) {
-            $this->transactionRequest->setAddition($addition);
-        }
-        if ($discount) {
-            $this->transactionRequest->setDiscount($discount);
-        }
+        $this->transactionRequest->setAddition($addition);
+    }
+
+    /**
+     * Adiciona valor de desconto a transação atual caso o mesmo esteja definido no módulo.
+     * @param null $addition
+     * @param null $discount
+     */
+    public function setDiscount($discount)
+    {
+        $this->discount = $discount;
+        $this->transactionRequest->setDiscount($discount);
     }
 
     /**
