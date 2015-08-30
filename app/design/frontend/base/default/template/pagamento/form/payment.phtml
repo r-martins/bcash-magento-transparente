@@ -6,6 +6,7 @@
 <?php
 $code = $this->getCode();
 $paymentMethods = $this->getPaymentMethods();
+$paymentInstallments = $this->getInstallments();
 $size = count($paymentMethods);
 $paymentGroupName = array(
     'CARD' => "Cartão de cr&eacute;dito",
@@ -106,9 +107,12 @@ $paymentGroupName = array(
                         <div class="b-form-group b-col-xs-7">
                             <label>Parcelas</label>
                             <select class="b-form-control" name="installments_bcash" id="installments_bcash">
-                                <option value="1">1x - R$ 1,00</option>
-                                <option value="2">2x - R$ 1,00</option>
-                                <option value="3">3x - R$ 1,00</option>
+                                <?php
+                                $installments = $paymentInstallments["installments"];
+                                foreach ($installments as $times => $value) :
+                                ?>
+                                <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
