@@ -79,6 +79,7 @@
                             <tooltip>Adicione a comissão por transação dependente via Bcash, são válidos até 6 emails.</tooltip>
                             <frontend_model>pagamento/adminhtml_dependentes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized</backend_model>
+                            <comment><![CDATA[Acesse seu painel no bcash.com.br e vá até "Ferramentas > Transação Dependente", o limite definido aqui não deve ultrapassar o valor definido no painel.]]></comment>
                             <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>

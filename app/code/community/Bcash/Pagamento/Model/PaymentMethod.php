@@ -148,6 +148,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $stateObject->setState($state);
         $stateObject->setStatus('pending_payment');
         $stateObject->setIsNotified(false);
+
         try {
             $this->_customBeginPayment();
         } catch (Exception $e) {
@@ -192,6 +193,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             //$response['status'];//1
             //$response['descriptionStatus'];//Em+andamento
             //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
+
+            ///* @var $order Mage_Sales_Model_Order */
+            //$comment = 'blah blah';
+            //$order->addStatusHistoryComment($comment);
+            //$order->save();
+
+            //TODO: $stateObject IF Approved (CARTAO E TEF) outros aprovam depois
+
+
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
@@ -241,13 +251,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
         $payment_method = Mage::app()->getRequest()->getPost('payment-method');
         $installments = Mage::app()->getRequest()->getPost('installments_bcash');
+        $installments = $installments ?:1;
+
         $this->transactionRequest->setPaymentMethod($payment_method);
         if (in_array($payment_method, $cards)) {
             $this->transactionRequest->setCreditCard($this->createCreditCard());
             $this->transactionRequest->setInstallments($installments);
         }
+
         if ($installments == 1) {
-            $discount = 0;
             if (in_array($payment_method, $cards)) {
                 $percent = $this->getConfigData('desconto_credito_1x');
             } elseif (in_array($payment_method, $tefs)) {
@@ -259,6 +271,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 $discount = floatval(($this->subTotal / 100) * $percent);
                 $this->setDiscount($discount);
                 //TODO: Adicionar Desconto ao Pedido do Magento.
+
             }
         }
     }

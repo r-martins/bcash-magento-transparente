@@ -108,11 +108,33 @@ $paymentGroupName = array(
                             <label>Parcelas</label>
                             <select class="b-form-control" name="installments_bcash" id="installments_bcash">
                                 <?php
+                                $okInstallments = $paymentInstallments['ok'];
                                 $installments = $paymentInstallments["installments"];
-                                foreach ($installments as $times => $value) :
+                                if (!$okInstallments) :
+                                    foreach ($installments as $times => $value) :
                                 ?>
-                                <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
-                                <?php endforeach; ?>
+                                    <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
+                                <?php
+                                    endforeach;
+                                ?>
+                                <?php
+                                else :
+                                    $installments = $paymentInstallments["installments"][0]->paymentTypes;
+                                    foreach ($installments as $type) :
+                                        foreach ($type->paymentMethods as $typePayment) :
+                                            foreach ($typePayment->installments as $paymentInstallment) :
+                                            ?>
+                                            <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
+                                                <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?><?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
+                                            </option>
+                                            <?php
+                                            endforeach;
+                                        endforeach;
+                                    endforeach;
+                                    ?>
+                                <?php
+                                endif;
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -200,6 +222,28 @@ $paymentGroupName = array(
     var tefs = [banco_brasil, banco_bradesco, banco_itau, banco_banrisul, banco_hsbc];
 
     var initBcashPagamento = function () {
+
+        function showInstallmentsOnlyForMethod(method)
+        {
+            if (in_array(method, cards)) {
+                var select_id = 'installments_bcash';
+                var select =  document.getElementById(select_id);
+                var optionsNot = select.querySelectorAll("option");
+                for (var j in optionsNot)
+                {
+                    if (parseInt(j) || i == 0) {
+                        optionsNot[j].style.display="none";
+                    }
+                }
+                var options = select.querySelectorAll("option[data-type='" + method +"']");
+                for (var i in options)
+                {
+                    if (parseInt(i) || i == 0) {
+                        options[i].style.display="block";
+                    }
+                }
+            }
+        }
 
         function checkIsCardSelected() {
             var ElementPaymentMethod = [];
@@ -325,6 +369,7 @@ $paymentGroupName = array(
                 }
             }
             disableUnunsed(paymentRadio);
+            showInstallmentsOnlyForMethod(paymentRadio.value);
         }
 
         function enableCardForm() {

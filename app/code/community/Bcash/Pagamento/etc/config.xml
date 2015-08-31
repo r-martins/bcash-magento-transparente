@@ -70,8 +70,22 @@
             <pagamento_read>
                 <use>core_read</use>
             </pagamento_read>
+            <pagamento_setup>
+                    <setup>
+                        <module>Bcash_Pagamento</module>
+                        <!--
+                          Points to
+                          app/code/community/Bcash/Pagamento/sql/pagamento_setup/mysql4-install-0.0.1.php
+                          Sets mysql4-install-0.1.0.php to be a class of type Mage_Sales_Model_Mysql4_Setup
+                          Passes 'core_setup' as a connection 'type' :)
+                        -->
+                        <class>Mage_Sales_Model_Mysql4_Setup</class>
+                    </setup>
+                    <connection>
+                        <use>core_setup</use>
+                    </connection>
+            </pagamento_setup>
         </resources>
-
     </global>
     
     <admin>
