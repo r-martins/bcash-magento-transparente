@@ -34,42 +34,44 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     /**
      * @var string
      */
-    //protected $_formBlockType = 'pagamento/form_payment';
+    protected $_formBlockType = 'pagamento/form_payment';
 
     //Flag executa o método initalize() com o checkout completo.
     /**
      * @var bool
      */
-    protected $_isInitializeNeeded = true;
+     protected $_isInitializeNeeded = true;
+
+
     //Variaveis de Transação
     /**
      * @var
      */
-    private $email;
+    private $emailBcash;
     /**
      * @var
      */
-    private $consumer_key;
+    private $consumer_keyBcash;
     /**
      * @var
      */
-    private $sandbox;
+    private $sandboxBcash;
     /**
      * @var
      */
-    private $items;
+    private $itemsBcash;
     /**
      * @var
      */
-    private $billingData;
+    private $billingDataBcash;
     /**
      * @var
      */
-    private $grandTotal;
+    private $grandTotalBcash;
     /**
      * @var
      */
-    private $subTotal;
+    private $subTotalBcash;
     /**
      * @var
      */
@@ -81,7 +83,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     /**
      * @var
      */
-    private $dependents;
+    private $dependentsBcash;
     /**
      * @var
      */
@@ -124,10 +126,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     {
         Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
         Mage::log('Payment visitor: ' . Mage::helper('core/http')->getRemoteAddr());
-        $this->email = $this->getConfigData('email');
-        $this->consumer_key = $this->getConfigData('consumer_key');
-        $this->dependents = $this->getConfigData('transacao_dependente');
-        $this->sandbox = $this->getConfigData('sandbox');
+        $this->emailBcash = $this->getConfigData('email');
+        $this->consumer_keyBcash = $this->getConfigData('consumer_key');
+        $this->dependentsBcash = $this->getConfigData('transacao_dependente');
+        $this->sandboxBcash = $this->getConfigData('sandbox');
 
         parent::initialize($paymentAction, $stateObject);
 
@@ -163,17 +165,17 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $quoteId = $sessionCheckout->getQuoteId();
         $sessionCheckout->setData('QuoteId', $quoteId);
         $this->quoteBcash = Mage::getModel("sales/quote")->load($quoteId);
-        $this->grandTotal = floatval($this->quoteBcash->getData('grand_total'));
-        $this->subTotal = floatval($this->quoteBcash->getSubtotal());
-        $shippingHandling = floatval($this->grandTotal -$this->subTotal);
-        $this->billingData = $this->quoteBcash->getBillingAddress()->getData();
+        $this->grandTotalBcash = floatval($this->quoteBcash->getData('grand_total'));
+        $this->subTotalBcash = floatval($this->quoteBcash->getSubtotal());
+        $shippingHandling = floatval($this->grandTotalBcash -$this->subTotalBcash);
+        $this->billingDataBcash = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
-        $this->items = $this->quoteBcash->getItemsCollection()->getItems();
+        $this->itemsBcash = $this->quoteBcash->getItemsCollection()->getItems();
         $this->transactionRequest = $this->createTransactionRequestBcash();
         $this->setShippingBcash();
         $this->setPaymentMethodBcash();
-        $payment = new Payment($this->consumer_key);
-        if ($this->sandbox) {
+        $payment = new Payment($this->consumer_keyBcash);
+        if ($this->sandboxBcash) {
             $payment->enableSandBox(true);
         }
         try {
@@ -195,7 +197,6 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
             //TODO: Alterar o estado do Pedido
             return array();
-
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
@@ -223,7 +224,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     {
         $url = Mage::getUrl('pagamento/notification/request');
         $transactionRequest = new TransactionRequest();
-        $transactionRequest->setSellerMail($this->email);
+        $transactionRequest->setSellerMail($this->emailBcash);
         $transactionRequest->setOrderId($this->quoteIdTransaction);
         $transactionRequest->setBuyer($this->createBuyerBcash());
         $transactionRequest->setUrlNotification($url);
@@ -261,10 +262,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 $percent = $this->getConfigData('desconto_boleto');
             }
             if ($percent) {
-                $discount = floatval(($this->subTotal / 100) * $percent);
+                $discount = floatval(($this->subTotalBcash / 100) * $percent);
                 $this->setDiscount($discount);
                 //TODO: Adicionar Desconto ao Pedido do Magento.
-
             }
         }
     }
@@ -350,9 +350,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     public function createProductBcash()
     {
         $products = array();
-        foreach ($this->items as $item) {
+        foreach ($this->itemsBcash as $item) {
             $price = $item->getPrice();
-            if($price > 0){
+            if ($price > 0) {
                 $product = new Product();
                 $cod = $item->getSku() ? $item->getSku() : $item->getId();
                 $product->setCode($cod);
@@ -426,13 +426,13 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     public function createDependentTransactionsBcash()
     {
         $deps = array();
-        $unserialezedDeps = unserialize($this->dependents);
+        $unserialezedDeps = unserialize($this->dependentsBcash);
         foreach ($unserialezedDeps['dependente'] as $key => $obj) {
             if ($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0) {
                 $dependent = new DependentTransaction();
                 $dependent->setEmail($obj);
-                $value = ($this->subTotal / 100) * floatval($unserialezedDeps['percentual'][$key]);
-                $dependent->setValue(floatval(number_format($value,2,'.','')));
+                $value = ($this->subTotalBcash / 100) * floatval($unserialezedDeps['percentual'][$key]);
+                $dependent->setValue(floatval(number_format($value, 2, '.', '')));
                 array_push($deps, $dependent);
             }
         }
