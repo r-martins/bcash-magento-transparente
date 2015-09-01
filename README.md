@@ -15,4 +15,4 @@ Módulo do Magento para a API Bcash
 
 ## Configuração e utilização do módulo na loja
 
-    *Acesse:* [Manual do usuário](http://bcash.com.br/para-quem-vende/)
+   *Acesse:* [Manual do usuário](http://bcash.com.br/para-quem-vende)
