@@ -163,11 +163,11 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     {
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
-        $sessionCheckout->setData('QuoteId', $quoteId);
+        //$sessionCheckout->setData('QuoteId', $quoteId);
         $this->quoteBcash = Mage::getModel("sales/quote")->load($quoteId);
         $this->grandTotalBcash = floatval($this->quoteBcash->getData('grand_total'));
         $this->subTotalBcash = floatval($this->quoteBcash->getSubtotal());
-        $shippingHandling = floatval($this->grandTotalBcash -$this->subTotalBcash);
+        //$shippingHandling = floatval($this->grandTotalBcash -$this->subTotalBcash);
         $this->billingDataBcash = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
         $this->itemsBcash = $this->quoteBcash->getItemsCollection()->getItems();
