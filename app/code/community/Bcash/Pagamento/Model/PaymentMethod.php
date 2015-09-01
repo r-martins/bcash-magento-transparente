@@ -286,7 +286,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $addressObj->setComplement($complemento);
         $addressObj->setNeighborhood($bairro);
         $addressObj->setCity($address->getCity());
-        $addressObj->setState($this->parseState($address->getRegion()));
+        $addressObj->setState($this->parseRegionBcash($address->getRegion()));
         $addressObj->setZipCode($address->getPostcode());
         return $addressObj;
     }
