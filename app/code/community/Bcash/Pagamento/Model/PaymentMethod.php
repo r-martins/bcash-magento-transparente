@@ -97,11 +97,11 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     /**
      * @var
      */
-    private $quote;
+    private $quoteBcash;
     /**
      * @var
      */
-    private $discount;
+    private $discountBcash;
 
     /**
      * Retornar URL para redirecionar o cliente.
@@ -116,9 +116,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
          * it makes debugging problems with your api much easier.
          * The file is in magento-root/var/log/system.log
          */
-        mage::log('Called custom ' . __METHOD__);
-        $url = $this->getConfigData('redirecturl');
-        return $url;
+       //mage::log('Called custom ' . __METHOD__);
+       //$url = $this->getConfigData('redirecturl');
+       //return $url;
     }
 
     /**
@@ -170,13 +170,13 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
         $sessionCheckout->setData('QuoteId', $quoteId);
-        $this->quote = Mage::getModel("sales/quote")->load($quoteId);
-        $this->grandTotal = floatval($this->quote->getData('grand_total'));
-        $this->subTotal = floatval($this->quote->getSubtotal());
+        $this->quoteBcash = Mage::getModel("sales/quote")->load($quoteId);
+        $this->grandTotal = floatval($this->quoteBcash->getData('grand_total'));
+        $this->subTotal = floatval($this->quoteBcash->getSubtotal());
         $shippingHandling = floatval($this->grandTotal -$this->subTotal);
-        $this->billingData = $this->quote->getBillingAddress()->getData();
+        $this->billingData = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
-        $this->items = $this->quote->getItemsCollection()->getItems();
+        $this->items = $this->quoteBcash->getItemsCollection()->getItems();
         $this->transactionRequest = $this->createTransactionRequest();
         $this->setShipping();
         $this->setPaymentMethod();
@@ -282,7 +282,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     public function createAddress()
     {
-        $address = $this->quote->getShippingAddress();
+        $address = $this->quoteBcash->getShippingAddress();
         $street      = $address->getStreet(1);
         $numero      = $address->getStreet(2);
         $complemento = $address->getStreet(3);
@@ -304,7 +304,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     public function createBuyer()
     {
-        $customer_id = $this->quote->getCustomerId();
+        $customer_id = $this->quoteBcash->getCustomerId();
         $customer = Mage::getModel('customer/customer')->load($customer_id);
         $customerData = $customer->getData();
         $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
@@ -326,7 +326,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     public function completePhone()
     {
-        $address  = $this->quote->getBillingAddress()->getData();
+        $address  = $this->quoteBcash->getBillingAddress()->getData();
         $ddd_bcash = Mage::app()->getRequest()->getPost('ddd_bcash');
         $phone_bcash = Mage::app()->getRequest()->getPost('phone_bcash');
         $full_phone = "";
@@ -389,7 +389,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     public function setDiscount($discount)
     {
-        $this->discount = $discount;
+        $this->discountBcash = $discount;
         $this->transactionRequest->setDiscount($discount);
     }
 
@@ -399,7 +399,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     public function setShipping()
     {
-        $shipping = $this->quote->getShippingAddress()->getData();
+        $shipping = $this->quoteBcash->getShippingAddress()->getData();
         $this->transactionRequest->setShipping(floatval($shipping['shipping_amount']));
         $this->transactionRequest->setShippingType($shipping['shipping_description']);
     }

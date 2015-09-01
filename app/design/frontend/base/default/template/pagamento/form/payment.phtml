@@ -107,6 +107,7 @@ $paymentGroupName = array(
                         <div class="b-form-group b-col-xs-7">
                             <label>Parcelas</label>
                             <select class="b-form-control" name="installments_bcash" id="installments_bcash">
+                                <option value=""> - - - </option>
                                 <?php
                                 $okInstallments = $paymentInstallments['ok'];
                                 $installments = $paymentInstallments["installments"];
@@ -121,15 +122,19 @@ $paymentGroupName = array(
                                 else :
                                     $installments = $paymentInstallments["installments"][0]->paymentTypes;
                                     foreach ($installments as $type) :
-                                        foreach ($type->paymentMethods as $typePayment) :
-                                            foreach ($typePayment->installments as $paymentInstallment) :
-                                            ?>
-                                            <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
-                                                <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?><?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
-                                            </option>
-                                            <?php
+                                        if ($type->name == 'card') :
+                                            foreach ($type->paymentMethods as $typePayment) :
+                                                foreach ($typePayment->installments as $paymentInstallment) :
+                                                ?>
+                                                <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
+                                                    <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?>
+                                                    <?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
+                                                    <?php echo isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '' ?>
+                                                </option>
+                                                <?php
+                                                endforeach;
                                             endforeach;
-                                        endforeach;
+                                        endif;
                                     endforeach;
                                     ?>
                                 <?php
@@ -138,7 +143,7 @@ $paymentGroupName = array(
                             </select>
                         </div>
                     </div>
-
+                    <!--
                     <hr>
 
                     <div class="b-row">
@@ -166,6 +171,7 @@ $paymentGroupName = array(
                             </div>
                         </div>
                     </div>
+                    //-->
 
                 </div> <!-- card-conteiner -->
 
@@ -242,6 +248,7 @@ $paymentGroupName = array(
                         options[i].style.display="block";
                     }
                 }
+                document.getElementById(select_id).value = "";
             }
         }
 
@@ -548,7 +555,7 @@ $paymentGroupName = array(
             var paymentFlags = paymentsOptions[i];
             paymentFlags.onclick = clickFlag;
         }
-
+        /*
         document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -568,7 +575,7 @@ $paymentGroupName = array(
         document.getElementById("phone_bcash").onkeypress = function (event) {
             return validateNumber(event);
         };
-
+        */
         document.getElementById("card_number_bcash").onkeypress = function (event) {
             return validateNumber(event);
         };
@@ -584,7 +591,7 @@ $paymentGroupName = array(
             // console.log($isCard);
             return {'element': ElementPaymentMethod, 'isCard': $isCard};
         }
-
+        /*
         $('cpf_cnpj_bcash').observe('blur', function (e) {
             var RegExp = /^[0-9]{11,14}$/;
             var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
@@ -601,7 +608,7 @@ $paymentGroupName = array(
                 });
             }
         });
-
+        */
         function saveCardNumber() {
             var id = document.getElementById("card_number_bcash").value;
             var $elem = getCardSelected();
@@ -655,7 +662,7 @@ $paymentGroupName = array(
                 parameters: 'pid=' + id + '&input=cvv'
             });
         });
-
+        /*
         $('ddd_bcash').observe('blur', function (e) {
             var id = document.getElementById("ddd_bcash").value;
             new Ajax.Request(requestUrl, {
@@ -671,7 +678,7 @@ $paymentGroupName = array(
                 parameters: 'pid=' + id + '&input=telefone'
             });
         });
-
+        */
         function validateCardNumber()
         {
             var RegExpHipercard = /^(3841\d{10}(\d{3})?)|(3841\d{15})$/;

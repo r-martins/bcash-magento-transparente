@@ -45,6 +45,14 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
     * @var
     */
     private $tefs;
+    /**
+     * @var
+     */
+    private $desconto_credito_1x;
+    /**
+     * @var
+     */
+    private $quote;
 
     /**
      * Instancia o template referente ao método de pagamento
@@ -58,6 +66,8 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
         $this->token   = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');
         $this->max_installments = $this->obj->getConfigData('max_installments');
+
+        $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
 
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
@@ -80,18 +90,16 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
      */
     public function getInstallments()
     {
-
         $installments = new Installments($this->email, $this->token);
         try {
             $sessionCheckout = Mage::getSingleton('checkout/session');
             $quoteId = $sessionCheckout->getQuoteId();
-            $quote = Mage::getModel("sales/quote")->load($quoteId);
-            $grandTotal = floatval($quote->getData('grand_total'));
+            $this->quote = Mage::getModel("sales/quote")->load($quoteId);
+            $grandTotal = floatval($this->quote->getData('grand_total'));
             $ignoreScheduledDiscount = false;
             if($this->sandbox){
                 $installments->enableSandBox(true);
             }
-           
             $response = $installments->calculate($grandTotal, $this->max_installments, $ignoreScheduledDiscount);
             return array("ok" => true, "installments" => array(0 => $this->prepareInstallmentsCards($response)));
         } catch (ValidationException $e) {
@@ -105,13 +113,31 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
 
     public function prepareInstallmentsCards($installments)
     {
-        foreach ($installments->paymentTypes as $Obj) {
-            if (!in_array('card', $Obj->name)){
-                unset($Obj);
+        foreach ($installments->paymentTypes as &$obj) {
+            if ('card' != $obj->name) {
+                unset($obj);
+            } else {
+                if ($this->desconto_credito_1x) {
+                    $subTotal = floatval($this->quote->getSubtotal());
+                    $desconto = ($this->desconto_credito_1x / 100) * $subTotal;
+                    if ($desconto) {
+                        foreach ($obj->paymentMethods as &$type) {
+                            foreach ($type->installments as &$installment) {
+                                if ($installment->number == 1) {
+                                    $installment->installmentAmount -= $desconto;
+                                    $installment->installmentAmountDesc = " ({$this->desconto_credito_1x} % de desconto)";
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return $installments;
     }
+
+
 
 }
 
