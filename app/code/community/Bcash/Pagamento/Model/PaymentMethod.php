@@ -27,32 +27,20 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      */
     protected $_code = 'pagamento';
     /**
-     * @var bool
+     * @var string
      */
-    protected $_isGateway = true;
-    /**
-     * @var bool
-     */
-    protected $_canCapture = true;
-    /**
-     * @var bool
-     */
-    protected $_canAuthorize = true;
-    /**
-     * @var bool
-     */
-    protected $_canOrder = true;
+    //Disable multi-shipping for this payment module.
+    protected $_canUseForMultishipping  = false;
     /**
      * @var string
      */
-    protected $_formBlockType = 'pagamento/form_payment';
+    //protected $_formBlockType = 'pagamento/form_payment';
 
     //Flag executa o método initalize() com o checkout completo.
     /**
      * @var bool
      */
     protected $_isInitializeNeeded = true;
-
     //Variaveis de Transação
     /**
      * @var
@@ -140,11 +128,14 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $this->consumer_key = $this->getConfigData('consumer_key');
         $this->dependents = $this->getConfigData('transacao_dependente');
         $this->sandbox = $this->getConfigData('sandbox');
+
         parent::initialize($paymentAction, $stateObject);
+
         if ($paymentAction != 'sale') {
             return $this;
         }
-        $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT; // state now = 'pending_payment'
+
+        $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT;
         $stateObject->setState($state);
         $stateObject->setStatus('pending_payment');
         $stateObject->setIsNotified(false);
@@ -155,6 +146,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             Mage::log($e->getMessage());
             Mage::throwException($e->getMessage());
         }
+
         return $this;
     }
 
@@ -177,9 +169,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $this->billingData = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
         $this->items = $this->quoteBcash->getItemsCollection()->getItems();
-        $this->transactionRequest = $this->createTransactionRequest();
-        $this->setShipping();
-        $this->setPaymentMethod();
+        $this->transactionRequest = $this->createTransactionRequestBcash();
+        $this->setShippingBcash();
+        $this->setPaymentMethodBcash();
         $payment = new Payment($this->consumer_key);
         if ($this->sandbox) {
             $payment->enableSandBox(true);
@@ -201,6 +193,8 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
             //TODO: $stateObject IF Approved (CARTAO E TEF) outros aprovam depois
 
+            //TODO: Alterar o estado do Pedido
+            return array();
 
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
@@ -225,25 +219,25 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Cria o objeto TransactionRequest via SDK Api Bcash.
      * @return TransactionRequest
      */
-    public function createTransactionRequest()
+    public function createTransactionRequestBcash()
     {
         $url = Mage::getUrl('pagamento/notification/request');
         $transactionRequest = new TransactionRequest();
         $transactionRequest->setSellerMail($this->email);
         $transactionRequest->setOrderId($this->quoteIdTransaction);
-        $transactionRequest->setBuyer($this->createBuyer());
+        $transactionRequest->setBuyer($this->createBuyerBcash());
         $transactionRequest->setUrlNotification($url);
-        $transactionRequest->setProducts($this->createProduct());
+        $transactionRequest->setProducts($this->createProductBcash());
         $transactionRequest->setAcceptedContract("S");
         $transactionRequest->setViewedContract("S");
-        $transactionRequest->setDependentTransactions($this->createDependentTransactions());
+        $transactionRequest->setDependentTransactions($this->createDependentTransactionsBcash());
         return $transactionRequest;
     }
 
     /**
      * Adiciona o método de pagamento a transação atual.
      */
-    public function setPaymentMethod()
+    public function setPaymentMethodBcash()
     {
         $cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $boleto = PaymentMethodEnum::BANK_SLIP;
@@ -254,7 +248,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
         $this->transactionRequest->setPaymentMethod($payment_method);
         if (in_array($payment_method, $cards)) {
-            $this->transactionRequest->setCreditCard($this->createCreditCard());
+            $this->transactionRequest->setCreditCard($this->createCreditCardBcash());
             $this->transactionRequest->setInstallments($installments);
         }
 
@@ -279,7 +273,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona o endereço a transação atual.
      * @return Address
      */
-    public function createAddress()
+    public function createAddressBcash()
     {
         $address = $this->quoteBcash->getShippingAddress();
         $street      = $address->getStreet(1);
@@ -301,7 +295,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona o comprador a transação atual
      * @return Customer
      */
-    public function createBuyer()
+    public function createBuyerBcash()
     {
         $customer_id = $this->quoteBcash->getCustomerId();
         $customer = Mage::getModel('customer/customer')->load($customer_id);
@@ -314,8 +308,8 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $name .= isset($customerData['lastname'])   ? ' ' . $customerData['lastname']   : '';
         $buyer->setName($name);
         $buyer->setCpf($cpf_cnpj_bcash);
-        $buyer->setPhone($this->completePhone());
-        $buyer->setAddress($this->createAddress());
+        $buyer->setPhone($this->completePhoneBcash());
+        $buyer->setAddress($this->createAddressBcash());
         return $buyer;
     }
 
@@ -323,7 +317,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona o telefone a transação atual.
      * @return string
      */
-    public function completePhone()
+    public function completePhoneBcash()
     {
         $address  = $this->quoteBcash->getBillingAddress()->getData();
         $ddd_bcash = Mage::app()->getRequest()->getPost('ddd_bcash');
@@ -353,7 +347,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona os produtos do carrinho de compras a transação atual.
      * @return array
      */
-    public function createProduct()
+    public function createProductBcash()
     {
         $products = array();
         foreach ($this->items as $item) {
@@ -378,7 +372,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * @param null $addition
      * @param null $discount
      */
-    public function setAddition($addition = 0)
+    public function setAdditionBcash($addition = 0)
     {
         $this->transactionRequest->setAddition($addition);
     }
@@ -388,7 +382,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * @param null $addition
      * @param null $discount
      */
-    public function setDiscount($discount)
+    public function setDiscountBcash($discount)
     {
         $this->discountBcash = $discount;
         $this->transactionRequest->setDiscount($discount);
@@ -398,7 +392,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona o tipo de Frete e valor definido para o mesmo a transação atual.
      * @return void
      */
-    public function setShipping()
+    public function setShippingBcash()
     {
         $shipping = $this->quoteBcash->getShippingAddress()->getData();
         $this->transactionRequest->setShipping(floatval($shipping['shipping_amount']));
@@ -409,7 +403,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona o cartão de crédito a transação atual quando solicitado a transação atual.
      * @return CreditCard
      */
-    public function createCreditCard()
+    public function createCreditCardBcash()
     {
         $card_number_bcash = Mage::app()->getRequest()->getPost('card_number_bcash');
         $month_bcash = Mage::app()->getRequest()->getPost('month_bcash');
@@ -429,7 +423,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Adiciona as transações dependentes a transação atual.
      * @return array
      */
-    public function createDependentTransactions()
+    public function createDependentTransactionsBcash()
     {
         $deps = array();
         $unserialezedDeps = unserialize($this->dependents);
@@ -481,7 +475,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * @param $state
      * @return mixed|string
      */
-    public function parseState($state)
+    public function parseRegionBcash($state)
     {
         if (strlen($state) == 2 && is_string($state)) {
             return strtoupper($state);
