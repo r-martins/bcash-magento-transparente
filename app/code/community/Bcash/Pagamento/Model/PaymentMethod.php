@@ -116,9 +116,9 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
          * it makes debugging problems with your api much easier.
          * The file is in magento-root/var/log/system.log
          */
-       //mage::log('Called custom ' . __METHOD__);
-       //$url = $this->getConfigData('redirecturl');
-       //return $url;
+        Mage::log('Called custom ' . __METHOD__);
+        $url = $this->getConfigData('redirecturl');
+        return $url;
     }
 
     /**
@@ -207,7 +207,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $errorsList = $errorsArr->list;
             $messages  = array();
             foreach ($errorsList as $err) {
-                $messages[] = $err['code'] . " - " . $err['description'];
+                $messages[] = $err->code . " - " . urldecode($err->description);
             }
             Mage::throwException(implode("\n", $messages));
         } catch (ConnectionException $e) {
@@ -215,11 +215,10 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $errorsList = $errorsArr->list;
             $messages  = array();
             foreach ($errorsList as $err) {
-                $messages[] = $err['code'] . " - " . $err['description'];
+                $messages[] = $err->code . " - " . urldecode($err->description);
             }
             Mage::throwException(implode("\n", $messages));
         }
-        return $this;
     }
 
     /**
@@ -358,16 +357,18 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     {
         $products = array();
         foreach ($this->items as $item) {
-            $product = new Product();
-            $cod = $item->getSku() ? $item->getSku() : $item->getId();
-            $product->setCode($cod);
-            $name = $item->getName();
-            $product->setDescription($name);
-            $qty = $item->getQty();
-            $product->setAmount(intval($qty));
             $price = $item->getPrice();
-            $product->setValue(floatval($price));
-            array_push($products, $product);
+            if($price > 0){
+                $product = new Product();
+                $cod = $item->getSku() ? $item->getSku() : $item->getId();
+                $product->setCode($cod);
+                $name = $item->getName();
+                $product->setDescription($name);
+                $qty = $item->getQty();
+                $product->setAmount(intval($qty));
+                $product->setValue(floatval($price));
+                array_push($products, $product);
+            }
         }
         return $products;
     }
@@ -437,7 +438,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 $dependent = new DependentTransaction();
                 $dependent->setEmail($obj);
                 $value = ($this->subTotal / 100) * floatval($unserialezedDeps['percentual'][$key]);
-                $dependent->setValue(floatval($value));
+                $dependent->setValue(floatval(number_format($value,2,'.','')));
                 array_push($deps, $dependent);
             }
         }
