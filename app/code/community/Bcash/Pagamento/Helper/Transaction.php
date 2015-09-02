@@ -247,44 +247,46 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $customer = Mage::getModel('customer/customer')->load($customer_id);
         $customerData = $customer->getData();
         $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
+        $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
         $buyer = new Customer();
         $buyer->setMail($customerData['email']);
         $name  = ($customerData['firstname']);
         $name .= isset($customerData['middlename']) ? ' ' . $customerData['middlename'] : '';
         $name .= isset($customerData['lastname'])   ? ' ' . $customerData['lastname']   : '';
         $buyer->setName($name);
-        $buyer->setCpf($cpf_cnpj_bcash);
-        $buyer->setPhone($this->completePhoneBcash());
+        if(strlen($cpf_cnpj_bcash) > 11) {
+            $buyer->setCnpj($cpf_cnpj_bcash);
+            $buyer->setCompanyName($name);
+        }else { $buyer->setCpf($cpf_cnpj_bcash); }
+        $buyer->setPhone($this->completePhoneBcash('telephone'));
+        $buyer->setCellPhone($this->completePhoneBcash('fax'));
         $buyer->setAddress($this->createAddressBcash());
         return $buyer;
     }
 
     /**
-     * Adiciona o telefone a transação atual.
+     * Adiciona o telefone/celular na transação atual.
      * @return string
      */
-    public function completePhoneBcash()
+    public function completePhoneBcash($attr = null)
     {
         $address  = $this->quoteBcash->getBillingAddress()->getData();
-        $ddd_bcash = Mage::app()->getRequest()->getPost('ddd_bcash');
-        $phone_bcash = Mage::app()->getRequest()->getPost('phone_bcash');
-        $full_phone = "";
-        if (!$address['telephone'] && $ddd_bcash && $full_phone) {
-            $full_phone = $ddd_bcash . $full_phone;
+        if(!is_null($attr)) {
+            return $this->parsePhone($address[$attr]);
         }
-        return $this->parsePhone($full_phone);
+        return $this->parsePhone($address['telephone']);
     }
 
     /**
-     * Retorna somente 11 dígitos do telefone.
+     * Retorna somente 20 dígitos do telefone (limite da API).
      * @param $phone
      * @return string
      */
     public function parsePhone($phone)
     {
         $phone = preg_replace('/[^0-9]+/', '', $phone);
-        if (strlen($phone) > 11) {
-            return substr($phone, -11);
+        if (strlen($phone) > 20) {
+            return substr($phone, -20);
         }
         return $phone;
     }
