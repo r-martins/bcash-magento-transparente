@@ -18,13 +18,34 @@ use Bcash\Domain\DependentTransaction;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
 
+/**
+ * Class Bcash_Pagamento_Helper_Transaction
+ */
 class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
 {
+    /**
+     * @var
+     */
     private $email;
+    /**
+     * @var
+     */
     private $token;
+    /**
+     * @var Mage_Core_Model_Abstract
+     */
     private $obj;
+    /**
+     * @var
+     */
     private $sandbox;
+    /**
+     * @var
+     */
     private $dependents;
+    /**
+     * @var
+     */
     private $consumer_key;
 
     //Variaveis de Transação
@@ -96,7 +117,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public $boleto;
 
-
     public function __construct()
     {
         $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
@@ -122,6 +142,10 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
     }
 
+    /**
+     * @return array
+     * @throws Mage_Core_Exception
+     */
     public function startTransaction()
     {
         $this->transactionRequest = $this->createTransactionRequestBcash();
@@ -196,6 +220,10 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
     }
 
+    /**
+     * @param $payment_method
+     * @return float|int
+     */
     public function calculateDiscount($payment_method)
     {
         $discount = 0;
