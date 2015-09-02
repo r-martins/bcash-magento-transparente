@@ -116,4 +116,43 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $transaction = new Bcash_Pagamento_Helper_Transaction();
         $transaction->startTransaction();
     }
+
+    /**
+     * Assign data to info model instance
+     * @param   mixed $data
+     * @return  Mage_Payment_Model_Info
+     */
+    public function assignData($data)
+    {
+        Mage::log('Assign Data with Bcash');
+        $result = parent::assignData($data);
+
+        $params = Mage::app()->getFrontController()->getRequest()->getParams();
+
+        /**
+        Array(
+               [payment] => Array([method] => pagamento)
+               [payment-method] => 2
+               [card_number_bcash] => 5555666677778884
+               [month_bcash] => 05
+               [year_bcash] => 2018
+               [name_card_bcash] => Flavio H Ferreira
+               [cvv_bcash] => 123
+               [installments_bcash] => 1
+            )
+         */
+        //TODO: Adicionar Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
+
+        return $result;
+    }
+
+    public function calculateDiscount()
+    {
+
+    }
+
+    public function addDiscountToOrder()
+    {
+
+    }
 }
