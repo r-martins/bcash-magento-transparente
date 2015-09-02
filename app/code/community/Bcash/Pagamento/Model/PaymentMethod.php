@@ -114,7 +114,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     protected function _customBeginPayment()
     {
         $transaction = new Bcash_Pagamento_Helper_Transaction();
-        $transaction->startTransaction();
+        return $transaction->startTransaction();
     }
 
     /**
@@ -141,24 +141,42 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                [installments_bcash] => 1
             )
          */
+
+        $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;
         //TODO: Adicionar Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
-
-        $this->addDiscountToQuote();
-
+        $discount = 0;
+        if ($params['installments_bcash'] == 1) {
+            $discount = $this->calculateDiscount($params['payment-method']);
+        }
+        $this->addDiscountToQuote($discount);
         return $result;
     }
 
-    public function calculateDiscount()
+    public function calculateDiscount($payment_method)
     {
-
+        $transaction = new Bcash_Pagamento_Helper_Transaction();
+        return $transaction->calculateDiscount($payment_method);
     }
 
-    public function addDiscountToQuote()
+    public function addDiscountToQuote($discountAmount = 0)
     {
-      $sessionCheckout = Mage::getSingleton('checkout/session');
-      $quoteId = $sessionCheckout->getQuoteId();
-      $quote = Mage::getModel("sales/quote")->load($quoteId);
-      $quote->setDiscountAmount('2');
-      $quote->collectTotals()->save();
+            $cart = Mage::getSingleton('checkout/cart');
+            $objShippingAddress = $cart->getQuote()->getShippingAddress();
+            $objShippingAddress->setDiscountDescription('Meio de pagamento selecionado');
+            $objShippingAddress->addTotal(array(
+                'code' => 'discount',
+                'title' => "Desconto",
+                'value' => -$discountAmount,
+            ));
+            $totalDiscountAmount = $discountAmount;
+            $subtotalWithDiscount = $discountAmount;
+            $baseTotalDiscountAmount = $discountAmount;
+            $baseSubtotalWithDiscount = $discountAmount;
+            $objShippingAddress->setDiscountAmount($totalDiscountAmount);
+            $objShippingAddress->setSubtotalWithDiscount($subtotalWithDiscount);
+            $objShippingAddress->setBaseDiscountAmount($baseTotalDiscountAmount);
+            $objShippingAddress->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
+            $objShippingAddress->setGrandTotal($objShippingAddress->getGrandTotal() - $objShippingAddress->getDiscountAmount());
+            $objShippingAddress->setBaseGrandTotal($objShippingAddress->getBaseGrandTotal() - $objShippingAddress->getBaseDiscountAmount());
     }
 }
