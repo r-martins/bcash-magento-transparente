@@ -114,13 +114,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             */
 
             //TODO: Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
-            if ($response['status'] != 1) {
+            if ($response->status != 1) {
 
-                switch($response['status'])
+                $setIsNotified = false;
+                switch($response->status)
                 {
                     case 3: //3 – Aprovada
                     case 4: //4 – Concluída
                         $state = Mage_Sales_Model_Order::STATE_PROCESSING;
+                        $setIsNotified = true;
                         break;
                     case 6://6 – Devolvida
                         $state = Mage_Sales_Model_Order::STATE_HOLDED;
@@ -137,23 +139,31 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 if(!is_null($state)){
                     $stateObject->setState($state);
                     $stateObject->setStatus($state);
-                    $stateObject->setIsNotified(false);
+                    $stateObject->setIsNotified($setIsNotified);
                 }
             }
 
-            $response['transactionId'];//224
-            $response['orderId'];//000000700
-            $response['status'];//1
-            $response['descriptionStatus'];//Em+andamento
-            $response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
+            // $response['transactionId'];//224
+            //$response['orderId'];//000000700
+            //$response['status'];//1
+            //$response['descriptionStatus'];//Em+andamento
+            //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
 
-            if (in_array($payment_method, $this->transaction->cards)) {
+            Mage::getSingleton("checkout/cart")
+                ->getQuote()
+                ->setTransactionIdBcash($response->transactionId)
+                ->setStatusBcash($response->status)
+                ->setDescriptionStatusBcash($response->descriptionStatus)
+                ->setPaymentLinkBcash($response->paymentLink)
+                ->save();
 
-            } elseif (in_array($payment_method, $this->transaction->tefs)) {
-
-            } else {
-
-            }
+            //if (in_array($payment_method, $this->transaction->cards)) {
+            //
+            //} elseif (in_array($payment_method, $this->transaction->tefs)) {
+            //
+            //} else {
+            //
+            //}
 
         } catch (Exception $e) {
             Mage::log($e->getMessage());
