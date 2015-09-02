@@ -86,6 +86,16 @@
                     </connection>
             </pagamento_setup>
         </resources>
+
+        <sales>
+            <order>
+                <states>
+                    <pending_payment translate="label">
+                        <visible_on_front>1</visible_on_front>
+                    </pending_payment>
+                </states>
+            </order>
+        </sales>
     </global>
     
     <admin>
@@ -127,15 +137,9 @@
         <payment>
             <pagamento>
                 <title>Bcash</title>
-                <order_status_approved>processing</order_status_approved>
-                <order_status_refunded>pending</order_status_refunded>
-                <order_status_in_process>pending</order_status_in_process>
-                <order_status_in_mediation>pending</order_status_in_mediation>
-                <order_status_rejected>pending</order_status_rejected>
-                <order_status_cancelled>pending</order_status_cancelled>
-                <order_status_chargeback>pending</order_status_chargeback>
                 <active>1</active>
                 <model>pagamento/paymentMethod</model>
+                <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
             </pagamento>

@@ -36,9 +36,9 @@ class Bcash_Pagamento_Model_Observer
         $orderId = $order->getId();
         $incrId  = $order->getIncrementId();
         Mage::log("Saving quote  [$quoteId] and order [$incrId] to checkout/session");
-        $session->setData('OrderId',$orderId);
-        $session->setData('OrderIncrementId',$incrId);
-        $session->setData('QuoteId',$quoteId);
+        $session->setData('OrderIdBcash',$orderId);
+        $session->setData('OrderIncrementIdBcash',$incrId);
+        $session->setData('QuoteIdBcash',$quoteId);
         unset($event);
         unset($order);
         unset($quote);

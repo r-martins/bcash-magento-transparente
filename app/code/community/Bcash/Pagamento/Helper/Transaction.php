@@ -64,6 +64,26 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      * @var
      */
     private $discountBcash;
+    /**
+     * @var
+     */
+    private $discountPercentBcash;
+
+    /**
+     * @var
+     */
+    private $deps = array();
+
+    /**
+     * @var
+     */
+    private $installments;
+
+    /**
+     * @var
+     */
+    private $payment_method;
+
 
     public function __construct()
     {
@@ -78,7 +98,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     public function startTransaction(){
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
-        //$sessionCheckout->setData('QuoteId', $quoteId);
+        $sessionCheckout->setData('QuoteIdBcash', $quoteId);
         $this->quoteBcash = Mage::getModel("sales/quote")->load($quoteId);
         $this->grandTotalBcash = floatval($this->quoteBcash->getData('grand_total'));
         $this->subTotalBcash = floatval($this->quoteBcash->getSubtotal());
@@ -95,23 +115,16 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
         try {
             $response = $payment->create($this->transactionRequest);
-            //TODO: Tratar retorno
-            $responseTransaction = $response;
-            //$response['transactionId'];//224
-            //$response['orderId'];//000000700
-            //$response['status'];//1
-            //$response['descriptionStatus'];//Em+andamento
-            //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
+            $payment_method = Mage::app()->getRequest()->getPost('payment-method');
 
-            ///* @var $order Mage_Sales_Model_Order */
-            //$comment = 'blah blah';
-            //$order->addStatusHistoryComment($comment);
-            //$order->save();
-
-            //TODO: $stateObject IF Approved (CARTAO E TEF) outros aprovam depois
-
-            //TODO: Alterar o estado do Pedido
-            return true;
+            return array(
+                'response' => $response,
+                'payment_method' => $payment_method,
+                'discountPercent' => $this->discountPercentBcash,
+                'discount' => $this->discountBcash,
+                'deps' => $this->deps,
+                'installments' => $this->installments
+            );
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
@@ -160,26 +173,30 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
         $payment_method = Mage::app()->getRequest()->getPost('payment-method');
         $installments = Mage::app()->getRequest()->getPost('installments_bcash');
-        $installments = $installments ?:1;
+        $this->installments = $installments ?:1;
+        $this->payment_method = $payment_method;
 
-        $this->transactionRequest->setPaymentMethod($payment_method);
-        if (in_array($payment_method, $cards)) {
+        $this->transactionRequest->setPaymentMethod($this->payment_method);
+        if (in_array($this->payment_method, $cards)) {
             $this->transactionRequest->setCreditCard($this->createCreditCardBcash());
-            $this->transactionRequest->setInstallments($installments);
+            $this->transactionRequest->setInstallments($this->installments);
         }
 
         if ($installments == 1) {
-            if (in_array($payment_method, $cards)) {
+            if (in_array($this->payment_method, $cards)) {
                 $percent = $this->obj->getConfigData('desconto_credito_1x');
-            } elseif (in_array($payment_method, $tefs)) {
+            } elseif (in_array($this->payment_method, $tefs)) {
                 $percent = $this->obj->getConfigData('desconto_tef');
             } else {
                 $percent = $this->obj->getConfigData('desconto_boleto');
             }
             if ($percent) {
                 $discount = floatval(($this->subTotalBcash / 100) * $percent);
+                $this->discountPercentBcash = $percent;
+                $this->discountBcash = $discount;
                 $this->setDiscountBcash($discount);
                 //TODO: Adicionar Desconto ao Pedido do Magento.
+
             }
         }
     }
@@ -190,14 +207,11 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createAddressBcash()
     {
-        $address = $this->quoteBcash->getShippingAddress();
+        $address     = $this->quoteBcash->getShippingAddress();
         $street      = $address->getStreet(1);
         $numero      = $address->getStreet(2);
         $complemento = $address->getStreet(3);
         $bairro      = $address->getStreet(4);
-
-
-
         $addressObj = new Address();
         $addressObj->setAddress($street);
         $addressObj->setNumber($numero ? $numero : 'SN');
@@ -343,7 +357,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createDependentTransactionsBcash()
     {
-        $deps = array();
         $unserialezedDeps = unserialize($this->dependentsBcash);
         foreach ($unserialezedDeps['dependente'] as $key => $obj) {
             if ($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0) {
@@ -351,10 +364,10 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 $dependent->setEmail($obj);
                 $value = ($this->subTotalBcash / 100) * floatval($unserialezedDeps['percentual'][$key]);
                 $dependent->setValue(floatval(number_format($value, 2, '.', '')));
-                array_push($deps, $dependent);
+                array_push($this->deps, $dependent);
             }
         }
-        return $deps;
+        return $this->deps;
     }
 
     /**

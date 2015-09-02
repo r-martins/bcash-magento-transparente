@@ -10,21 +10,42 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * @var string
      */
     protected $_code = 'pagamento';
-    /**
-     * @var string
-     */
-    //Disable multi-shipping for this payment module.
-    protected $_canUseForMultishipping  = false;
+
     /**
      * @var string
      */
     protected $_formBlockType = 'pagamento/form_payment';
 
-    //Flag executa o método initalize() com o checkout completo.
-    /**
+    /** Flag executa o método initalize() com o checkout completo.
      * @var bool
      */
-     protected $_isInitializeNeeded = true;
+    protected $_isInitializeNeeded = true;
+
+    protected $_isGateway = true;
+    protected $_canAuthorize = true;
+    protected $_canUseCheckout = true;
+    //Disable multi-shipping for this payment module.
+    protected $_canUseForMultishipping  = false;
+
+    /*
+    protected $_isGateway                   = false;
+    protected $_canOrder                    = false;
+    protected $_canAuthorize                = false;
+    protected $_canCapture                  = false;
+    protected $_canCapturePartial           = false;
+    protected $_canCaptureOnce              = false;
+    protected $_canRefund                   = false;
+    protected $_canRefundInvoicePartial     = false;
+    protected $_canVoid                     = false;
+    protected $_canUseInternal              = true;
+    protected $_canUseCheckout              = true;
+    protected $_canUseForMultishipping      = true;
+    protected $_isInitializeNeeded          = false;
+    protected $_canFetchTransactionInfo     = false;
+    protected $_canReviewPayment            = false;
+    protected $_canCreateBillingAgreement   = false;
+    protected $_canManageRecurringProfiles  = true;
+    */
 
     /**
      * Retornar URL para redirecionar o cliente.
@@ -69,11 +90,12 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
         $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT;
         $stateObject->setState($state);
-        $stateObject->setStatus('pending_payment');
+        $stateObject->setStatus(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
         $stateObject->setIsNotified(false);
 
         try {
-            $this->_customBeginPayment();
+            $result = $this->_customBeginPayment();
+            Mage::log(print_r($result,true));
         } catch (Exception $e) {
             Mage::log($e->getMessage());
             Mage::throwException($e->getMessage());
