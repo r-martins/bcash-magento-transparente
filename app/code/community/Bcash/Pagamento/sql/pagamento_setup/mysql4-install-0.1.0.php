@@ -14,7 +14,7 @@ $installer->startSetup();
 
 $installer->addAttribute(
     'quote',  /* order, quote, order_item, quote_item */
-    'transactionIdBcash',
+    'transaction_id_bcash',
     array(
         'type' => 'varchar', /* int, varchar, text, decimal, datetime */
         'nullable' => true, /* default true */
@@ -24,7 +24,7 @@ $installer->addAttribute(
 
 $installer->addAttribute(
     'quote',  /* order, quote, order_item, quote_item */
-    'statusBcash',
+    'status_bcash',
     array(
         'type' => 'varchar', /* int, varchar, text, decimal, datetime */
         'nullable' => true, /* default true */
@@ -34,7 +34,7 @@ $installer->addAttribute(
 
 $installer->addAttribute(
     'quote',  /* order, quote, order_item, quote_item */
-    'descriptionStatusBcash',
+    'description_status_bcash',
     array(
         'type' => 'varchar', /* int, varchar, text, decimal, datetime */
         'nullable' => true, /* default true */
@@ -44,7 +44,7 @@ $installer->addAttribute(
 
 $installer->addAttribute(
     'quote',  /* order, quote, order_item, quote_item */
-    'paymentLinkBcash',
+    'payment_link_bcash',
     array(
         'type' => 'varchar', /* int, varchar, text, decimal, datetime */
         'nullable' => true, /* default true */

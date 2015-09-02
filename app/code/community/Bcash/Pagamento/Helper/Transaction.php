@@ -80,7 +80,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     /**
      * @var
      */
-    private $quoteBcash;
+    public $quoteBcash;
     /**
      * @var
      */

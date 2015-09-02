@@ -142,27 +142,12 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 }
             }
 
-            // $response['transactionId'];//224
-            //$response['orderId'];//000000700
-            //$response['status'];//1
-            //$response['descriptionStatus'];//Em+andamento
-            //$response['paymentLink'];//https%3A%2F%2Fsandbox.bcash.com.br%2Fcheckout%2FBoleto%2FImprime%2F224%2F0z0ajEHp0RqdnYydaRlPFkCME2cuwt
-
-            Mage::getSingleton("checkout/cart")
-                ->getQuote()
+            $this->transaction->quoteBcash
                 ->setTransactionIdBcash($response->transactionId)
                 ->setStatusBcash($response->status)
                 ->setDescriptionStatusBcash($response->descriptionStatus)
                 ->setPaymentLinkBcash($response->paymentLink)
                 ->save();
-
-            //if (in_array($payment_method, $this->transaction->cards)) {
-            //
-            //} elseif (in_array($payment_method, $this->transaction->tefs)) {
-            //
-            //} else {
-            //
-            //}
 
         } catch (Exception $e) {
             Mage::log($e->getMessage());
