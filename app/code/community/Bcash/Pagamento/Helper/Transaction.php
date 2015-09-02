@@ -77,24 +77,24 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     /**
      * @var
      */
-    private $installments;
+    public $installments;
 
     /**
      * @var
      */
-    private $payment_method;
+    public $payment_method;
     /**
      * @var
      */
-    private $cards;
+    public $cards;
     /**
      * @var
      */
-    private $tefs;
+    public $tefs;
     /**
      * @var
      */
-    private $boleto;
+    public $boleto;
 
 
     public function __construct()
@@ -105,7 +105,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->sandbox = $this->obj->getConfigData('sandbox');
         $this->consumer_key = $this->obj->getConfigData('consumer_key');
         $this->dependents = $this->obj->getConfigData('transacao_dependente');
-
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
         $sessionCheckout->setData('QuoteIdBcash', $quoteId);
@@ -116,11 +115,11 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->billingDataBcash = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
         $this->itemsBcash = $this->quoteBcash->getItemsCollection()->getItems();
-
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
-
+        $this->payment_method = Mage::app()->getRequest()->getPost('payment-method');
+        $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
     }
 
     public function startTransaction()
@@ -134,10 +133,9 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
         try {
             $response = $payment->create($this->transactionRequest);
-            $payment_method = Mage::app()->getRequest()->getPost('payment-method');
             return array(
                 'response' => $response,
-                'payment_method' => $payment_method,
+                'payment_method' => $this->payment_method,
                 'discountPercent' => $this->discountPercentBcash,
                 'discount' => $this->discountBcash,
                 'deps' => $this->deps,
@@ -186,18 +184,13 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function setPaymentMethodBcash()
     {
-        $payment_method = Mage::app()->getRequest()->getPost('payment-method');
-        $installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
-        $this->installments = $installments;
-        $this->payment_method = $payment_method;
-
         $this->transactionRequest->setPaymentMethod($this->payment_method);
         if (in_array($this->payment_method, $this->cards)) {
             $this->transactionRequest->setCreditCard($this->createCreditCardBcash());
             $this->transactionRequest->setInstallments($this->installments);
         }
 
-        if ($installments == 1) {
+        if ($this->installments == 1) {
             $discount = $this->calculateDiscount($this->payment_method);
             $this->setDiscountBcash($discount);
         }
