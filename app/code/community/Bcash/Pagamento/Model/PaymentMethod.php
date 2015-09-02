@@ -143,6 +143,8 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
          */
         //TODO: Adicionar Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
 
+        $this->addDiscountToQuote();
+
         return $result;
     }
 
@@ -151,8 +153,12 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
     }
 
-    public function addDiscountToOrder()
+    public function addDiscountToQuote()
     {
-
+      $sessionCheckout = Mage::getSingleton('checkout/session');
+      $quoteId = $sessionCheckout->getQuoteId();
+      $quote = Mage::getModel("sales/quote")->load($quoteId);
+      $quote->setDiscountAmount('2');
+      $quote->collectTotals()->save();
     }
 }
