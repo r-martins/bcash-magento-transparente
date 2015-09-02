@@ -102,7 +102,6 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $payment_method = $result['payment_method'];
             $installments = $result['installments'];
 
-
             /*
             1 – Em andamento
             3 – Aprovada
