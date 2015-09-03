@@ -75,8 +75,8 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
     {
 
         $order = new Mage_Sales_Model_Order();
-        $incrementId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-        $order->loadByIncrementId($incrementId);
+        $lastOrderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+        $order->loadByIncrementId($lastOrderId);
         $quoteId = $order->getQuoteId();
         $quote = Mage::getModel("sales/quote")->load($quoteId);
 
@@ -119,6 +119,9 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
         $block->setType($type);
 
         $this->getLayout()->getBlock('content')->append($block);
+
+        $this->_initLayoutMessages('checkout/session');
+        Mage::dispatchEvent('checkout_onepage_controller_success_action', array('order_ids' => array($lastOrderId)));
 
         //Release layout stream... lol... sounds fancy
         $this->renderLayout();
