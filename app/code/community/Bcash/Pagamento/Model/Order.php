@@ -56,4 +56,5 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 
         return $response;
     }
+
 }

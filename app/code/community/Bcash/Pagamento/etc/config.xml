@@ -7,22 +7,49 @@
     </modules>
     <global>
         <fieldsets>
-            <sales_convert_quote_payment>
-                <bcash_transaction_id>
-                    <to_order_payment>*</to_order_payment>
-                </bcash_transaction_id>
+
+            <sales_convert_quote>
+                <transaction_id_bcash>
+                    <to_order>*</to_order>
+                </transaction_id_bcash>
+                <status_bcash>
+                    <to_order>*</to_order>
+                </status_bcash>
+                <description_status_bcash>
+                    <to_order>*</to_order>
+                </description_status_bcash>
+                <payment_link_bcash>
+                    <to_order>*</to_order>
+                </payment_link_bcash>
+                <payment_method_bcash>
+                    <to_order>*</to_order>
+                </payment_method_bcash>
                 <installments_bcash>
-                    <to_quote_payment>*</to_quote_payment>
+                    <to_order>*</to_order>
                 </installments_bcash>
-            </sales_convert_quote_payment>
-            <sales_convert_order_payment>
-                <bcash_transaction_id>
-                    <to_quote_payment>*</to_quote_payment>
-                </bcash_transaction_id>
+            </sales_convert_quote>
+
+            <sales_convert_order>
+                <transaction_id_bcash>
+                    <to_quote>*</to_quote>
+                </transaction_id_bcash>
+                <status_bcash>
+                    <to_quote>*</to_quote>
+                </status_bcash>
+                <description_status_bcash>
+                    <to_quote>*</to_quote>
+                </description_status_bcash>
+                <payment_link_bcash>
+                    <to_quote>*</to_quote>
+                </payment_link_bcash>
+                <payment_method_bcash>
+                    <to_quote>*</to_quote>
+                </payment_method_bcash>
                 <installments_bcash>
-                    <to_quote_payment>*</to_quote_payment>
+                    <to_quote>*</to_quote>
                 </installments_bcash>
-            </sales_convert_order_payment>
+            </sales_convert_order>
+
         </fieldsets>
         <helpers>
             <pagamento>

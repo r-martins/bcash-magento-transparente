@@ -142,12 +142,24 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 }
             }
 
-            $this->transaction->quoteBcash
-                ->setTransactionIdBcash($response->transactionId)
-                ->setStatusBcash($response->status)
-                ->setDescriptionStatusBcash($response->descriptionStatus)
-                ->setPaymentLinkBcash($response->paymentLink)
-                ->save();
+            Mage::getSingleton('core/session')->setTransactionIdBcash($response->transactionId);
+            Mage::getSingleton('core/session')->setStatusBcash($response->status);
+            Mage::getSingleton('core/session')->setDescriptionStatusBcash(urldecode($response->descriptionStatus));
+            Mage::getSingleton('core/session')->setPaymentLinkBcash(urldecode($response->paymentLink));
+            Mage::getSingleton('core/session')->setPaymentMethodBcash($payment_method);
+            Mage::getSingleton('core/session')->setInstallmentsBcash($installments);
+
+            $cart = Mage::getSingleton('checkout/cart')->getQuote();
+            $cart->setTransactionIdBcash($response->transactionId)
+                 ->setStatusBcash($response->status)
+                 ->setDescriptionStatusBcash(urldecode($response->descriptionStatus))
+                 ->setPaymentLinkBcash(urldecode($response->paymentLink))
+                 ->setPaymentMethodBcash($payment_method)
+                 ->setInstallmentsBcash($installments);
+            $cart->save();
+
+
+
 
         } catch (Exception $e) {
             Mage::log($e->getMessage());
