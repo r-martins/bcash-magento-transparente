@@ -104,20 +104,23 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
             $type = $helper->getPaymentMethod($payment_method_bcash);
         }
 
-        //echo "<pre>";
-        //print_r($order->getData());
-        //echo "</pre>";
-        //
-        //echo "<pre>";
-        //print_r($quote);
-        //echo "</pre>";
-        //echo "Success Action";
-        //die();
         $this->loadLayout();
 
-        $this->_initLayoutMessages('core/session');
+        $this->getLayout()->getBlock('root')->setTemplate('page/2columns-right.phtml');
 
-        /* rendering layout */
+        $block = $this->getLayout()->createBlock(
+            'Mage_Core_Block_Template',
+            'link_pagamento_bcash',
+            array('template' => 'pagamento/checkout/success.phtml')
+        );
+
+        $block->setOrder($order);
+        $block->setQuote($quote);
+        $block->setType($type);
+
+        $this->getLayout()->getBlock('content')->append($block);
+
+        //Release layout stream... lol... sounds fancy
         $this->renderLayout();
     }
 }

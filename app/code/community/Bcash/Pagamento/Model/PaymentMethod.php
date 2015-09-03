@@ -58,12 +58,6 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
     public function getOrderPlaceRedirectUrl()
     {
-        /* Mage log is your friend.
-         * While it shouldn't be on in production,
-         * it makes debugging problems with your api much easier.
-         * The file is in magento-root/var/log/system.log
-         */
-
         Mage::log('Called custom ' . __METHOD__);
         $url = Mage::getUrl("pagamento/payment/success");
         return $url;

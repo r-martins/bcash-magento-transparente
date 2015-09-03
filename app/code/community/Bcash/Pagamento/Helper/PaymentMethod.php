@@ -67,4 +67,5 @@ class Bcash_Pagamento_Helper_PaymentMethod
         }
         return null;
     }
+
 }
