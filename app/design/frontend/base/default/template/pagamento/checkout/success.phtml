@@ -33,34 +33,34 @@
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
 <h2 class="sub-title"><?php echo $this->__('Thank you for your purchase!') ?></h2>
 
-<?php if ($this->getOrderId()):?>
-    <?php if ($this->getCanViewOrder()) :?>
+<?php if ($this->getOrderId()): ?>
+    <?php if ($this->getCanViewOrder()) : ?>
         <p><?php echo $this->__('Your order # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getViewOrderUrl()), $this->escapeHtml($this->getOrderId()))) ?></p>
-    <?php  else :?>
+    <?php else : ?>
         <p><?php echo $this->__('Your order # is: %s.', $this->escapeHtml($this->getOrderId())) ?></p>
-    <?php endif;?>
+    <?php endif; ?>
     <p><?php echo $this->__('You will receive an order confirmation email with details of your order and a link to track its progress.') ?></p>
-    <?php if ($this->getCanViewOrder() && $this->getCanPrintOrder()) :?>
+    <?php if ($this->getCanViewOrder() && $this->getCanPrintOrder()) : ?>
         <p>
             <?php echo $this->__('Click <a href="%s" onclick="this.target=\'_blank\'">here to print</a> a copy of your order confirmation.', $this->getPrintUrl()) ?>
             <?php echo $this->getChildHtml() ?>
         </p>
-    <?php endif;?>
-<?php endif;?>
+    <?php endif; ?>
+<?php endif; ?>
 
 <?php if ($this->getAgreementRefId()): ?>
-    <p><?php echo $this->__('Your billing agreement # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getAgreementUrl()), $this->escapeHtml($this->getAgreementRefId())))?></p>
-<?php endif;?>
+    <p><?php echo $this->__('Your billing agreement # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getAgreementUrl()), $this->escapeHtml($this->getAgreementRefId()))) ?></p>
+<?php endif; ?>
 
-<?php if ($profiles = $this->getRecurringProfiles()):?>
+<?php if ($profiles = $this->getRecurringProfiles()): ?>
     <p><?php echo $this->__('Your recurring payment profiles:'); ?></p>
     <ul class="disc">
-        <?php foreach($profiles as $profile):?>
-            <?php $profileIdHtml = ($this->getCanViewProfiles() ? sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getProfileUrl($profile)), $this->escapeHtml($this->getObjectData($profile, 'reference_id'))) : $this->escapeHtml($this->getObjectData($profile, 'reference_id')));?>
-            <li><?php echo $this->__('Payment profile # %s: "%s".', $profileIdHtml, $this->escapeHtml($this->getObjectData($profile, 'schedule_description')))?></li>
-        <?php endforeach;?>
+        <?php foreach ($profiles as $profile): ?>
+            <?php $profileIdHtml = ($this->getCanViewProfiles() ? sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getProfileUrl($profile)), $this->escapeHtml($this->getObjectData($profile, 'reference_id'))) : $this->escapeHtml($this->getObjectData($profile, 'reference_id'))); ?>
+            <li><?php echo $this->__('Payment profile # %s: "%s".', $profileIdHtml, $this->escapeHtml($this->getObjectData($profile, 'schedule_description'))) ?></li>
+        <?php endforeach; ?>
     </ul>
-<?php endif;?>
+<?php endif; ?>
 
 <?php
 //var_dump($this->getOrder()->getData());
@@ -69,29 +69,30 @@ $type = $this->getType();
 
 ?>
 
-<?php if ($type->type == Bcash_Pagamento_Helper_PaymentMethod::CARD_TYPE):?>
+<?php if ($type->type == Bcash_Pagamento_Helper_PaymentMethod::CARD_TYPE): ?>
 
     <!-- Compra realizada via Cartão de Crédito -->
 
-<?php elseif ($type->type == Bcash_Pagamento_Helper_PaymentMethod::ONLINE_TRANSFER_TYPE):?>
+<?php elseif ($type->type == Bcash_Pagamento_Helper_PaymentMethod::ONLINE_TRANSFER_TYPE): ?>
 
     <!-- Compra realizada via Transferência -->
 
-    Clique no icone ao lado para acessar seu banco para realizar a transferência <a href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
+    Clique no icone ao lado para acessar seu banco para realizar a transferência <a
+        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label
+            class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
 
-<?php elseif ($type->type == Bcash_Pagamento_Helper_PaymentMethod::BANKSLIP_TYPE):?>
+<?php elseif ($type->type == Bcash_Pagamento_Helper_PaymentMethod::BANKSLIP_TYPE): ?>
 
     <!-- Compra realizada via Boleto -->
-    Clique no icone ao lado para gerar o boleto para pagamento <a href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
+    Clique no icone ao lado para gerar o boleto para pagamento <a
+        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label
+            class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
 
 <?php endif; ?>
 
 <div class="buttons-set">
-    <button type="button" class="button" title="<?php echo $this->__('Continue Shopping') ?>" onclick="window.location='<?php echo $this->getUrl() ?>'">
+    <button type="button" class="button" title="<?php echo $this->__('Continue Shopping') ?>"
+            onclick="window.location='<?php echo $this->getUrl() ?>'">
         <?php echo $this->__('Continue Shopping') ?>
     </button>
 </div>
-
-<?php
-
-?>
