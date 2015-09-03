@@ -33,43 +33,46 @@
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
 <h2 class="sub-title"><?php echo $this->__('Thank you for your purchase!') ?></h2>
 
-<?php if ($this->getOrderId()): ?>
-    <?php if ($this->getCanViewOrder()) : ?>
-        <p><?php echo $this->__('Your order # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getViewOrderUrl()), $this->escapeHtml($this->getOrderId()))) ?></p>
+<?php
+//$this->escapeHtml($this->getOrder()->getViewOrderUrl())
+$url = Mage::getUrl() . 'sales/order/view/order_id' . $this->getOrder()->getId();
+$idPedido = $this->getQuote()->getReservedOrderId();
+?>
+
+<?php if ($this->getOrder()->getId()): ?>
+    <?php if ($this->getOrder()->getCanViewOrder()) : ?>
+        <p><?php echo $this->__('Your order # is: %s.', sprintf('<a href="%s">%s</a>', $url, $this->escapeHtml($idPedido))) ?></p>
     <?php else : ?>
-        <p><?php echo $this->__('Your order # is: %s.', $this->escapeHtml($this->getOrderId())) ?></p>
+        <p><?php echo $this->__('Your order # is: %s.', sprintf('<a href="%s">%s</a>', $url, $this->escapeHtml($idPedido))) ?></p>
     <?php endif; ?>
     <p><?php echo $this->__('You will receive an order confirmation email with details of your order and a link to track its progress.') ?></p>
-    <?php if ($this->getCanViewOrder() && $this->getCanPrintOrder()) : ?>
+    <?php if ($this->getOrder()->getCanViewOrder() && $this->getOrder()->getCanPrintOrder()) : ?>
         <p>
-            <?php echo $this->__('Click <a href="%s" onclick="this.target=\'_blank\'">here to print</a> a copy of your order confirmation.', $this->getPrintUrl()) ?>
+            <?php echo $this->__('Click <a href="%s" onclick="this.target=\'_blank\'">here to print</a> a copy of your order confirmation.', $this->getOrder()->getPrintUrl()) ?>
             <?php echo $this->getChildHtml() ?>
         </p>
     <?php endif; ?>
 <?php endif; ?>
 
-<?php if ($this->getAgreementRefId()): ?>
-    <p><?php echo $this->__('Your billing agreement # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getAgreementUrl()), $this->escapeHtml($this->getAgreementRefId()))) ?></p>
+<?php if ($this->getOrder()->getAgreementRefId()): ?>
+    <p><?php echo $this->__('Your billing agreement # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getOrder()->getAgreementUrl()), $this->escapeHtml($this->getOrder()->getAgreementRefId()))) ?></p>
 <?php endif; ?>
 
-<?php if ($profiles = $this->getRecurringProfiles()): ?>
+<?php if ($profiles = $this->getOrder()->getRecurringProfiles()): ?>
     <p><?php echo $this->__('Your recurring payment profiles:'); ?></p>
     <ul class="disc">
         <?php foreach ($profiles as $profile): ?>
-            <?php $profileIdHtml = ($this->getCanViewProfiles() ? sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getProfileUrl($profile)), $this->escapeHtml($this->getObjectData($profile, 'reference_id'))) : $this->escapeHtml($this->getObjectData($profile, 'reference_id'))); ?>
+            <?php $profileIdHtml = ($this->getOrder()->getCanViewProfiles() ? sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getOrder()->getProfileUrl($profile)), $this->escapeHtml($this->getOrder()->getObjectData($profile, 'reference_id'))) : $this->escapeHtml($this->getOrder()->getObjectData($profile, 'reference_id'))); ?>
             <li><?php echo $this->__('Payment profile # %s: "%s".', $profileIdHtml, $this->escapeHtml($this->getObjectData($profile, 'schedule_description'))) ?></li>
         <?php endforeach; ?>
     </ul>
 <?php endif; ?>
-
+<br/>
+<br/>
 <?php
-//var_dump($this->getOrder()->getData());
-//var_dump($this->getType());
 $type = $this->getType();
 
-?>
-
-<?php if ($type->type == Bcash_Pagamento_Helper_PaymentMethod::CARD_TYPE): ?>
+if ($type->type == Bcash_Pagamento_Helper_PaymentMethod::CARD_TYPE): ?>
 
     <!-- Compra realizada via Cartão de Crédito -->
 
@@ -78,14 +81,14 @@ $type = $this->getType();
     <!-- Compra realizada via Transferência -->
 
     Clique no icone ao lado para acessar seu banco para realizar a transferência <a
-        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label
+        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" ><label
             class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
 
 <?php elseif ($type->type == Bcash_Pagamento_Helper_PaymentMethod::BANKSLIP_TYPE): ?>
 
     <!-- Compra realizada via Boleto -->
     Clique no icone ao lado para gerar o boleto para pagamento <a
-        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" target="_new"><label
+        href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" ><label
             class="bandeira band-<?php echo $type->id ?>" for="payment-method-<?php echo $type->id ?>"></label></a>
 
 <?php endif; ?>
