@@ -55,4 +55,16 @@ class Bcash_Pagamento_Helper_PaymentMethod
             self::ONLINE_TRANSFER_TYPE => self::$onlineTransfer
         );
     }
+
+    public function getPaymentMethod($payment_method){
+        $methods = $this->getPaymentMethods();
+        foreach ($methods as $type => $methodsType) {
+            foreach ($methodsType as $PaymentObject) {
+                if($payment_method == $PaymentObject->id){
+                    return $PaymentObject;
+                }
+            }
+        }
+        return null;
+    }
 }
