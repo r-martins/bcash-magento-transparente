@@ -27,11 +27,13 @@ class Bcash_Pagamento_Model_Observer
     }
 
     /**
+     * Registra os dados do pedido na sessão.
      * See etc/config.xml
      * Triggered by: Mage::dispatchEvent('checkout_type_onepage_save_order_after', array('order'=>$order, 'quote'=>$this->getQuote()));
      * @param Varien_Event_Observer $observer
      */
-    public function saveOrderQuoteToSession($observer){
+    public function saveOrderQuoteToSession($observer)
+    {
         /* @var $event Varien_Event */
         $event = $observer->getEvent();
         /* @var $order Mage_Sales_Model_Order */
@@ -41,15 +43,70 @@ class Bcash_Pagamento_Model_Observer
         $session = Mage::getSingleton('checkout/session');
         $quoteId = $quote->getId();
         $orderId = $order->getId();
-        $incrId  = $order->getIncrementId();
+        $incrId = $order->getIncrementId();
         Mage::log("Saving quote  [$quoteId] and order [$incrId] to checkout/session");
-        $session->setData('OrderIdBcash',$orderId);
-        $session->setData('OrderIncrementIdBcash',$incrId);
-        $session->setData('QuoteIdBcash',$quoteId);
+        $session->setData('OrderIdBcash', $orderId);
+        $session->setData('OrderIncrementIdBcash', $incrId);
+        $session->setData('QuoteIdBcash', $quoteId);
         unset($event);
         unset($order);
         unset($quote);
         unset($session);
         return $this;
     }
+
+    /*
+    <global>
+    - If you want your observer to listen no matter where the event is dispatched from, put it here. You can also put it in "frontend" or "adminhtml".
+    <events>
+    - This is the element that stores all of the events that are registered.
+    <checkout_submit_all_after>
+    - This is the "event" that you are listening to.
+    <observers>
+    - This is the type of event. I don't think there are others.
+    <awesome_example>
+    - This is a unique string that defines this configuration. It can be anything, and just needs to be unique.
+    <type>
+    - I have always used singleton, but other options can be "model" or "object". The "singleton" will create the object as Mage::getSingleton()
+    while both "object" and "model" will use Mage::getModel() when creating the observer object.
+    <class>
+    - This is the observer class.
+    <method>
+    - This is the function to be called in the observer class.
+    */
+
+    /**
+     * Adiciona o Link do meio de pagamento a página de sucesso.
+     * @param $observer
+     */
+    public function orderSuccessEvent($observer)
+    {
+        Mage::log("Bcash_Pagamento_Model_Observer::showPaymentLink");
+        try {
+            $order = new Mage_Sales_Model_Order();
+            $lastOrderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+            $order->loadByIncrementId($lastOrderId);
+            $quoteId = $order->getQuoteId();
+            $quote = Mage::getModel("sales/quote")->load($quoteId);
+            $type = null;
+            $payment_method_bcash = $order->getPaymentMethodBcash();
+            if ($payment_method_bcash) {
+                $helper = new Bcash_Pagamento_Helper_PaymentMethod();
+                $type = $helper->getPaymentMethod($payment_method_bcash);
+            }
+            $layout = Mage::app()->getLayout();
+            $block = $layout->createBlock(
+                'Mage_Core_Block_Template',
+                'link_pagamento_bcash',
+                array('template' => 'pagamento/checkout/success.phtml')
+            );
+            $block->setOrder($order);
+            $block->setQuote($quote);
+            $block->setType($type);
+            $layout->getBlock('content')->append($block);
+        } catch(Exception $e) {
+            Mage::log($e->getMessage());
+        }
+    }
+
 }
