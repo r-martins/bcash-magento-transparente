@@ -15,7 +15,14 @@ class Bcash_Pagamento_Model_Observer
         $origOrderData = $observer->getEvent()->getData('data_object')->getOrigData();
         $newOrderData = $observer->getEvent()->getData('data_object')->getData();
         if (($origOrderData['state'] !== $newOrderData['state']) && ($newOrderData['state'] == Mage_Sales_Model_Order::STATE_CANCELED)) {
-            // TODO: Verificar se pedido possui transação Bcash e registrar em histórico
+            // Verifica se pedido possui transação Bcash relacionada
+            $order = $observer->getOrder()->getData();
+            if(!empty($order['transaction_id_bcash']) && !is_null($order['transaction_id_bcash'])) {
+                $orderId = $order['entity_id'];
+                $order = Mage::getModel('sales/order')->load($orderId);
+                $order->addStatusHistoryComment('Pedido não cancelado através do cancelamento Bcash. A transação ' . $order['transaction_id_bcash'] . ' não foi alterada.');
+                $order->save();
+            }
         }
     }
 

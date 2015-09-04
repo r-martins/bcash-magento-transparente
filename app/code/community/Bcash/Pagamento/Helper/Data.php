@@ -26,6 +26,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
     {
         $response = null;
         $consultation = new Consultation($this->email, $this->token);
+        $consultation->enableSandBox($this->sandbox);
 
         try {
             if (!empty($transactionId) && !is_null($transactionId)) {
