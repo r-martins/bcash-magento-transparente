@@ -72,7 +72,6 @@ while both "object" and "model" will use Mage::getModel() when creating the obse
 
         $order = new Mage_Sales_Model_Order();
         $lastOrderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-        $lastOrderId = '145000069';
         $order->loadByIncrementId($lastOrderId);
         $quoteId = $order->getQuoteId();
         $quote = Mage::getModel("sales/quote")->load($quoteId);
