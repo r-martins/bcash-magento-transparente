@@ -193,7 +193,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $url = Mage::getUrl('pagamento/notification/request');
         $transactionRequest = new TransactionRequest();
         $transactionRequest->setSellerMail($this->email);
-        $transactionRequest->setOrderId($this->quoteIdTransaction);
+        $transactionRequest->setOrderId($this->quoteBcash->getReservedOrderId());
         $transactionRequest->setBuyer($this->createBuyerBcash());
         $transactionRequest->setUrlNotification($url);
         $transactionRequest->setProducts($this->createProductBcash());
