@@ -85,30 +85,41 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
 
         if ($order->getId()) {
             try {
-                // TODO: Código de transação registrado no pedido
-                //$orderTransaction = $newOrderData['some_attribute_value'];
-                $orderTransaction = "a32ad4asdf435asdf435435as76";
+                // Consulta transaçao Bcash
+                $quoteId = $order->getQuoteId();
+                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                $orderTransactionBcash = $quote->getTransactionIdBcash();
+                $transactionInfo = Mage::helper('pagamento')->getTransaction($orderTransactionBcash);
 
-                if (!is_null($orderTransaction) && !empty($orderTransaction)) {
+                // Checa se o status da transaçao Bcash permite cancelamento
+                //const IN_PROGRESS = 1;
+                //const APPROVED = 3;
+                if($transactionInfo->transacao->cod_status == 1 || $transactionInfo->transacao->cod_status == 3) {
                     $pagamentoOrderModel = Mage::getModel('pagamento/order');
-                    $responseCancellation = $pagamentoOrderModel->cancellation($orderTransaction);
+                    $responseCancellation = $pagamentoOrderModel->cancellation($orderTransactionBcash);
 
                     if ($responseCancellation != null) {
-                        // TODO: Retorno correto da API
-                        if ($responseCancellation['control_cancellation'] == true) {
+                        // NotificationStatusEnum -> const CANCELLED = 7;
+                        if ($responseCancellation->transactionStatusId == 7) {
                             // Registro do cancelamento no pedido
                             $order->registerCancellation('Cancelamento efetivado no Bcash. ', TRUE)->save();
 
+                            // Atualiza status na transação
+                            $quote->setStatusBcash($responseCancellation->transactionStatusId)
+                                  ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
+                            $quote->save();
+
                             return true;
                         } else {
-                            // Registro em histórico do pedido de cancelamento não efetivado
-                            $order->addStatusHistoryComment('Tentativa de cancelamento não efetivada no Bcash.' . $responseCancellation['message_fail']);
+                            // Registro em histórico do pedido: cancelamento não efetivado
+                            $order->addStatusHistoryComment('Tentativa de cancelamento não efetivada no Bcash.');
                             $order->save();
 
                             return false;
                         }
                     }
                 }
+
             } catch (Mage_Core_Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             } catch (Exception $e) {
