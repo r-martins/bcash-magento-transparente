@@ -7,7 +7,6 @@
     </modules>
     <global>
         <fieldsets>
-
             <sales_convert_quote>
                 <transaction_id_bcash>
                     <to_order>*</to_order>
@@ -28,7 +27,6 @@
                     <to_order>*</to_order>
                 </installments_bcash>
             </sales_convert_quote>
-
             <sales_convert_order>
                 <transaction_id_bcash>
                     <to_quote>*</to_quote>
@@ -49,7 +47,6 @@
                     <to_quote>*</to_quote>
                 </installments_bcash>
             </sales_convert_order>
-
         </fieldsets>
         <helpers>
             <pagamento>
@@ -178,5 +175,12 @@
                 </args>
             </pagamento>
         </routers>
+        <layout>
+            <updates>
+                <bcash_pagamento>
+                    <file>bcash/pagamento/layout.xml</file>
+                </bcash_pagamento>
+            </updates>
+        </layout>
     </frontend>
 </config>
