@@ -15,6 +15,7 @@ $paymentGroupName = array(
 );
 ?>
 <div id="payment-<?php echo $code; ?>">
+
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
         <div class="payment-group">
             <div>
@@ -143,35 +144,7 @@ $paymentGroupName = array(
                             </select>
                         </div>
                     </div>
-                    <!--
-                    <hr>
 
-                    <div class="b-row">
-                        <div class="b-form-group b-col-xs-4">
-                            <label>CPF/CNPJ do titular</label>
-                            <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash"
-                                   name="cpf_cnpj_bcash" value=""
-                                   maxlength="18" autocomplete="off">
-                        </div>
-
-                        <div class="b-form-group b-col-xs-6">
-                            <label class="b-l-margin">Telefone do titular</label>
-
-                            <div class="b-form-group">
-                                <div class="b-col-xs-4">
-                                    <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
-                                           name="ddd_bcash"
-                                           id="ddd_bcash">
-                                </div>
-                                <div class="b-col-xs-8">
-                                    <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
-                                           name="phone_bcash"
-                                           id="phone_bcash">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    //-->
 
                 </div> <!-- card-conteiner -->
 
@@ -185,6 +158,36 @@ $paymentGroupName = array(
         <?php
         $size--;
     endforeach; ?>
+                    <hr>
+
+                    <div class="b-row">
+                        <?php if($this->cpf) : ?>
+                        <div class="b-form-group b-col-xs-4">
+                            <label>CPF/CNPJ do titular</label>
+                            <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash"
+                                   name="cpf_cnpj_bcash" value=""
+                                   maxlength="18" autocomplete="off"/>
+                        </div>
+                        <?php endif; ?>
+                        <?php if($this->phone) : ?>
+                        <div class="b-form-group b-col-xs-6">
+                            <label class="b-l-margin">Telefone do titular</label>
+                            <div class="b-form-group">
+                                <div class="b-col-xs-4">
+                                    <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
+                                           name="ddd_bcash"
+                                           id="ddd_bcash">
+                                </div>
+                                <div class="b-col-xs-8">
+                                    <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
+                                           name="phone_bcash"
+                                           id="phone_bcash">
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                      <!--  //-->
 </div>
 <!-- div b-col-xs-4 -->
 <script type="text/javascript">
