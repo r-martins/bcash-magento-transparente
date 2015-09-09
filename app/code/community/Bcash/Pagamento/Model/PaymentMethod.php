@@ -108,7 +108,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             */
 
             //TODO: Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
-            if ($response->status != 1) {
+            if ($response->status != 1 && $response->status != 2) {
 
                 $setIsNotified = false;
                 switch($response->status)

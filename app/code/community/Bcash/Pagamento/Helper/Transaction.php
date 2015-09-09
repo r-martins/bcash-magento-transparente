@@ -190,6 +190,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createTransactionRequestBcash()
     {
+        //Id:Plataforma => 565
         $url = Mage::getUrl('pagamento/notification/request');
         $transactionRequest = new TransactionRequest();
         $transactionRequest->setSellerMail($this->email);

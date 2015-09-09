@@ -87,9 +87,9 @@ class Bcash_Pagamento_Model_Observer
             $lastOrderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
             $order->loadByIncrementId($lastOrderId);
             $quoteId = $order->getQuoteId();
-            $quote = Mage::getModel("sales/quote")->load($quoteId);
+            $quote = Mage::getModel("sales/quote")->loadByIdWithoutStore($quoteId);
             $type = null;
-            $payment_method_bcash = $order->getPaymentMethodBcash();
+            $payment_method_bcash = $quote->getPaymentMethodBcash();
             if ($payment_method_bcash) {
                 $helper = new Bcash_Pagamento_Helper_PaymentMethod();
                 $type = $helper->getPaymentMethod($payment_method_bcash);
