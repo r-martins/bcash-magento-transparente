@@ -270,27 +270,15 @@ $paymentGroupName = array(
         }
 
         Validation.add('validate-cpf-cnpj', 'Documento inválido.', function (v) {
-            var iscard = checkIsCardSelected();
-            if (iscard) {
-                return isCpfCnpj(v);
-            }
-            return true;
+            return isCpfCnpj(v);
         });
 
         Validation.add('validate-ddd', 'Preencha o ddd.', function (v) {
-            var iscard = checkIsCardSelected();
-            if (iscard) {
-                return v.length == 2;
-            }
-            return true;
+            return v.length == 2;
         });
 
         Validation.add('validate-phone', 'Preencha o telefone.', function (v) {
-            var iscard = checkIsCardSelected();
-            if (iscard) {
-                return v.length == 8 || v.length == 9;
-            }
-            return true;
+           return v.length == 8 || v.length == 9;
         });
 
         Validation.add('validate-name-card', 'Preencha o nome do titular.', function (v) {

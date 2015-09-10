@@ -288,7 +288,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : null;
         $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
 
-        if (boolval($this->cpf) && !$cpf_cnpj_bcash) {
+        if (boolval($this->cpf)) {
             $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
             $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
         }
@@ -315,14 +315,14 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function completePhoneBcash($attr = null)
     {
+        if (boolval($this->phone)) {
+            $phone = Mage::app()->getRequest()->getPost('ddd_bcash') . Mage::app()->getRequest()->getPost('phone_bcash');
+            $phone = preg_replace('/[^0-9]+/', '', $phone);
+            return $this->parsePhone($phone);
+        }
         $address  = $this->quoteBcash->getBillingAddress()->getData();
-        if(!is_null($attr)) {
+        if (!is_null($attr)) {
             $phone = $this->parsePhone($address[$attr]);
-            if (boolval($this->phone) && !$phone) {
-                $phone = Mage::app()->getRequest()->getPost('ddd_bcash') . Mage::app()->getRequest()->getPost('phone_bcash');
-                $phone = preg_replace('/[^0-9]+/', '', $phone);
-                $phone = $this->parsePhone($phone);
-            }
             return $phone;
         }
         return $this->parsePhone($address['telephone']);
