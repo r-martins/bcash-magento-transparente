@@ -37,7 +37,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     public function indexAction()
     {
         // Notification Simulator
-        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "435", "145000033", "3");
+        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "509", "145000040", "1");
     }
 
     /**
@@ -61,17 +61,19 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
         try {
             $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
             if ($order->getData() != null) {
-                // Registro de notificação recebida
-                $order->addStatusHistoryComment('Notificação da transação de pagamento recebida. Status: ' . $status);
-                $order->save();
-
                 // Checa requisição válida através de valor total do pedido (valor dos produtos + frete + acréscimo - desconto)
                 $transactionValue = $order->getBaseGrandTotal();
                 $validNotification = $notification->verify($transactionValue);
 
                 if ($validNotification == true) {
+                    // Registro de notificação recebida
+                    $order->addStatusHistoryComment('Notificação da transação de pagamento recebida. Status: ' . $status);
+                    $order->save();
+
                     // Processamento da notificação no pedido
                     $this->processNotification($transactionId, $orderId, $statusId);
+                }else {
+                    Mage::log("Invalid bcash notification: Transaction: " . $transactionId . " - Status: " . $statusId);
                 }
             } else {
                 Mage::log("Pedido " . $orderId . " não identificado. ");
@@ -100,9 +102,17 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
         $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
 
         switch ($statusId) {
-            case NotificationStatusEnum::APPROVED:
-                $order->getPayment()->registerCaptureNotification($order->getBaseGrandTotal());
-                $order->getPayment()->setTransactionId($transactionId);
+            case NotificationStatusEnum::APPROVED || NotificationStatusEnum::COMPLETED:
+                //$order->getPayment()->registerCaptureNotification();
+                //$order->getPayment()->setTransactionId($transactionId);
+                //$order->save();
+                $BaseGrandtotal = $order->getBaseGrandTotal();
+                $payment = $order->getPayment();
+                $payment->setTransactionId($transactionId)
+                        ->setCurrencyCode($order->getBaseCurrencyCode())
+                        ->setPreparedMessage("Pagamento aprovado.")
+                        ->setIsTransactionClosed(1)
+                        ->registerCaptureNotification($BaseGrandtotal);
                 $order->save();
 
                 // Atualiza status na transação
@@ -113,9 +123,21 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 $quote->save();
                 break;
             case NotificationStatusEnum::IN_PROGRESS:
-                $order->getPayment()->registerCaptureNotification();
-                $order->getPayment()->setTransactionId($transactionId);
+                //$order->getPayment()->registerCaptureNotification();
+                //$order->getPayment()->setTransactionId($transactionId);
+                //$order->save();
+
+                $payment = $order->getPayment();
+               // $payment->setTransactionId($transactionId)
+                    //    ->setPreparedMessage("Aguardando pagamento.")
+                 //       ->setIsTransactionClosed(0);
+                //$order->save();
+
+                $payment->setTransactionId($transactionId);
+                $payment->setIsTransactionClosed(0);
+                $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, array('Status'=>'Em andamento'));
                 $order->save();
+
                 break;
             case NotificationStatusEnum::CANCELLED:
                 $order->registerCancellation('Pagamento cancelado.', TRUE)->save();
@@ -127,6 +149,10 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 $quote->setStatusBcash($statusId)
                       ->setDescriptionStatusBcash("Cancelada");
                 $quote->save();
+                break;
+            case NotificationStatusEnum::IN_DISPUTE:
+                break;
+            case NotificationStatusEnum::CHARGEBACK:
                 break;
             default:
                 //$order->registerCancellation('Nothing to do.', TRUE)->save();
