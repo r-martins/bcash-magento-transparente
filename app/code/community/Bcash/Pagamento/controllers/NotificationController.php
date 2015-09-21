@@ -37,7 +37,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     public function indexAction()
     {
         // Notification Simulator
-        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "509", "145000040", "1");
+        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "503", "145000036", "8");
     }
 
     /**
@@ -100,62 +100,68 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     {
         // Carrega pedido a partir de código incremental
         $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-
         switch ($statusId) {
-            case NotificationStatusEnum::APPROVED || NotificationStatusEnum::COMPLETED:
-                //$order->getPayment()->registerCaptureNotification();
-                //$order->getPayment()->setTransactionId($transactionId);
-                //$order->save();
-                $BaseGrandtotal = $order->getBaseGrandTotal();
-                $payment = $order->getPayment();
-                $payment->setTransactionId($transactionId)
-                        ->setCurrencyCode($order->getBaseCurrencyCode())
-                        ->setPreparedMessage("Pagamento aprovado.")
-                        ->setIsTransactionClosed(1)
-                        ->registerCaptureNotification($BaseGrandtotal);
-                $order->save();
+            case NotificationStatusEnum::APPROVED:
+            case NotificationStatusEnum::COMPLETED:
+                    $BaseGrandtotal = $order->getBaseGrandTotal();
+                    $payment = $order->getPayment();
+                    $payment->setTransactionId($transactionId)
+                            ->setCurrencyCode($order->getBaseCurrencyCode())
+                            ->setPreparedMessage("Pagamento aprovado.")
+                            ->setIsTransactionClosed(1)
+                            ->registerCaptureNotification($BaseGrandtotal);
+                    $order->save();
 
-                // Atualiza status na transação
-                $quoteId = $order->getQuoteId();
-                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
-                $quote->setStatusBcash($statusId)
-                      ->setDescriptionStatusBcash("Aprovada");
-                $quote->save();
+                    // Atualiza status na transação
+                    $quoteId = $order->getQuoteId();
+                    $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                    $quote->setStatusBcash($statusId)
+                          ->setDescriptionStatusBcash("Aprovada");
+                    $quote->save();
                 break;
             case NotificationStatusEnum::IN_PROGRESS:
-                //$order->getPayment()->registerCaptureNotification();
-                //$order->getPayment()->setTransactionId($transactionId);
-                //$order->save();
-
-                $payment = $order->getPayment();
-               // $payment->setTransactionId($transactionId)
-                    //    ->setPreparedMessage("Aguardando pagamento.")
-                 //       ->setIsTransactionClosed(0);
-                //$order->save();
-
-                $payment->setTransactionId($transactionId);
-                $payment->setIsTransactionClosed(0);
-                $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, array('Status'=>'Em andamento'));
-                $order->save();
-
+                    $payment = $order->getPayment();
+                    $payment->setTransactionId($transactionId);
+                    $payment->setIsTransactionClosed(0);
+                    $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, array('Status'=>'Em andamento'));
+                    $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
                 break;
             case NotificationStatusEnum::CANCELLED:
-                $order->registerCancellation('Pagamento cancelado.', TRUE)->save();
-                $order->save();
+                    $order->registerCancellation('Pagamento cancelado.', TRUE)->save();
+                    $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true);
+                    $order->save();
 
-                // Atualiza status na transação
-                $quoteId = $order->getQuoteId();
-                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
-                $quote->setStatusBcash($statusId)
-                      ->setDescriptionStatusBcash("Cancelada");
-                $quote->save();
+                    // Atualiza status na transação
+                    $quoteId = $order->getQuoteId();
+                    $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                    $quote->setStatusBcash($statusId)
+                          ->setDescriptionStatusBcash("Cancelada");
+                    $quote->save();
                 break;
             case NotificationStatusEnum::IN_DISPUTE:
+                    $order->addStatusHistoryComment('A transação ' . $transactionId . ' está com status EM DISPUTA. Entre em contato com o Bcash.');
+                    if($order->canHold()) {
+                        $order->hold();
+                    }else {
+                        $order->setState(Mage_Sales_Model_Order::STATE_HOLDED, true);
+                    }
+                    $order->save();
                 break;
             case NotificationStatusEnum::CHARGEBACK:
+                    $order->addStatusHistoryComment('A transação ' . $transactionId . ' está com status CHARGEBACK EM ANÁLISE. Entre em contato com o Bcash.');
+                    if($order->canHold()) {
+                        $order->hold();
+                    }else {
+                        $order->setState(Mage_Sales_Model_Order::STATE_HOLDED, true);
+                    }
+                    $order->save();
+                break;
+            case NotificationStatusEnum::REFUNDED:
+                    $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true)->save();
                 break;
             default:
-                //$order->registerCancellation('Nothing to do.', TRUE)->save();
+                $order->addStatusHistoryComment('Notificação da transação ' . $transactionId . ' sem ação identificada para o status ' . $statusId);
+                $order->save();
                 break;
         }
     }
