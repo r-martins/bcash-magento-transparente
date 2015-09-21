@@ -125,6 +125,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     private $phone;
 
+    private $platformId;
+
     public function __construct()
     {
         $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
@@ -150,6 +152,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
         $this->payment_method = Mage::app()->getRequest()->getPost('payment-method');
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
+
     }
 
     /**
@@ -158,6 +161,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function startTransaction()
     {
+        
         $this->transactionRequest = $this->createTransactionRequestBcash();
         $this->setShippingBcash();
         $this->setPaymentMethodBcash();
@@ -167,7 +171,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
         try {
             $response = $payment->create($this->transactionRequest);
-            return array(
+
+            $arRet = array(
                 'response' => $response,
                 'payment_method' => $this->payment_method,
                 'discountPercent' => $this->discountPercentBcash,
@@ -175,6 +180,24 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 'deps' => $this->deps,
                 'installments' => $this->installments
             );
+
+            if(isset($arRet['response']->cancellationCode) && $arRet['response']->cancellationCode == "700000"){
+                Mage::throwException(urldecode($arRet['response']->message));
+                /*echo "<script>
+                        try{
+                            checkout.changeSection('opc-payment');
+                        }
+                        catch
+                        {
+
+                        }
+                      </script>
+                ";*/
+            }else{
+                return $arRet;
+            }
+
+
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
@@ -184,6 +207,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             }
             Mage::throwException(implode("\n", $messages));
         } catch (ConnectionException $e) {
+            //echo "3<hr/>";
+
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = array();
@@ -211,6 +236,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $transactionRequest->setAcceptedContract("S");
         $transactionRequest->setViewedContract("S");
         $transactionRequest->setDependentTransactions($this->createDependentTransactionsBcash());
+        $transactionRequest->setPlatformId(565);
+        //var_dump($transactionRequest);
         return $transactionRequest;
     }
 
@@ -246,7 +273,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $percent = $this->obj->getConfigData('desconto_boleto');
         }
         if ($percent) {
-            $discount = floatval(($this->subTotalBcash / 100) * $percent);
+            //$discount = floatval(($this->subTotalBcash / 100) * $percent);
+            $discount = floatval(number_format(($this->subTotalBcash / 100) * $percent, 2, '.', ''));
             $this->discountPercentBcash = $percent;
             $this->discountBcash = $discount;
         }

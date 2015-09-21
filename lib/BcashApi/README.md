@@ -3,7 +3,24 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/bcash/bcash-php-sdk.svg?style=flat)](https://packagist.org/packages/bcash/bcash-php-sdk)
 [![GitHub tag](https://img.shields.io/github/tag/payu-br/bcash-php-sdk.svg)](https://github.com/payu-br/bcash-php-sdk)
 
+## Requisitos
+ * PHP >= 5.3
+ * extensões: cURL e JSON.
 
+## Instalando utilizando o composer
+
+Adicione a dependencia do sdk no seu arquivo de configuração do composer. Por exemmplo:
+
+```javascript
+{
+    "config": {
+        "vendor-dir": "lib"
+    },
+    "require": {
+        "bcash/bcash-php-sdk": "dev-develop"
+    }
+}
+```
 
 ## Exemplo de criação de transação
 ```php
@@ -318,7 +335,7 @@ transação:
 $transactionRequest->setUrlNotification("https://www.minhaloja.com.br/notification.php");
 ```
 O seguinte exemplo demonstra como deve ser realizado o recebimento
-do post de retorno na url informada.
+da notificação de alteração de status na url informada.
 
 ```php
 require_once '../lib/bcash-php-sdk/autoloader.php';
