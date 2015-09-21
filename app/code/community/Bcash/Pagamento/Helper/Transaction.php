@@ -116,6 +116,14 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      * @var
      */
     public $boleto;
+    /**
+     * @var
+     */
+    private $cpf;
+    /**
+     * @var
+     */
+    private $phone;
 
     public function __construct()
     {
@@ -125,6 +133,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->sandbox = $this->obj->getConfigData('sandbox');
         $this->consumer_key = $this->obj->getConfigData('consumer_key');
         $this->dependents = $this->obj->getConfigData('transacao_dependente');
+        $this->cpf = $this->obj->getConfigData('cpf');
+        $this->phone = $this->obj->getConfigData('phone');
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
         $sessionCheckout->setData('QuoteIdBcash', $quoteId);
@@ -275,8 +285,14 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $customer_id = $this->quoteBcash->getCustomerId();
         $customer = Mage::getModel('customer/customer')->load($customer_id);
         $customerData = $customer->getData();
-        $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
+        $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : null;
         $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+
+        if (boolval($this->cpf)) {
+            $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
+            $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+        }
+
         $buyer = new Customer();
         $buyer->setMail($customerData['email']);
         $name  = ($customerData['firstname']);
@@ -299,9 +315,15 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function completePhoneBcash($attr = null)
     {
+        if (boolval($this->phone)) {
+            $phone = Mage::app()->getRequest()->getPost('ddd_bcash') . Mage::app()->getRequest()->getPost('phone_bcash');
+            $phone = preg_replace('/[^0-9]+/', '', $phone);
+            return $this->parsePhone($phone);
+        }
         $address  = $this->quoteBcash->getBillingAddress()->getData();
-        if(!is_null($attr)) {
-            return $this->parsePhone($address[$attr]);
+        if (!is_null($attr)) {
+            $phone = $this->parsePhone($address[$attr]);
+            return $phone;
         }
         return $this->parsePhone($address['telephone']);
     }
