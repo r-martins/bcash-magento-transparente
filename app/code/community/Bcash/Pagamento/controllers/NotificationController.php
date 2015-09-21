@@ -36,8 +36,43 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
      */
     public function indexAction()
     {
-        // Notification Simulator
-        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "503", "145000036", "8");
+        if($this->sandbox) {
+            // Get request
+            $transactionId = Mage::app()->getRequest()->getParam('transactionId');
+            $orderId = trim(stripslashes(Mage::app()->getRequest()->getParam('orderId')));
+            $statusId = (int)Mage::app()->getRequest()->getParam('statusId');
+
+            // Notification Simulator
+            $urlSubmit = Mage::getUrl('pagamento/notification/index');
+            echo "<h1>Bcash Notification Simulator</h1>
+              <form method='GET' action='" . $urlSubmit . "'>
+                <label>Nro. Pedido:</label>
+                <input type='text' name='orderId' placeholder='Nro. Pedido' value='" . $orderId . "'/>
+                <label>Nro. Transação:</label>
+                <input type='text' name='transactionId' placeholder='Nro. Transação' value='" . $transactionId . "'/>
+                <label>Status:</label>
+                <select name='statusId'>
+                    <option value='1' " . ($statusId == 1 ? "selected" : "") . ">Em andamento</option>
+                    <option value='3' " . ($statusId == 3 ? "selected" : "") . ">Aprovada</option>
+                    <option value='4' " . ($statusId == 4 ? "selected" : "") . ">Concluída</option>
+                    <option value='5' " . ($statusId == 5 ? "selected" : "") . ">Em disputa</option>
+                    <option value='6' " . ($statusId == 6 ? "selected" : "") . ">Devolvida</option>
+                    <option value='7' " . ($statusId == 7 ? "selected" : "") . ">Cancelada</option>
+                    <option value='8' " . ($statusId == 8 ? "selected" : "") . ">Chargeback</option>
+                </select>
+                <input type='submit' value='Enviar'/>
+             </form>";
+
+            if(!empty($transactionId) && !empty($statusId) && !empty($orderId)) {
+                $urlSimulator = Mage::getUrl('pagamento/notification/request');
+                $returnSimulator = $this->notificationSimulator($urlSimulator, $transactionId, $orderId, $statusId);
+                echo "<h2>Retorno:</h2> <div style='clear:both;'></div><pre style='background-color: #EAEAEA; padding:20px;'>";
+                var_dump($returnSimulator);
+                echo "</pre>";
+            }
+        }else {
+            echo "Habilite o Sandbox para simular notificações pelo Bcash.";
+        }
     }
 
     /**
@@ -178,11 +213,9 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     {
         try {
             $result = NotificationSimulator::test($notificationUrl, $transactionId, $orderId, $statusId);
-
-            echo "<pre>";
-            var_dump($result);
-            echo "</pre>";
+            return $result;
         } catch (ConnectionException $e) {
+            return $e->getMessage();
         }
     }
 }
