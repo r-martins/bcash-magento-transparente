@@ -181,7 +181,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 'installments' => $this->installments
             );
 
-            if(isset($arRet['response']->cancellationCode) && $arRet['response']->cancellationCode == "700000"){
+            if(isset($arRet['response']->cancellationCode) && substr($arRet['response']->cancellationCode,0,1) == "7"){
                 Mage::throwException(urldecode($arRet['response']->message));
                 /*echo "<script>
                         try{
