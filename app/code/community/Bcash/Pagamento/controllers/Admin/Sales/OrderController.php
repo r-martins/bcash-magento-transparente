@@ -111,6 +111,21 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
                             $quote->save();
 
                             return true;
+                        } else if ($responseCancellation->transactionStatusId == NotificationStatusEnum::REFUNDED) {
+                            // Registro do estorno do pagamento
+                            $payment = $order->getPayment();
+                            $payment->setTransactionId($orderTransactionBcash)
+                                ->setPreparedMessage("Pagamento devolvido.")
+                                ->setIsTransactionClosed(1);
+                            $payment->setRefundTransactionId($orderTransactionBcash);
+                            $order->registerCancellation('Pagamento devolvido no Bcash. ', TRUE)->save();
+
+                            // Atualiza status na transação
+                            $quote->setStatusBcash($responseCancellation->transactionStatusId)
+                                ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
+                            $quote->save();
+
+                            return true;
                         } else {
                             // Registro em histórico do pedido: cancelamento não efetivado
                             $order->addStatusHistoryComment('Tentativa de cancelamento não efetivada no Bcash.');
