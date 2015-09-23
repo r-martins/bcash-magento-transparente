@@ -1,5 +1,9 @@
 <?php
 
+require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
+
+use Bcash\Domain\NotificationStatusEnum;
+
 /**
  * Controller Bcash_Pagamento_Admin_Sales_OrderController
  */
@@ -85,28 +89,40 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
 
         if ($order->getId()) {
             try {
-                // Consulta transaçao Bcash
+                // Consulta transação Bcash
                 $quoteId = $order->getQuoteId();
                 $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
                 $orderTransactionBcash = $quote->getTransactionIdBcash();
                 $transactionInfo = Mage::helper('pagamento')->getTransaction($orderTransactionBcash);
 
                 // Checa se o status da transaçao Bcash permite cancelamento
-                //const IN_PROGRESS = 1;
-                //const APPROVED = 3;
-                if($transactionInfo->transacao->cod_status == 1 || $transactionInfo->transacao->cod_status == 3) {
+                if($transactionInfo->transacao->cod_status == NotificationStatusEnum::IN_PROGRESS || $transactionInfo->transacao->cod_status == NotificationStatusEnum::APPROVED) {
                     $pagamentoOrderModel = Mage::getModel('pagamento/order');
                     $responseCancellation = $pagamentoOrderModel->cancellation($orderTransactionBcash);
 
                     if ($responseCancellation != null) {
-                        // NotificationStatusEnum -> const CANCELLED = 7;
-                        if ($responseCancellation->transactionStatusId == 7) {
+                        if ($responseCancellation->transactionStatusId == NotificationStatusEnum::CANCELLED) {
                             // Registro do cancelamento no pedido
                             $order->registerCancellation('Cancelamento efetivado no Bcash. ', TRUE)->save();
 
                             // Atualiza status na transação
                             $quote->setStatusBcash($responseCancellation->transactionStatusId)
                                   ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
+                            $quote->save();
+
+                            return true;
+                        } else if ($responseCancellation->transactionStatusId == NotificationStatusEnum::REFUNDED) {
+                            // Registro do estorno do pagamento
+                            $payment = $order->getPayment();
+                            $payment->setTransactionId($orderTransactionBcash)
+                                ->setPreparedMessage("Pagamento devolvido.")
+                                ->setIsTransactionClosed(1);
+                            $payment->setRefundTransactionId($orderTransactionBcash);
+                            $order->registerCancellation('Pagamento devolvido no Bcash. ', TRUE)->save();
+
+                            // Atualiza status na transação
+                            $quote->setStatusBcash($responseCancellation->transactionStatusId)
+                                ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
                             $quote->save();
 
                             return true;
