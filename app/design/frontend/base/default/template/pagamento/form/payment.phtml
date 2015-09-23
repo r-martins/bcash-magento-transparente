@@ -19,30 +19,30 @@ $paymentGroupName = array(
     <div class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
         <div class="payment-group" >
 
-            <div class="b-row">
+            <div class="b-row" style="padding-left:15px; margin-bottom:10px">
                 <?php if($this->getCpf()) : ?>
-                    <div class="b-form-group b-col-xs-4">
+                    <div class="" style="float:left; width:40%; margin:2px">
                         <label>CPF/CNPJ do titular</label>
-                        <input type="text" class=" validate-cpf-cnpj" id="cpf_cnpj_bcash"
+                        <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash"
                                name="cpf_cnpj_bcash" value=""
                                maxlength="18" autocomplete="off"/>
                     </div>
                 <?php endif; ?>
                 <?php if($this->getPhone()) : ?>
-                    <div class="b-form-group b-col-xs-6">
-                        <label class="b-l-margin">Telefone do titular</label>
-                        <div class="b-form-group">
-                            <div class="b-col-xs-4">
-                                <input type="text" class=" validate-ddd" maxlength="2" value=""
-                                       name="ddd_bcash"
-                                       id="ddd_bcash">
-                            </div>
-                            <div class="b-col-xs-8">
-                                <input type="text" class=" validate-phone" maxlength="9" value=""
-                                       name="phone_bcash"
-                                       id="phone_bcash">
-                            </div>
+                    <div class="" style="float:left; width:53%; margin:3px; margin-left:10px">
+                        <label>Telefone do titular</label><br />
+
+                        <div style="width: 53px; float: left;">
+                            <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
+                                   name="ddd_bcash"
+                                   id="ddd_bcash">
                         </div>
+                        <div style="width: 123px; float: left; margin-left:3px">
+                            <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
+                                   name="phone_bcash"
+                                   id="phone_bcash">
+                        </div>
+
                     </div>
                 <?php endif; ?>
             </div>
@@ -69,22 +69,31 @@ $paymentGroupName = array(
             <?php if ($paymentType == 'CARD'): ?>
 
                 <div id="card-conteiner" class="b-form-group b-hide">
-                    <div class="b-row">
-                        <div class="b-form-group b-col-xs-5">
+                    <div class="b-n-row">
+                        <div class="b-form-group b-col-xs-8">
                             <label>N&uacute;mero do cart&atilde;o</label>
                             <input type="text" class="b-form-control validate-number-card" maxlength="20" value=""
                                    id="card_number_bcash"
                                    name="card_number_bcash"
-                                   autocomplete="off">
+                                   autocomplete="off" style="width:100%">
                         </div>
-
-                        <div class="b-form-group b-col-xs-6">
-                            <label class="b-l-margin">Validade</label>
+                        <div class="b-form-group b-col-xs-4" style="padding:0px">
+                            <div>
+                                <label>C&oacute;digo de seguran&ccedil;a (CVV)</label>
+                                <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value=""
+                                       name="cvv_bcash"
+                                       id="cvv_bcash" style="padding:2px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-n-row">
+                        <div class="b-form-group b-col-xs-5" style="padding-right:0px">
+                            <label class="">Validade</label>
 
                             <div class="b-form-group">
-                                <div class="b-col-xs-6">
+                                <div class="b-col-xs-5" style="padding:0px">
                                     <select class="b-form-control validate-month-bcash" id="month_bcash"
-                                            name="month_bcash">
+                                            name="month_bcash" style="padding: 2px;">
                                         <option value=""></option>
                                         <?php
                                         for ($i = 1; $i < 13; $i++) :
@@ -96,9 +105,9 @@ $paymentGroupName = array(
                                         ?>
                                     </select>
                                 </div>
-                                <div class="b-col-xs-6">
+                                <div class="b-col-xs-7" style="padding:0px; padding-left:4px">
                                     <select class="b-form-control validate-year-bcash" id="year_bcash"
-                                            name="year_bcash">
+                                            name="year_bcash" style="padding: 2px;">
                                         <option value=""></option>
                                         <?php
                                         $year = date("Y");
@@ -114,68 +123,57 @@ $paymentGroupName = array(
                                 </div>
                             </div>
                         </div>
-
-                    </div>
-
-                    <div class="b-row">
-                        <div class="b-form-group b-col-xs-5">
-                            <label>Nome titular</label>
-                            <input type="text" class="b-form-control validate-name-card" value="" name="name_card_bcash"
-                                   id="name_card_bcash" maxlength="100"
-                                   autocomplete="off">
-                        </div>
-
-                        <div class="b-form-group b-col-xs-4">
-                            <label class="b-l-margin">C&oacute;digo de seguran&ccedil;a (CVV)</label>
-
-                            <div class="b-col-xs-6">
-                                <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value=""
-                                       name="cvv_bcash"
-                                       id="cvv_bcash">
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="b-row">
-                        <div class="b-form-group b-col-xs-7">
+                        <div class="b-form-group b-col-xs-7" style="padding-right:0px">
                             <label>Parcelas</label>
-                            <select class="b-form-control" name="installments_bcash" id="installments_bcash">
+                            <select class="b-form-control" name="installments_bcash" id="installments_bcash" style="max-width:100% !important">
                                 <option value=""> - - - </option>
                                 <?php
                                 $okInstallments = $paymentInstallments['ok'];
                                 $installments = $paymentInstallments["installments"];
                                 if (!$okInstallments) :
                                     foreach ($installments as $times => $value) :
-                                ?>
-                                    <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
-                                <?php
+                                        ?>
+                                        <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
+                                        <?php
                                     endforeach;
-                                ?>
-                                <?php
+                                    ?>
+                                    <?php
                                 else :
                                     $installments = $paymentInstallments["installments"][0]->paymentTypes;
                                     foreach ($installments as $type) :
                                         if ($type->name == 'card') :
                                             foreach ($type->paymentMethods as $typePayment) :
                                                 foreach ($typePayment->installments as $paymentInstallment) :
-                                                ?>
-                                                <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
-                                                    <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?>
-                                                    <?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
-                                                    <?php echo isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '' ?>
-                                                </option>
-                                                <?php
+                                                    ?>
+                                                    <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
+                                                        <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?>
+                                                        <?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
+                                                        <?php echo isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '' ?>
+                                                    </option>
+                                                    <?php
                                                 endforeach;
                                             endforeach;
                                         endif;
                                     endforeach;
                                     ?>
-                                <?php
+                                    <?php
                                 endif;
                                 ?>
                             </select>
                         </div>
+                    </div>
+
+                    <div  class="b-n-row">
+                        <div class="b-form-group" style="padding-left:17px">
+                            <label>Nome titular</label>
+                            <input type="text" class="b-form-control validate-name-card" value="" name="name_card_bcash"
+                                   id="name_card_bcash" maxlength="100"
+                                   autocomplete="off" style="width:100%">
+                        </div>
+                    </div>
+
+                    <div class="b-row">
+
                     </div>
 
 
@@ -278,7 +276,7 @@ $paymentGroupName = array(
         });
 
         Validation.add('validate-phone', 'Preencha o telefone.', function (v) {
-           return v.length == 8 || v.length == 9;
+            return v.length == 8 || v.length == 9;
         });
 
         Validation.add('validate-name-card', 'Preencha o nome do titular.', function (v) {

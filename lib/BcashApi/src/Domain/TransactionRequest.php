@@ -50,6 +50,8 @@ class TransactionRequest extends Model
 
 	protected $campaignId;
 
+	protected $platformId;
+
 	/**
      * Recupera o e-mail da loja cadastrada no Pagamento Digital.
      *
@@ -561,6 +563,30 @@ class TransactionRequest extends Model
 	public function setIpSeller($ipSeller)
 	{
 		$this->ipSeller = $ipSeller;
+	}
+
+
+	/**
+	 * Recupera identificador da plataforma cadastrada no Bcash<br>
+	 *
+	 * @return platformId
+	 *            , ex.: 999
+	 */
+	public function getPlatformId()
+	{
+		return $this->platformId;
+	}
+
+
+	/**
+	 * Atribui identificador da plataforma cadastrada no Bcash<br>
+	 *
+	 * @param platformId
+	 *            , ex.: 999
+	 */
+	public function setPlatformId($platformId)
+	{
+		$this->platformId = $platformId;
 	}
 
 }
