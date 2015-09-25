@@ -161,7 +161,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function startTransaction()
     {
-        
         $this->transactionRequest = $this->createTransactionRequestBcash();
         $this->setShippingBcash();
         $this->setPaymentMethodBcash();
@@ -180,24 +179,15 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 'deps' => $this->deps,
                 'installments' => $this->installments
             );
-
-            if(isset($arRet['response']->cancellationCode) && substr($arRet['response']->cancellationCode,0,1) == "7"){
-                Mage::throwException(urldecode($arRet['response']->message));
-                /*echo "<script>
-                        try{
-                            checkout.changeSection('opc-payment');
-                        }
-                        catch
-                        {
-
-                        }
-                      </script>
-                ";*/
+            if(isset($response->cancellationCode) && $response->cancellationCode){
+                if($response->cancellationCode == "700001"){
+                    Mage::throwException("A transação não pode ser processada utilizando este cartão. Por favor, selecione outro meio de pagamento.");
+                }else{
+                    Mage::throwException( Mage::helper('sales')->__(urldecode($arRet['response']->message)));
+                }
             }else{
                 return $arRet;
             }
-
-
         } catch (ValidationException $e) {
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
@@ -207,8 +197,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             }
             Mage::throwException(implode("\n", $messages));
         } catch (ConnectionException $e) {
-            //echo "3<hr/>";
-
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = array();

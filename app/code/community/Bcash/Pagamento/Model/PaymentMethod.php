@@ -96,7 +96,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $response = $result['response'];
             $payment_method = $result['payment_method'];
             $installments = $result['installments'];
-
+            $this->loadLayout('checkout_onepage_payment');
             /*
             1 – Em andamento
             3 – Aprovada
@@ -107,7 +107,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             8 – Chargeback
             */
 
-            //TODO: Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
+            // Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
             if ($response->status != 1 && $response->status != 2) {
 
                 $setIsNotified = false;
@@ -155,7 +155,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
         } catch (Exception $e) {
             Mage::log($e->getMessage());
-            Mage::throwException($e->getMessage());
+            throw new Mage_Payment_Model_Info_Exception($e->getMessage());
         }
 
         return $this;
