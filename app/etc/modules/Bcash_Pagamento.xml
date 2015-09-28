@@ -4,9 +4,10 @@
     	<Bcash_Pagamento>
       		<active>true</active>
       		<codePool>community</codePool>
-      		<depends>
-        		<Mage_Payment />
-      		</depends>
+			<depends>
+				<Mage_Sales />
+				<Mage_Payment />
+			</depends>
     	</Bcash_Pagamento>
   	</modules>
 </config>

@@ -9,56 +9,73 @@ use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
 use Bcash\Test\NotificationSimulator;
 
+/**
+ * Controller Bcash_Pagamento_NotificationController
+ */
 class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_Action
 {
 
-	private $email;
-	private $token;
-	private $obj;
+    private $email;
+    private $token;
+    private $obj;
     private $sandbox;
 
-	protected function _construct()
-    {        
+    protected function _construct()
+    {
         // access log (debug)
         Mage::log('Notification visitor: ' . Mage::helper('core/http')->getRemoteAddr());
 
         $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
-		$this->email = $this->obj->getConfigData('email');
-		$this->token = $this->obj->getConfigData('token');
+        $this->email = $this->obj->getConfigData('email');
+        $this->token = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');
     }
 
-	public function indexAction()
-	{
-		// ...
-		// Notification Simulator
-		$this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "1234", "ORDER-1", "1");
-	}
-
-	public function requestAction()
+    /**
+     * Index
+     */
+    public function indexAction()
     {
-		// POST request
-		$transactionId = Mage::app()->getRequest()->getParam('transacao_id');
-		$orderId = trim(stripslashes(Mage::app()->getRequest()->getParam('pedido')));
-		$statusId = (int) Mage::app()->getRequest()->getParam('status_id');
-		$status = Mage::app()->getRequest()->getParam('status');
+        // Notification Simulator
+        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "1234", "145000009", "3");
+    }
 
-		$notificationContent = new NotificationContent($transactionId, $orderId, $statusId);
-        Mage::log($notificationContent);
+    /**
+     * Recebimento de notificações pela API
+     */
+    public function requestAction()
+    {
+        // GET THIS URL -> Mage::getUrl('pagamento/notification/request')
 
-		$notification = new Notification($this->email, $this->token, $notificationContent);
+        // POST request
+        $transactionId = Mage::app()->getRequest()->getParam('transacao_id');
+        $orderId = trim(stripslashes(Mage::app()->getRequest()->getParam('pedido')));
+        $statusId = (int)Mage::app()->getRequest()->getParam('status_id');
+        $status = Mage::app()->getRequest()->getParam('status');
+
+        // Instância de classe de notificação
+        $notificationContent = new NotificationContent($transactionId, $orderId, $statusId);
+        $notification = new Notification($this->email, $this->token, $notificationContent);
         $notification->enableSandBox($this->sandbox);
 
-        $result = false;
         try {
-            /**
-            * Verificação de requisição válida
-            */
-            //valor dos produtos + frete + acrecimo - desconto
-            // TODO: Buscar valor total do pedido registrado na transação
-            $transactionValue = 273.20;
-            $result = $notification->verify($transactionValue);
+            $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+            if ($order->getData() != null) {
+                // Registro de notificação recebida
+                $order->addStatusHistoryComment('Notificação da transação de pagamento recebida. Status: ' . $status);
+                $order->save();
 
+                // Checa requisição válida através de valor total do pedido (valor dos produtos + frete + acréscimo - desconto)
+                $transactionValue = $order->getBaseGrandTotal();
+                $validNotification = $notification->verify($transactionValue);
+
+                if ($validNotification == true) {
+                    // Processamento da notificação no pedido
+                    $this->processNotification($transactionId, $orderId, $statusId);
+                }
+            } else {
+                Mage::log("Pedido " . $orderId . " não identificado. ");
+            }
         } catch (ValidationException $e) {
             Mage::log("Validation error: " . $e->getMessage());
             Mage::log($e->getErrors());
@@ -67,15 +84,19 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
             Mage::log("Connection error: " . $e->getMessage());
             Mage::log($e->getErrors());
         }
+    }
 
-        if ($result == true) {            
-            // Processamento da notificação no pedido
-            $this->processNotification($transactionId, $orderId, $statusId);
-        }
-	}
-
-	private function processNotification($transactionId, $orderId, $statusId)
+    /**
+     * Atualização de status do pedido conforme retorno da notificação
+     *
+     * @param $transactionId
+     * @param $orderId
+     * @param $statusId
+     * @throws Exception
+     */
+    private function processNotification($transactionId, $orderId, $statusId)
     {
+        // Carrega pedido a partir de código incremental
         $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
 
         switch ($statusId) {
@@ -85,37 +106,36 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 $order->save();
                 break;
             case NotificationStatusEnum::IN_PROGRESS:
-                //$order->getPayment()->registerCaptureNotification();
-                //$order->getPayment()->setTransactionId($transactionId);
-                //$order->save();
+                $order->getPayment()->registerCaptureNotification();
+                $order->getPayment()->setTransactionId($transactionId);
+                $order->save();
                 break;
             case NotificationStatusEnum::CANCELLED:
-                $order->registerCancellation('Pagamento cancelado', TRUE)->save();
+                $order->registerCancellation('Pagamento cancelado.', TRUE)->save();
                 break;
             default:
-                $order->registerCancellation('Falha', TRUE)->save();
+                //$order->registerCancellation('Falha.', TRUE)->save();
                 break;
         }
-	}   
+    }
 
-    private function notificationSimulator($notificationUrl, $transactionId, $orderId, $statusId) {
-		//$notificationUrl = "https://hostofstore.com/address/alert";
-		//$transactionId = 987654321;  // id transacao do bcash
-		//$orderId = "my-store-1234"; // id pedido da sua loja
-		//$statusId = 3; // Aprovada
+    /**
+     * Simulação de notificação enviada pelo Bcash na URL de retorno
+     *
+     * @param $notificationUrl
+     * @param $transactionId
+     * @param $orderId
+     * @param $statusId
+     */
+    private function notificationSimulator($notificationUrl, $transactionId, $orderId, $statusId)
+    {
+        try {
+            $result = NotificationSimulator::test($notificationUrl, $transactionId, $orderId, $statusId);
 
-		try {
-		    $result = NotificationSimulator::test ($notificationUrl, $transactionId, $orderId, $statusId);
-
-		    echo "<pre>";
-		    var_dump($result);die;
-		    echo "</pre>";
-
-		} catch (ConnectionException $e) {
-		    echo "ErroTeste: " . $e->getMessage() . "\n";
-		    echo "<pre>";
-		    var_dump($e->getErrors());die;
-		    echo "</pre>";
-		}
-    }		
+            echo "<pre>";
+            var_dump($result);
+            echo "</pre>";
+        } catch (ConnectionException $e) {
+        }
+    }
 }

@@ -6,6 +6,7 @@
 <?php
 $code = $this->getCode();
 $paymentMethods = $this->getPaymentMethods();
+$paymentInstallments = $this->getInstallments();
 $size = count($paymentMethods);
 $paymentGroupName = array(
     'CARD' => "Cartão de cr&eacute;dito",
@@ -23,7 +24,7 @@ $paymentGroupName = array(
                         <li>
                             <input type="radio" class="payment-method-bcash validate-one-required-by-name"
                                    id="payment-method-<?php echo $payment->id ?>" name="payment-method"
-                                   value="<?php echo $payment->id ?>"/>
+                                   value="<?php echo $payment->id ?>" class/>
                             <label class="bandeira band-<?php echo $payment->id ?>"
                                    for="payment-method-<?php echo $payment->id ?>"></label>
                         </li>
@@ -106,13 +107,43 @@ $paymentGroupName = array(
                         <div class="b-form-group b-col-xs-7">
                             <label>Parcelas</label>
                             <select class="b-form-control" name="installments_bcash" id="installments_bcash">
-                                <option value="1">1x - R$ 1,00</option>
-                                <option value="2">2x - R$ 1,00</option>
-                                <option value="3">3x - R$ 1,00</option>
+                                <option value=""> - - - </option>
+                                <?php
+                                $okInstallments = $paymentInstallments['ok'];
+                                $installments = $paymentInstallments["installments"];
+                                if (!$okInstallments) :
+                                    foreach ($installments as $times => $value) :
+                                ?>
+                                    <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
+                                <?php
+                                    endforeach;
+                                ?>
+                                <?php
+                                else :
+                                    $installments = $paymentInstallments["installments"][0]->paymentTypes;
+                                    foreach ($installments as $type) :
+                                        if ($type->name == 'card') :
+                                            foreach ($type->paymentMethods as $typePayment) :
+                                                foreach ($typePayment->installments as $paymentInstallment) :
+                                                ?>
+                                                <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
+                                                    <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?>
+                                                    <?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
+                                                    <?php echo isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '' ?>
+                                                </option>
+                                                <?php
+                                                endforeach;
+                                            endforeach;
+                                        endif;
+                                    endforeach;
+                                    ?>
+                                <?php
+                                endif;
+                                ?>
                             </select>
                         </div>
                     </div>
-
+                    <!--
                     <hr>
 
                     <div class="b-row">
@@ -140,6 +171,7 @@ $paymentGroupName = array(
                             </div>
                         </div>
                     </div>
+                    //-->
 
                 </div> <!-- card-conteiner -->
 
@@ -148,42 +180,20 @@ $paymentGroupName = array(
             <?php if ($size > 1): ?>
                 <hr>
             <?php endif ?>
-
-        </div> <!-- payment-group -->
+        </div>
+        <!-- payment-group -->
         <?php
         $size--;
     endforeach; ?>
-</div> <!-- div b-col-xs-4 -->
+</div>
+<!-- div b-col-xs-4 -->
 <script type="text/javascript">
     //<![CDATA[
     var requestUrl = '<?php echo Mage::getUrl('pagamento/payment/dados') ?>';
 
     function in_array(needle, haystack, argStrict) {
-        /*
-         //  discuss at: http://phpjs.org/functions/in_array/
-         // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-         // improved by: vlado houba
-         // improved by: Jonas Sciangula Street (Joni2Back)
-         //    input by: Billy
-         // bugfixed by: Brett Zamir (http://brett-zamir.me)
-         //   example 1: in_array('van', ['Kevin', 'van', 'Zonneveld']);
-         //   returns 1: true
-         //   example 2: in_array('vlado', {0: 'Kevin', vlado: 'van', 1: 'Zonneveld'});
-         //   returns 2: false
-         //   example 3: in_array(1, ['1', '2', '3']);
-         //   example 3: in_array(1, ['1', '2', '3'], false);
-         //   returns 3: true
-         //   returns 3: true
-         //   example 4: in_array(1, ['1', '2', '3'], true);
-         //   returns 4: false
-         */
         var key = '',
             strict = !!argStrict;
-        /*
-         //we prevent the double check (strict && arr[key] === ndl) || (!strict && arr[key] == ndl)
-         //in just one for, in order to improve the performance
-         //deciding wich type of comparation will do before walk array
-         */
         if (strict) {
             for (key in haystack) {
                 if (haystack[key] === needle) {
@@ -197,7 +207,6 @@ $paymentGroupName = array(
                 }
             }
         }
-
         return false;
     }
 
@@ -220,6 +229,29 @@ $paymentGroupName = array(
 
     var initBcashPagamento = function () {
 
+        function showInstallmentsOnlyForMethod(method)
+        {
+            if (in_array(method, cards)) {
+                var select_id = 'installments_bcash';
+                var select =  document.getElementById(select_id);
+                var optionsNot = select.querySelectorAll("option");
+                for (var j in optionsNot)
+                {
+                    if (parseInt(j) || i == 0) {
+                        optionsNot[j].style.display="none";
+                    }
+                }
+                var options = select.querySelectorAll("option[data-type='" + method +"']");
+                for (var i in options)
+                {
+                    if (parseInt(i) || i == 0) {
+                        options[i].style.display="block";
+                    }
+                }
+                document.getElementById(select_id).value = "";
+            }
+        }
+
         function checkIsCardSelected() {
             var ElementPaymentMethod = [];
             document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
@@ -228,7 +260,6 @@ $paymentGroupName = array(
                 }
             });
             var $isCard = isCard(ElementPaymentMethod);
-            // console.log($isCard);
             return $isCard;
         }
 
@@ -264,10 +295,12 @@ $paymentGroupName = array(
             return true;
         });
 
-        Validation.add('validate-number-card', 'Preencha o número do cartão.', function (v) {
+        Validation.add('validate-number-card', 'Preencha o número do cartão corretamente.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
-                return v.length > 0;
+                if (v.length > 0) {
+                    return validateCardNumber();
+                }
             }
             return true;
         });
@@ -330,8 +363,20 @@ $paymentGroupName = array(
                     method: 'POST',
                     parameters: 'input=boleto&tipo=' + paymentRadio.value
                 });
+            } else {
+                var option = paymentRadio.value;
+                var typePayment = 'boleto';
+                if (!in_array(option, cards)) {
+                    new Ajax.Request(requestUrl, {
+                        method: 'POST',
+                        parameters: 'input=' + typePayment + '&tipo=' + option
+                    });
+                } else {
+                    saveCardNumber();
+                }
             }
             disableUnunsed(paymentRadio);
+            showInstallmentsOnlyForMethod(paymentRadio.value);
         }
 
         function enableCardForm() {
@@ -505,15 +550,12 @@ $paymentGroupName = array(
             }
         }
 
-        /* Inicialização de comportamentos referentes ao checkout Bcash */
-        /* function init() { */
-
         var paymentsOptions = document.getElementsByClassName("bandeira");
         for (var i = paymentsOptions.length - 1; i >= 0; i--) {
             var paymentFlags = paymentsOptions[i];
             paymentFlags.onclick = clickFlag;
         }
-
+        /*
         document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -533,16 +575,10 @@ $paymentGroupName = array(
         document.getElementById("phone_bcash").onkeypress = function (event) {
             return validateNumber(event);
         };
-
+        */
         document.getElementById("card_number_bcash").onkeypress = function (event) {
             return validateNumber(event);
         };
-
-        /*  } */
-
-        /*  init();*/
-
-        /* var initBcashPagamentoAjax = function () { */
 
         function getCardSelected() {
             var ElementPaymentMethod = [];
@@ -555,7 +591,7 @@ $paymentGroupName = array(
             // console.log($isCard);
             return {'element': ElementPaymentMethod, 'isCard': $isCard};
         }
-
+        /*
         $('cpf_cnpj_bcash').observe('blur', function (e) {
             var RegExp = /^[0-9]{11,14}$/;
             var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
@@ -572,8 +608,8 @@ $paymentGroupName = array(
                 });
             }
         });
-
-        $('card_number_bcash').observe('blur', function (e) {
+        */
+        function saveCardNumber() {
             var id = document.getElementById("card_number_bcash").value;
             var $elem = getCardSelected();
             var tipo = $elem.element.value;
@@ -581,6 +617,10 @@ $paymentGroupName = array(
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=cartao&tipo=' + tipo
             });
+        }
+
+        $('card_number_bcash').observe('blur', function (e) {
+            saveCardNumber();
         });
 
         $('name_card_bcash').observe('blur', function (e) {
@@ -622,7 +662,7 @@ $paymentGroupName = array(
                 parameters: 'pid=' + id + '&input=cvv'
             });
         });
-
+        /*
         $('ddd_bcash').observe('blur', function (e) {
             var id = document.getElementById("ddd_bcash").value;
             new Ajax.Request(requestUrl, {
@@ -638,16 +678,53 @@ $paymentGroupName = array(
                 parameters: 'pid=' + id + '&input=telefone'
             });
         });
-
-
-        function validarCardNumber() {
-
-
+        */
+        function validateCardNumber()
+        {
+            var RegExpHipercard = /^(3841\d{10}(\d{3})?)|(3841\d{15})$/;
+            var RegExpElo = /^((((636368)|(438935)|(504175)|(451416)|(636297)|(509048)|(509067)|(509049)|(509069)|(509050)|(509074)|(509068)|(509040)|(509045)|(509051)|(509046)|(509066)|(509047)|(509042)|(509052)|(509043)|(509064)|(509040))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/;
+            var RegExpDiners = /^3[0,6,8]\d{12}$/;
+            var RegExpAmex = /^3[47][0-9]{13}$/;
+            var RegExpVisa = /^4[0-9]{12}([0-9]{3})?$/;
+            var RegExpMaster = /^5[1-5][0-9]{14}$/;
+            var RegexFinal = '';
+            var paymentRadio = getCardSelected();
+            if (paymentRadio.isCard) {
+                var codeCard = paymentRadio.element.value;
+                switch (parseInt(codeCard)) {
+                    case visa:
+                        RegexFinal = RegExpVisa;
+                        break;
+                    case master:
+                        RegexFinal = RegExpMaster;
+                        break;
+                    case american_express:
+                        RegexFinal = RegExpAmex;
+                        break;
+                    case elo:
+                        RegexFinal = RegExpElo;
+                        break;
+                    case hipercard:
+                        RegexFinal = RegExpHipercard;
+                        break;
+                    case dinners:
+                        RegexFinal = RegExpDiners;
+                        break;
+                }
+                var cardNumber = document.getElementById("card_number_bcash").value;
+                if (RegexFinal == '') {
+                    alert('cartão não corresponde a bandeira selecionada ou está incorreto');
+                    cardNumber.value = '';
+                    return false;
+                }
+                if (RegexFinal.test(cardNumber) == false) {
+                    alert('cartão não corresponde a bandeira selecionada ou está incorreto');
+                    cardNumber.value = '';
+                    return false;
+                }
+                return true;
+            }
         }
-
-
-        /*}*/
-        /* initBcashPagamentoAjax(); */
     };
     initBcashPagamento();
     //]]>
