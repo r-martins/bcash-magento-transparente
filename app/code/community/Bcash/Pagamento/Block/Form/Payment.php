@@ -86,12 +86,12 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
 
     public function getCpf()
     {
-        return boolval($this->cpf);
+        return $this->cpf;
     }
 
     public function getPhone()
     {
-        return boolval($this->phone);
+        return $this->phone;
     }
 
     /**
@@ -123,10 +123,12 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
             $response = $installments->calculate($grandTotal, $this->max_installments, $ignoreScheduledDiscount);
             return array("ok" => true, "installments" => array(0 => $this->prepareInstallmentsCards($response)));
         } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . implode(",", $e->getErrors()));
+            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
+            Mage::log($e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . implode(",", $e->getErrors()));
+            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
+            Mage::log($e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         }
     }

@@ -304,7 +304,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : null;
         $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
 
-        if (boolval($this->cpf)) {
+        if ($this->cpf) {
             $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
             $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
         }
@@ -331,7 +331,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function completePhoneBcash($attr = null)
     {
-        if (boolval($this->phone)) {
+        if ($this->phone) {
             $phone = Mage::app()->getRequest()->getPost('ddd_bcash') . Mage::app()->getRequest()->getPost('phone_bcash');
             $phone = preg_replace('/[^0-9]+/', '', $phone);
             return $this->parsePhone($phone);
