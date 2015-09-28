@@ -13,17 +13,6 @@ Módulo do Magento para a API Bcash
 3. Em **System > Index Management** selecione todos os campos e clique em **Reindex Data**.
 
 
-## Configurando a loja
+## Configuração e utilização do módulo na loja
 
-1. No painel administrativo acesse **System > Configuration > Sales > Payment Methods** e selecione **Bcash - Pagamento Transparente**.
-
-2. Preencha os campos com suas informações:
-
-    * Sandbox
-    * Email cadastrado no Bcash
-    * Consumer Key
-    * Token
-    * Transação dependente
-    * Percentual Desconto Boleto
-    * Percentual Desconto TEF
-    * Percentual Desconto Cartão de Crédito 1x
+   *Acesse:* [Manual do usuário](http://bcash.com.br/para-quem-vende)
