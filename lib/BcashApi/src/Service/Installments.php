@@ -27,11 +27,6 @@ class Installments implements IEnvironmentManager
 		$this->url = Config::host . self::route;
 	}
 
-	public function setUrl($url)
-	{
-		$this->url = $url . self::route;
-	}
-
 	/**
 	 * Chama o serviço de cálculo de parcelas.
 	 *

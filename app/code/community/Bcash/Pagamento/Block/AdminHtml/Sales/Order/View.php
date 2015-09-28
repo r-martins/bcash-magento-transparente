@@ -34,5 +34,14 @@ class Bcash_Pagamento_Block_Adminhtml_Sales_Order_View extends Mage_Adminhtml_Bl
                 ), 0, 100, 'header', 'header');
             }
         }
+
+        $payment_link = $quote->getPaymentLinkBcash();
+        if ($transactionInfo->transacao->cod_status == 1 && $payment_link) {
+            $this->_addButton('button_payment_link_bcash', array(
+                'label' => 'Link de Pagamento Bcash',
+                'onclick' => 'window.open(\'' . $payment_link . '\')',
+            ), 0, 110, 'header', 'header');
+        }
+
     }
 }

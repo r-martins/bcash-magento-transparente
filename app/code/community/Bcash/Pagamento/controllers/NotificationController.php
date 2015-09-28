@@ -37,7 +37,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     public function indexAction()
     {
         // Notification Simulator
-        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "1234", "145000009", "3");
+        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "435", "145000033", "3");
     }
 
     /**
@@ -104,6 +104,13 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 $order->getPayment()->registerCaptureNotification($order->getBaseGrandTotal());
                 $order->getPayment()->setTransactionId($transactionId);
                 $order->save();
+
+                // Atualiza status na transação
+                $quoteId = $order->getQuoteId();
+                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                $quote->setStatusBcash($statusId)
+                      ->setDescriptionStatusBcash("Aprovada");
+                $quote->save();
                 break;
             case NotificationStatusEnum::IN_PROGRESS:
                 $order->getPayment()->registerCaptureNotification();
@@ -112,9 +119,17 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 break;
             case NotificationStatusEnum::CANCELLED:
                 $order->registerCancellation('Pagamento cancelado.', TRUE)->save();
+                $order->save();
+
+                // Atualiza status na transação
+                $quoteId = $order->getQuoteId();
+                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                $quote->setStatusBcash($statusId)
+                      ->setDescriptionStatusBcash("Cancelada");
+                $quote->save();
                 break;
             default:
-                //$order->registerCancellation('Falha.', TRUE)->save();
+                //$order->registerCancellation('Nothing to do.', TRUE)->save();
                 break;
         }
     }

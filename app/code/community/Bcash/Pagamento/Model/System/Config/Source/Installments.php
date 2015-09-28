@@ -28,6 +28,12 @@ class Bcash_Pagamento_Model_System_Config_Source_Installments
             array('value' => 16, 'label' => Mage::helper('adminhtml')->__('16 parcelas')),
             array('value' => 17, 'label' => Mage::helper('adminhtml')->__('17 parcelas')),
             array('value' => 18, 'label' => Mage::helper('adminhtml')->__('18 parcelas')),
+            array('value' => 19, 'label' => Mage::helper('adminhtml')->__('19 parcelas')),
+            array('value' => 20, 'label' => Mage::helper('adminhtml')->__('20 parcelas')),
+            array('value' => 21, 'label' => Mage::helper('adminhtml')->__('21 parcelas')),
+            array('value' => 22, 'label' => Mage::helper('adminhtml')->__('22 parcelas')),
+            array('value' => 23, 'label' => Mage::helper('adminhtml')->__('23 parcelas')),
+            array('value' => 24, 'label' => Mage::helper('adminhtml')->__('24 parcelas')),
         );
     }
 
@@ -56,7 +62,13 @@ class Bcash_Pagamento_Model_System_Config_Source_Installments
            15 => Mage::helper('adminhtml')->__('15 parcelas'),
            16 => Mage::helper('adminhtml')->__('16 parcelas'),
            17 => Mage::helper('adminhtml')->__('17 parcelas'),
-           18 => Mage::helper('adminhtml')->__('18 parcelas')
+           18 => Mage::helper('adminhtml')->__('18 parcelas'),
+           19 => Mage::helper('adminhtml')->__('19 parcelas'),
+           20 => Mage::helper('adminhtml')->__('20 parcelas'),
+           21 => Mage::helper('adminhtml')->__('21 parcelas'),
+           22 => Mage::helper('adminhtml')->__('22 parcelas'),
+           23 => Mage::helper('adminhtml')->__('23 parcelas'),
+           24 => Mage::helper('adminhtml')->__('24 parcelas'),
         );
     }
 }

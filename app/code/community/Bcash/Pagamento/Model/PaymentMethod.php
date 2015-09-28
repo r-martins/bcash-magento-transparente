@@ -55,13 +55,14 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
      * Chamado após a criação e registro do pedido "Order".
      * @return string
      */
-
+    /*
     public function getOrderPlaceRedirectUrl()
     {
         Mage::log('Called custom ' . __METHOD__);
         $url = Mage::getUrl("pagamento/payment/success");
         return $url;
     }
+    */
 
     /**
      *
@@ -95,7 +96,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $response = $result['response'];
             $payment_method = $result['payment_method'];
             $installments = $result['installments'];
-
+            $this->loadLayout('checkout_onepage_payment');
             /*
             1 – Em andamento
             3 – Aprovada
@@ -106,8 +107,8 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             8 – Chargeback
             */
 
-            //TODO: Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
-            if ($response->status != 1) {
+            // Salvar o PEDIDO em caso de SUCESSO e adicionar os dados da Transação
+            if ($response->status != 1 && $response->status != 2) {
 
                 $setIsNotified = false;
                 switch($response->status)
@@ -139,7 +140,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             Mage::getSingleton('core/session')->setTransactionIdBcash($response->transactionId);
             Mage::getSingleton('core/session')->setStatusBcash($response->status);
             Mage::getSingleton('core/session')->setDescriptionStatusBcash(urldecode($response->descriptionStatus));
-            Mage::getSingleton('core/session')->setPaymentLinkBcash(urldecode($response->paymentLink));
+            Mage::getSingleton('core/session')->setPaymentLinkBcash(isset($response->paymentLink) ? urldecode($response->paymentLink) : null);
             Mage::getSingleton('core/session')->setPaymentMethodBcash($payment_method);
             Mage::getSingleton('core/session')->setInstallmentsBcash($installments);
 
@@ -147,17 +148,14 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $cart->setTransactionIdBcash($response->transactionId)
                  ->setStatusBcash($response->status)
                  ->setDescriptionStatusBcash(urldecode($response->descriptionStatus))
-                 ->setPaymentLinkBcash(urldecode($response->paymentLink))
+                 ->setPaymentLinkBcash(isset($response->paymentLink) ? urldecode($response->paymentLink) : null)
                  ->setPaymentMethodBcash($payment_method)
                  ->setInstallmentsBcash($installments);
             $cart->save();
 
-
-
-
         } catch (Exception $e) {
             Mage::log($e->getMessage());
-            Mage::throwException($e->getMessage());
+            throw new Mage_Payment_Model_Info_Exception($e->getMessage());
         }
 
         return $this;

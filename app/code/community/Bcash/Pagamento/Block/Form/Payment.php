@@ -12,6 +12,8 @@ use Bcash\Domain\PaymentMethodEnum;
  */
 class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
 {
+    protected $_code = 'pagamento';
+
     /**
      * @var Mage_Core_Model_Abstract
      */
@@ -53,6 +55,14 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
      * @var
      */
     private $quote;
+    /**
+     * @var
+     */
+    private $cpf;
+    /**
+     * @var
+     */
+    private $phone;
 
     /**
      * Instancia o template referente ao método de pagamento
@@ -66,12 +76,22 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
         $this->token   = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');
         $this->max_installments = $this->obj->getConfigData('max_installments');
-
+        $this->cpf = $this->obj->getConfigData('cpf');
+        $this->phone = $this->obj->getConfigData('phone');
         $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
-
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
+    }
+
+    public function getCpf()
+    {
+        return boolval($this->cpf);
+    }
+
+    public function getPhone()
+    {
+        return boolval($this->phone);
     }
 
     /**
