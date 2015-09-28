@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class Bcash_Pagamento_Block_AdminHtml_Dependentes
+ * Class Bcash_Pagamento_Block_Adminhtml_Dependentes
  */
-class Bcash_Pagamento_Block_AdminHtml_Dependentes extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Bcash_Pagamento_Block_Adminhtml_Dependentes extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
 
     /**

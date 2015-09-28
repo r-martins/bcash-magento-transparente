@@ -2,45 +2,82 @@
 <config>
     <modules>
         <Bcash_Pagamento>
-            <version>1.0.0</version>
+            <version>0.1.0</version>
         </Bcash_Pagamento>
     </modules>
-
     <global>
         <fieldsets>
-            <sales_convert_quote_payment>
-                <bcash_transaction_id>
-                    <to_order_payment>*</to_order_payment>
-                </bcash_transaction_id>
+            <sales_convert_quote>
+                <transaction_id_bcash>
+                    <to_order>*</to_order>
+                </transaction_id_bcash>
+                <status_bcash>
+                    <to_order>*</to_order>
+                </status_bcash>
+                <description_status_bcash>
+                    <to_order>*</to_order>
+                </description_status_bcash>
+                <payment_link_bcash>
+                    <to_order>*</to_order>
+                </payment_link_bcash>
+                <payment_method_bcash>
+                    <to_order>*</to_order>
+                </payment_method_bcash>
                 <installments_bcash>
-                    <to_quote_payment>*</to_quote_payment>
+                    <to_order>*</to_order>
                 </installments_bcash>
-            </sales_convert_quote_payment>
-            <sales_convert_order_payment>
-                <bcash_transaction_id>
-                    <to_quote_payment>*</to_quote_payment>
-                </bcash_transaction_id>
+                <cpf_cnpj_bcash>
+                    <to_order>*</to_order>
+                </cpf_cnpj_bcash>
+                <ddd_bcash>
+                    <to_order>*</to_order>
+                </ddd_bcash>
+                <phone_bcash>
+                    <to_order>*</to_order>
+                </phone_bcash>
+            </sales_convert_quote>
+            <sales_convert_order>
+                <transaction_id_bcash>
+                    <to_quote>*</to_quote>
+                </transaction_id_bcash>
+                <status_bcash>
+                    <to_quote>*</to_quote>
+                </status_bcash>
+                <description_status_bcash>
+                    <to_quote>*</to_quote>
+                </description_status_bcash>
+                <payment_link_bcash>
+                    <to_quote>*</to_quote>
+                </payment_link_bcash>
+                <payment_method_bcash>
+                    <to_quote>*</to_quote>
+                </payment_method_bcash>
                 <installments_bcash>
-                    <to_quote_payment>*</to_quote_payment>
+                    <to_quote>*</to_quote>
                 </installments_bcash>
-            </sales_convert_order_payment>
+                <cpf_cnpj_bcash>
+                    <to_quote>*</to_quote>
+                </cpf_cnpj_bcash>
+                <ddd_bcash>
+                    <to_quote>*</to_quote>
+                </ddd_bcash>
+                <phone_bcash>
+                    <to_quote>*</to_quote>
+                </phone_bcash>
+            </sales_convert_order>
         </fieldsets>
-
         <helpers>
             <pagamento>
                 <class>Bcash_Pagamento_Helper</class>
             </pagamento>
         </helpers>
-
         <blocks>
             <pagamento>
                 <class>Bcash_Pagamento_Block</class>
             </pagamento>
-
             <pagamento_adminhtml>
                 <class>Bcash_Pagamento_Block_Adminhtml</class>
             </pagamento_adminhtml>
-
             <adminhtml>
                 <rewrite>
                     <sales_order_view>Bcash_Pagamento_Block_Adminhtml_Sales_Order_View</sales_order_view>
@@ -48,17 +85,16 @@
                 </rewrite>
             </adminhtml>
         </blocks>
-
         <models>
             <pagamento>
                 <class>Bcash_Pagamento_Model</class>
             </pagamento>
         </models>
-
         <resources>
             <pagamento_setup>
                 <setup>
                     <module>Bcash_Pagamento</module>
+                    <class>Mage_Sales_Model_Mysql4_Setup</class>
                 </setup>
                 <connection>
                     <use>core_setup</use>
@@ -71,23 +107,25 @@
                 <use>core_read</use>
             </pagamento_read>
             <pagamento_setup>
-                    <setup>
-                        <module>Bcash_Pagamento</module>
-                        <!--
-                          Points to
-                          app/code/community/Bcash/Pagamento/sql/pagamento_setup/mysql4-install-0.0.1.php
-                          Sets mysql4-install-0.1.0.php to be a class of type Mage_Sales_Model_Mysql4_Setup
-                          Passes 'core_setup' as a connection 'type' :)
-                        -->
-                        <class>Mage_Sales_Model_Mysql4_Setup</class>
-                    </setup>
-                    <connection>
-                        <use>core_setup</use>
-                    </connection>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+                <setup>
+                    <module>Bcash_Pagamento</module>
+                    <class>Mage_Sales_Model_Mysql4_Setup</class>
+                </setup>
             </pagamento_setup>
         </resources>
+        <sales>
+            <order>
+                <states>
+                    <pending_payment translate="label">
+                        <visible_on_front>1</visible_on_front>
+                    </pending_payment>
+                </states>
+            </order>
+        </sales>
     </global>
-    
     <admin>
         <routers>
             <pagamento>
@@ -99,19 +137,30 @@
             </pagamento>
         </routers>
     </admin>
-
     <adminhtml>
         <events>
             <sales_order_save_commit_after>
                 <observers>
                     <sales_order_save_commit_after_handler>
-                        <type>model</type> 
-                        <class>pagamento/observer</class> 
+                        <type>model</type>
+                        <class>pagamento/observer</class>
                         <method>checkOrderState</method>
                         <args></args>
                     </sales_order_save_commit_after_handler>
                 </observers>
             </sales_order_save_commit_after>
+    </events>
+    </adminhtml>
+    <frontend>
+        <events>
+            <checkout_onepage_controller_success_action>
+                <observers>
+                    <bcash_pagamento_observer_success>
+                        <class>Bcash_Pagamento_Model_Observer</class>
+                        <method>orderSuccessEvent</method>
+                    </bcash_pagamento_observer_success>
+                </observers>
+            </checkout_onepage_controller_success_action>
             <checkout_type_onepage_save_order_after>
                 <observers>
                     <bcash_pagamento_observer>
@@ -121,27 +170,19 @@
                 </observers>
             </checkout_type_onepage_save_order_after>
         </events>
-    </adminhtml> 
-
+    </frontend>
     <default>
         <payment>
             <pagamento>
                 <title>Bcash</title>
-                <order_status_approved>processing</order_status_approved>
-                <order_status_refunded>pending</order_status_refunded>
-                <order_status_in_process>pending</order_status_in_process>
-                <order_status_in_mediation>pending</order_status_in_mediation>
-                <order_status_rejected>pending</order_status_rejected>
-                <order_status_cancelled>pending</order_status_cancelled>
-                <order_status_chargeback>pending</order_status_chargeback>
                 <active>1</active>
                 <model>pagamento/paymentMethod</model>
+                <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
             </pagamento>
         </payment>
     </default>
-
     <frontend>
         <routers>
             <pagamento>
@@ -152,7 +193,12 @@
                 </args>
             </pagamento>
         </routers>
+        <layout>
+            <updates>
+                <bcash_pagamento>
+                    <file>bcash/pagamento/layout.xml</file>
+                </bcash_pagamento>
+            </updates>
+        </layout>
     </frontend>
-
 </config>
-

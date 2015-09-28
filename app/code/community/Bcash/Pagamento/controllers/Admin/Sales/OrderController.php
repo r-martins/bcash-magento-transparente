@@ -1,5 +1,9 @@
 <?php
 
+require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
+
+use Bcash\Domain\NotificationStatusEnum;
+
 /**
  * Controller Bcash_Pagamento_Admin_Sales_OrderController
  */
@@ -85,30 +89,53 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
 
         if ($order->getId()) {
             try {
-                // TODO: Código de transação registrado no pedido
-                //$orderTransaction = $newOrderData['some_attribute_value'];
-                $orderTransaction = "a32ad4asdf435asdf435435as76";
+                // Consulta transação Bcash
+                $quoteId = $order->getQuoteId();
+                $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                $orderTransactionBcash = $quote->getTransactionIdBcash();
+                $transactionInfo = Mage::helper('pagamento')->getTransaction($orderTransactionBcash);
 
-                if (!is_null($orderTransaction) && !empty($orderTransaction)) {
+                // Checa se o status da transaçao Bcash permite cancelamento
+                if($transactionInfo->transacao->cod_status == NotificationStatusEnum::IN_PROGRESS || $transactionInfo->transacao->cod_status == NotificationStatusEnum::APPROVED) {
                     $pagamentoOrderModel = Mage::getModel('pagamento/order');
-                    $responseCancellation = $pagamentoOrderModel->cancellation($orderTransaction);
+                    $responseCancellation = $pagamentoOrderModel->cancellation($orderTransactionBcash);
 
                     if ($responseCancellation != null) {
-                        // TODO: Retorno correto da API
-                        if ($responseCancellation['control_cancellation'] == true) {
+                        if ($responseCancellation->transactionStatusId == NotificationStatusEnum::CANCELLED) {
                             // Registro do cancelamento no pedido
                             $order->registerCancellation('Cancelamento efetivado no Bcash. ', TRUE)->save();
 
+                            // Atualiza status na transação
+                            $quote->setStatusBcash($responseCancellation->transactionStatusId)
+                                  ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
+                            $quote->save();
+
+                            return true;
+                        } else if ($responseCancellation->transactionStatusId == NotificationStatusEnum::REFUNDED) {
+                            // Registro do estorno do pagamento
+                            $payment = $order->getPayment();
+                            $payment->setTransactionId($orderTransactionBcash)
+                                ->setPreparedMessage("Pagamento devolvido.")
+                                ->setIsTransactionClosed(1);
+                            $payment->setRefundTransactionId($orderTransactionBcash);
+                            $order->registerCancellation('Pagamento devolvido no Bcash. ', TRUE)->save();
+
+                            // Atualiza status na transação
+                            $quote->setStatusBcash($responseCancellation->transactionStatusId)
+                                ->setDescriptionStatusBcash($responseCancellation->transactionStatusDescription);
+                            $quote->save();
+
                             return true;
                         } else {
-                            // Registro em histórico do pedido de cancelamento não efetivado
-                            $order->addStatusHistoryComment('Tentativa de cancelamento não efetivada no Bcash.' . $responseCancellation['message_fail']);
+                            // Registro em histórico do pedido: cancelamento não efetivado
+                            $order->addStatusHistoryComment('Tentativa de cancelamento não efetivada no Bcash.');
                             $order->save();
 
                             return false;
                         }
                     }
                 }
+
             } catch (Mage_Core_Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             } catch (Exception $e) {

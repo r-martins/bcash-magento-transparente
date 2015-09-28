@@ -44,7 +44,6 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
                 // Envia cancelamento da transação para API
                 $response = $cancellation->execute($transactionId);
             }
-
         } catch (ValidationException $e) {
             Mage::getSingleton('adminhtml/session')->addError('Erro: ' . $e->getMessage());
             Mage::log($e->getErrors());
@@ -56,4 +55,5 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 
         return $response;
     }
+
 }
