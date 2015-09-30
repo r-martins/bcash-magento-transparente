@@ -96,7 +96,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
             $response = $result['response'];
             $payment_method = $result['payment_method'];
             $installments = $result['installments'];
-            $this->loadLayout('checkout_onepage_payment');
+
             /*
             1 – Em andamento
             3 – Aprovada

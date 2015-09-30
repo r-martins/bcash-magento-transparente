@@ -36,10 +36,6 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
      */
     public function indexAction()
     {
-<<<<<<< HEAD
-        // Notification Simulator
-        $this->notificationSimulator("http://magento1921.local/pagamento/notification/request", "230", "100000065", "3");
-=======
         if($this->sandbox) {
             // Get request
             $transactionId = Mage::app()->getRequest()->getParam('transactionId');
@@ -77,7 +73,6 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
         }else {
             echo "Habilite o Sandbox para simular notificações pelo Bcash.";
         }
->>>>>>> develop
     }
 
     /**
