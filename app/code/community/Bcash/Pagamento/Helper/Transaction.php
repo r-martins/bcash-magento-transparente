@@ -298,30 +298,43 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createBuyerBcash()
     {
-        $customer_id = $this->quoteBcash->getCustomerId();
-        $customer = Mage::getModel('customer/customer')->load($customer_id);
-        $customerData = $customer->getData();
-        $cpf_cnpj_bcash = isset($customerData["taxvat"]) ? $customerData["taxvat"] : null;
-        $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+        $buyer = new Customer();
+        $customerData = null;
+        $prefix = "";
 
-        if ($this->cpf) {
-            $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
-            $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+        $customer_id = $this->quoteBcash->getCustomerId();
+        if(!is_null($customer_id)) {
+            $customer = Mage::getModel('customer/customer')->load($customer_id);
+            $customerData = $customer->getData();
+        }else {
+            $customerData = $this->quoteBcash->getData();
+            $prefix = "customer_";
         }
 
-        $buyer = new Customer();
-        $buyer->setMail($customerData['email']);
-        $name  = ($customerData['firstname']);
-        $name .= isset($customerData['middlename']) ? ' ' . $customerData['middlename'] : '';
-        $name .= isset($customerData['lastname'])   ? ' ' . $customerData['lastname']   : '';
-        $buyer->setName($name);
-        if(strlen($cpf_cnpj_bcash) > 11) {
-            $buyer->setCnpj($cpf_cnpj_bcash);
-            $buyer->setCompanyName($name);
-        }else { $buyer->setCpf($cpf_cnpj_bcash); }
-        $buyer->setPhone($this->completePhoneBcash('telephone'));
-        $buyer->setCellPhone($this->completePhoneBcash('fax'));
-        $buyer->setAddress($this->createAddressBcash());
+        if(!is_null($customerData)) {
+            $cpf_cnpj_bcash = isset($customerData[$prefix."taxvat"]) ? $customerData[$prefix."taxvat"] : null;
+            $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+
+            if ($this->cpf) {
+                $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
+                $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+            }
+
+
+            $buyer->setMail($customerData[$prefix.'email']);
+            $name  = ($customerData[$prefix.'firstname']);
+            $name .= isset($customerData[$prefix.'middlename']) ? ' ' . $customerData[$prefix.'middlename'] : '';
+            $name .= isset($customerData[$prefix.'lastname'])   ? ' ' . $customerData[$prefix.'lastname']   : '';
+            $buyer->setName($name);
+            if(strlen($cpf_cnpj_bcash) > 11) {
+                $buyer->setCnpj($cpf_cnpj_bcash);
+                $buyer->setCompanyName($name);
+            }else { $buyer->setCpf($cpf_cnpj_bcash); }
+            $buyer->setPhone($this->completePhoneBcash('telephone'));
+            $buyer->setCellPhone($this->completePhoneBcash('fax'));
+            $buyer->setAddress($this->createAddressBcash());
+        }
+
         return $buyer;
     }
 

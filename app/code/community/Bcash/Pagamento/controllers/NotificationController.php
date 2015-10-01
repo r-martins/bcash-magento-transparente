@@ -8,6 +8,7 @@ use Bcash\Domain\NotificationStatusEnum;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
 use Bcash\Test\NotificationSimulator;
+use Bcash\Config\Config;
 
 /**
  * Controller Bcash_Pagamento_NotificationController
@@ -70,6 +71,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 var_dump($returnSimulator);
                 echo "</pre>";
             }
+            echo "<div style='clear:both;'><div style='float: right;margin-top: 20px; font-size: 12px;'>hostSandBox: " . Config::hostSandBox . "</div>";
         }else {
             echo "Habilite o Sandbox para simular notificações pelo Bcash.";
         }
