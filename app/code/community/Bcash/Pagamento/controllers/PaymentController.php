@@ -40,7 +40,6 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
      */
     public function dadosAction()
     {
-        Mage::log('dadosAction');
         $pid = Mage::app()->getRequest()->getPost('pid');
         $input = Mage::app()->getRequest()->getPost('input');
         $tipo = Mage::app()->getRequest()->getPost('tipo');
@@ -123,7 +122,6 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
         $this->_initLayoutMessages('checkout/session');
         Mage::dispatchEvent('checkout_onepage_controller_success_action', array('order_ids' => array($lastOrderId)));
 
-        //Release layout stream... lol... sounds fancy
         $this->renderLayout();
     }
 }

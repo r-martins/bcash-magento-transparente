@@ -29,51 +29,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
     protected $transaction;
 
-    /*
-    protected $_isGateway                   = false;
-    protected $_canOrder                    = false;
-    protected $_canAuthorize                = false;
-    protected $_canCapture                  = false;
-    protected $_canCapturePartial           = false;
-    protected $_canCaptureOnce              = false;
-    protected $_canRefund                   = false;
-    protected $_canRefundInvoicePartial     = false;
-    protected $_canVoid                     = false;
-    protected $_canUseInternal              = true;
-    protected $_canUseCheckout              = true;
-    protected $_canUseForMultishipping      = true;
-    protected $_isInitializeNeeded          = false;
-    protected $_canFetchTransactionInfo     = false;
-    protected $_canReviewPayment            = false;
-    protected $_canCreateBillingAgreement   = false;
-    protected $_canManageRecurringProfiles  = true;
-    */
 
     /**
-     * Retornar URL para redirecionar o cliente.
-     * Chamado depois que o botão é clicado.
-     * Chamado após a criação e registro do pedido "Order".
-     * @return string
-     */
-    /*
-    public function getOrderPlaceRedirectUrl()
-    {
-        Mage::log('Called custom ' . __METHOD__);
-        $url = Mage::getUrl("pagamento/payment/success");
-        return $url;
-    }
-    */
-
-    /**
-     *
-     * <payment_action>sale</payment_action>
      * Inicializa o método de pagamento. Chamado quando a compra é completa.
-     * Objeto "Order" será criado após a chamada deste método.
+     * Objeto Order será criado após a chamada deste método.
      *
      * @param string $paymentAction
      * @param Varien_Object $stateObject
-     *
      * @return Mage_Payment_Model_Abstract
+     * @throws Mage_Payment_Model_Info_Exception
      */
     public function initialize($paymentAction, $stateObject)
     {
@@ -185,7 +149,8 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $result = parent::assignData($data);
         $params = Mage::app()->getFrontController()->getRequest()->getParams();
         $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;
-        //TODO: Adicionar Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
+
+        //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
         $discount = 0;
         if ($params['installments_bcash'] == 1) {
             $discount = $this->calculateDiscount($params['payment-method']);

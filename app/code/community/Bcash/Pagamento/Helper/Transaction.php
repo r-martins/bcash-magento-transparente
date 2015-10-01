@@ -76,10 +76,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     /**
      * @var
      */
-    private $dependentsBcash;
-    /**
-     * @var
-     */
     public $quoteBcash;
     /**
      * @var
@@ -189,21 +185,11 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 return $arRet;
             }
         } catch (ValidationException $e) {
-            $errorsArr = $e->getErrors();
-            $errorsList = $errorsArr->list;
-            $messages  = array();
-            foreach ($errorsList as $err) {
-                $messages[] = $err->code . " - " . urldecode($err->description);
-            }
-            Mage::throwException(implode("\n", $messages));
+            Mage::log($e->getErrors());
+            Mage::throwException($e->getMessage());
         } catch (ConnectionException $e) {
-            $errorsArr = $e->getErrors();
-            $errorsList = $errorsArr->list;
-            $messages  = array();
-            foreach ($errorsList as $err) {
-                $messages[] = $err->code . " - " . urldecode($err->description);
-            }
-            Mage::throwException(implode("\n", $messages));
+            Mage::log($e->getErrors());
+            Mage::throwException($e->getMessage());
         }
     }
 
@@ -453,7 +439,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createDependentTransactionsBcash()
     {
-        $unserialezedDeps = unserialize($this->dependentsBcash);
+        $unserialezedDeps = unserialize($this->dependents);
         foreach ($unserialezedDeps['dependente'] as $key => $obj) {
             if ($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0) {
                 $dependent = new DependentTransaction();
