@@ -1,6 +1,6 @@
 .payment-group {
-   font: 14px Arial,Helvetica,sans-serif;
- }
+  font: 14px Arial, Helvetica, sans-serif;
+}
 
 .payment-group ul {
   list-style: none;
@@ -37,7 +37,9 @@
   cursor: pointer;
 }
 
+
 /* visa */
+
 .band-1 {
   background-position: 0 -177px
 }
@@ -51,7 +53,9 @@
   background-position: -150px -177px;
 }
 
+
 /* master */
+
 .band-2 {
   background-position: 0 -226px
 }
@@ -65,7 +69,9 @@
   background-position: -150px -226px;
 }
 
+
 /* amex */
+
 .band-37 {
   background-position: 0 -274px
 }
@@ -79,7 +85,9 @@
   background-position: -150px -274px
 }
 
+
 /* aura */
+
 .band-45 {
   background-position: 0 -323px
 }
@@ -93,7 +101,9 @@
   background-position: -150px -323px
 }
 
+
 /* diners */
+
 .band-55 {
   background-position: 0 -371px
 }
@@ -107,7 +117,9 @@
   background-position: -150px -371px
 }
 
+
 /* hiper */
+
 .band-56 {
   background-position: 0 -420px
 }
@@ -121,7 +133,9 @@
   background-position: -150px -420px
 }
 
+
 /* elo */
+
 .band-63 {
   background-position: 0 -468px
 }
@@ -135,7 +149,9 @@
   background-position: -150px -468px
 }
 
+
 /* boleto */
+
 .band-10 {
   background-position: 0 -517px
 }
@@ -149,7 +165,9 @@
   background-position: -150px -517px
 }
 
+
 /* bb */
+
 .band-58 {
   background-position: 0 -565px
 }
@@ -163,7 +181,9 @@
   background-position: -150px -565px
 }
 
+
 /* bradesco */
+
 .band-59 {
   background-position: 0 -614px
 }
@@ -177,7 +197,9 @@
   background-position: -150px -614px
 }
 
+
 /* itau */
+
 .band-60 {
   background-position: 0 -662px
 }
@@ -191,7 +213,9 @@
   background-position: -150px -662px
 }
 
+
 /* hsbc */
+
 .band-62 {
   background-position: 0 -759px
 }
@@ -205,7 +229,9 @@
   background-position: -150px -759px
 }
 
+
 /* banrisul*/
+
 .band-61 {
   background-position: 0 -711px
 }
@@ -219,12 +245,72 @@
   background-position: -150px -711px
 }
 
+
 /* bootstrap */
-.b-col-xs-1, .b-col-xs-2, .b-col-xs-3, .b-col-xs-4, .b-col-xs-5, .b-col-xs-6, .b-col-xs-7, .b-col-xs-8, .b-col-xs-9, .b-col-xs-10, .b-col-xs-11, .b-col-xs-12 {
+
+.b-col-xs-1,
+.b-col-xs-2,
+.b-col-xs-3,
+.b-col-xs-4,
+.b-col-xs-5,
+.b-col-xs-6,
+.b-col-xs-7,
+.b-col-xs-8,
+.b-col-xs-9,
+.b-col-xs-10,
+.b-col-xs-11,
+.b-col-xs-12 {
   float: left;
 }
 
-.b-col-xs-1, .b-col-sm-1, .b-col-md-1, .b-col-lg-1, .b-col-xs-2, .b-col-sm-2, .b-col-md-2, .b-col-lg-2, .b-col-xs-3, .b-col-sm-3, .b-col-md-3, .b-col-lg-3, .b-col-xs-4, .b-col-sm-4, .b-col-md-4, .b-col-lg-4, .b-col-xs-5, .b-col-sm-5, .b-col-md-5, .b-col-lg-5, .b-col-xs-6, .b-col-sm-6, .b-col-md-6, .b-col-lg-6, .b-col-xs-7, .b-col-sm-7, .b-col-md-7, .b-col-lg-7, .b-col-xs-8, .b-col-sm-8, .b-col-md-8, .b-col-lg-8, .b-col-xs-9, .b-col-sm-9, .b-col-md-9, .b-col-lg-9, .b-col-xs-10, .b-col-sm-10, .b-col-md-10, .b-col-lg-10, .b-col-xs-11, .b-col-sm-11, .b-col-md-11, .b-col-lg-11, .b-col-xs-12, .b-col-sm-12, .b-col-md-12, .b-col-lg-12 {
+.b-col-xs-1,
+.b-col-sm-1,
+.b-col-md-1,
+.b-col-lg-1,
+.b-col-xs-2,
+.b-col-sm-2,
+.b-col-md-2,
+.b-col-lg-2,
+.b-col-xs-3,
+.b-col-sm-3,
+.b-col-md-3,
+.b-col-lg-3,
+.b-col-xs-4,
+.b-col-sm-4,
+.b-col-md-4,
+.b-col-lg-4,
+.b-col-xs-5,
+.b-col-sm-5,
+.b-col-md-5,
+.b-col-lg-5,
+.b-col-xs-6,
+.b-col-sm-6,
+.b-col-md-6,
+.b-col-lg-6,
+.b-col-xs-7,
+.b-col-sm-7,
+.b-col-md-7,
+.b-col-lg-7,
+.b-col-xs-8,
+.b-col-sm-8,
+.b-col-md-8,
+.b-col-lg-8,
+.b-col-xs-9,
+.b-col-sm-9,
+.b-col-md-9,
+.b-col-lg-9,
+.b-col-xs-10,
+.b-col-sm-10,
+.b-col-md-10,
+.b-col-lg-10,
+.b-col-xs-11,
+.b-col-sm-11,
+.b-col-md-11,
+.b-col-lg-11,
+.b-col-xs-12,
+.b-col-sm-12,
+.b-col-md-12,
+.b-col-lg-12 {
   position: relative;
   min-height: 1px;
   padding-right: 15px;
@@ -278,28 +364,25 @@
 .b-form-control {
   display: block;
   width: 100%;
-  height: 24px;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857;
-  color: #555;
-  background-color: #FFF;
-  background-image: none;
-  border: 1px solid #CCC;
-  border-radius: 4px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
-  transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+  /*height: 24px;*/
+  /*padding: 6px 12px;*/
+  /*font-size: 14px;*/
+  /*line-height: 1.42857;*/
+  /*color: #555;*/
+  /*background-color: #FFF;*/
+  /*background-image: none;*/
+  /*border: 1px solid #CCC;*/
+  /*border-radius: 4px;*/
+  /*box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+  /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;*/
 }
 
-.b-form-control .error{
+.b-form-control .error {
   border-color: red;
 }
 
 .b-form-control:focus {
-  border-color: #66afe9;
-  outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+  border: 1px solid #39C;
 }
 
 .b-form-control::-moz-placeholder {
@@ -315,13 +398,27 @@
   color: #999;
 }
 
-.b-form-control[disabled],.b-form-control[readonly],fieldset[disabled] .b-form-control {
+.b-form-control[disabled],
+.b-form-control[readonly],
+fieldset[disabled] .b-form-control {
   background-color: #eee;
   opacity: 1;
 }
 
-.b-form-control[disabled],fieldset[disabled] .b-form-control {
+.b-form-control[disabled],
+fieldset[disabled] .b-form-control {
   cursor: not-allowed;
+}
+
+select.b-form-control {
+  border-radius: 2px;
+  border: 1px solid silver;
+  background: #FFFFFF;
+  font-size: 15px;
+  width: 100%;
+  padding: 0 8px;
+  height: 30px;
+  margin-top: 0px;
 }
 
 .b-btn {
@@ -352,7 +449,8 @@
   border-color: #4cae4c;
 }
 
-.b-btn-success.focus,.b-btn-success:focus {
+.b-btn-success.focus,
+.b-btn-success:focus {
   color: #fff;
   background-color: #449d44;
   border-color: #255625;
@@ -375,12 +473,15 @@
   vertical-align: middle;
 }
 
-.b-form-group:before, .b-row:after, .b-row:before {
+.b-form-group:before,
+.b-row:after,
+.b-row:before {
   display: table;
   content: " ";
 }
 
-.b-row:after, .b-form-group:after {
+.b-row:after,
+.b-form-group:after {
   clear: both;
 }
 
@@ -424,6 +525,7 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type="number"] {
   -moz-appearance: textfield;
 }
@@ -432,7 +534,6 @@ input[type="number"] {
   height: 30px;
   line-height: 30px;
 }
-
 
 hr {
   margin-top: 20px;
@@ -445,9 +546,96 @@ hr {
   display: none;
 }
 
-
-.b-n-row{
+.b-n-row {
   float: left;
   width: 95%;
   padding: 2px;
+}
+
+
+/**
+ * Tooltip Styles
+ */
+
+.icon-tooltip {
+  display: inline-block;
+  color: #fff;
+  background-color: #2E8AB8;
+  padding: 2px 7px;
+  border-radius: 40px;
+  font-size: 85%;
+  margin-left: 3px;
+}
+
+
+/* Add this attribute to the element that needs a tooltip */
+
+[data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+
+/* Hide the tooltip content by default */
+
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* Position tooltip above the element */
+
+[data-tooltip]:before {
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  margin-bottom: 5px;
+  margin-left: -80px;
+  padding: 7px;
+  width: 160px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #000;
+  background-color: rgba(45, 133, 198, 1);
+  color: #fff;
+  content: attr(data-tooltip);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+
+/* Triangle hack to make tooltip look like a speech bubble */
+
+[data-tooltip]:after {
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -5px;
+  width: 0;
+  border-top: 5px solid #000;
+  border-top: 5px solid rgba(45, 133, 198, 1);
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  content: " ";
+  font-size: 0;
+  line-height: 0;
+}
+
+
+/* Show tooltip content on hover */
+
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
 }
