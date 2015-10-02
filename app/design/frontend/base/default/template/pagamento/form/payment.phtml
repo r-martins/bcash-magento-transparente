@@ -84,7 +84,7 @@ $paymentGroupName = array(
                             <div class="b-form-group b-col-xs-4" style="padding:0px">
                                 <div>
                                     <label>CVV <span class="icon-tooltip" data-tooltip="Código de segurança do cartão de crédito.">?</span></label>
-                                    <input type="text" class="b-form-control validate-ccv-card" maxlength="4" value=""
+                                    <input type="text" class="b-form-control validate-ccv-card" maxlength="3" value=""
                                            name="cvv_bcash"
                                            id="cvv_bcash" style="padding:2px">
                                 </div>
@@ -129,8 +129,8 @@ $paymentGroupName = array(
                             </div>
                             <div class="b-form-group b-col-xs-7" style="padding-right:0px">
                                 <label>Parcelas</label>
-                                <select class="b-form-control" name="installments_bcash" id="installments_bcash" style="max-width:100% !important">
-                                    <option value=""> - - - </option>
+                                <select class="b-form-control validate-installments-bcash" name="installments_bcash" id="installments_bcash" style="max-width:100% !important">
+                                    <option value="" disabled> (Selecione o número de parcelas) </option>
                                     <?php
                                     $okInstallments = $paymentInstallments['ok'];
                                     $installments = $paymentInstallments["installments"];
@@ -237,6 +237,7 @@ $paymentGroupName = array(
     var tefs = [banco_brasil, banco_bradesco, banco_itau, banco_banrisul, banco_hsbc];
 
     var initBcashPagamento = function () {
+        checkPaymentOnLoad();
 
         function showInstallmentsOnlyForMethod(method)
         {
@@ -248,6 +249,8 @@ $paymentGroupName = array(
                 {
                     if (parseInt(j) || i == 0) {
                         optionsNot[j].style.display="none";
+                        // Fix for IE and Safari
+                        optionsNot[j].attr('disabled', 'disabled').hide();
                     }
                 }
                 var options = select.querySelectorAll("option[data-type='" + method +"']");
@@ -255,10 +258,29 @@ $paymentGroupName = array(
                 {
                     if (parseInt(i) || i == 0) {
                         options[i].style.display="block";
+                        // Fix for IE and Safari
+                        optionsNot[j].removeAttr('disabled').show();
                     }
                 }
                 document.getElementById(select_id).value = "";
             }
+        }
+
+        function ableCvv(card) {
+            cvvInput = document.getElementById("cvv_bcash");
+            cvvInput.value = '';
+            // Amex
+            if(card == 37) {
+                cvvInput.maxLength = 4;
+            }else {
+                cvvInput.maxLength = 3;
+            }
+        }
+
+        function checkPaymentOnLoad() {
+            document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
+                if(e.value == 'pagamento') { e.checked; }
+            });
         }
 
         function checkIsCardSelected() {
@@ -297,6 +319,8 @@ $paymentGroupName = array(
             if (iscard) {
                 if (v.length > 0) {
                     return validateCardNumber();
+                }else {
+                    return false;
                 }
             }
             return true;
@@ -311,6 +335,14 @@ $paymentGroupName = array(
         });
 
         Validation.add('validate-year-bcash', 'Preencha o ano de validade do cartão.', function (v) {
+            var iscard = checkIsCardSelected();
+            if (iscard) {
+                return v.length > 0;
+            }
+            return true;
+        });
+
+        Validation.add('validate-installments-bcash', 'Selecione o número de parcelas.', function (v) {
             var iscard = checkIsCardSelected();
             if (iscard) {
                 return v.length > 0;
@@ -374,6 +406,7 @@ $paymentGroupName = array(
             }
             disableUnunsed(paymentRadio);
             showInstallmentsOnlyForMethod(paymentRadio.value);
+            ableCvv(paymentRadio.value);
         }
 
         function enableCardForm() {
@@ -681,14 +714,18 @@ $paymentGroupName = array(
         function validateCardNumber()
         {
             var RegExpHipercard = /^(3841\d{10}(\d{3})?)|(3841\d{15})$/;
-            var RegExpElo = /^((((636368)|(438935)|(504175)|(451416)|(636297)|(509048)|(509067)|(509049)|(509069)|(509050)|(509074)|(509068)|(509040)|(509045)|(509051)|(509046)|(509066)|(509047)|(509042)|(509052)|(509043)|(509064)|(509040))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/;
+            var RegExpElo = /^((((636368)|(438935)|(504175)|(451416)|(636297))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/;
+            var RegExpElo2 = /^(636368|438935|504175|451416|636297)([0-9]{10})$/;
             var RegExpDiners = /^3[0,6,8]\d{12}$/;
             var RegExpAmex = /^3[47][0-9]{13}$/;
             var RegExpVisa = /^4[0-9]{12}([0-9]{3})?$/;
             var RegExpMaster = /^5[1-5][0-9]{14}$/;
+            var RegExpAura = /^(5078\d{2})(\d{2})(\d{11})$/;
             var RegexFinal = '';
             var paymentRadio = getCardSelected();
             if (paymentRadio.isCard) {
+                var cardNumber = document.getElementById("card_number_bcash").value;
+                if(cardNumber.length <= 0) { return false; }
                 var codeCard = paymentRadio.element.value;
                 switch (parseInt(codeCard)) {
                     case visa:
@@ -701,23 +738,29 @@ $paymentGroupName = array(
                         RegexFinal = RegExpAmex;
                         break;
                     case elo:
+                        if(cardNumber.length <= 16) { return true; }
                         RegexFinal = RegExpElo;
                         break;
                     case hipercard:
+                        if(cardNumber.length >= 16 && cardNumber.length <= 19) { return true; }
                         RegexFinal = RegExpHipercard;
                         break;
                     case dinners:
+                        if(cardNumber.length >= 14 && cardNumber.length <= 16) { return true; }
                         RegexFinal = RegExpDiners;
                         break;
+                    case aura:
+                        if(cardNumber.length == 19) { return true; }
+                        RegexFinal = RegExpAura;
+                        break;
                 }
-                var cardNumber = document.getElementById("card_number_bcash").value;
                 if (RegexFinal == '') {
-                    alert('Cartão não corresponde a bandeira selecionada ou está incorreto.');
+                    alert('Número do cartão não corresponde a bandeira selecionada ou está incorreto.');
                     cardNumber.value = '';
                     return false;
                 }
                 if (RegexFinal.test(cardNumber) == false) {
-                    alert('Cartão não corresponde a bandeira selecionada ou está incorreto.');
+                    alert('Número do cartão não corresponde a bandeira selecionada ou está incorreto.');
                     cardNumber.value = '';
                     return false;
                 }
