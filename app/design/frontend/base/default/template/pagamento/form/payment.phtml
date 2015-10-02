@@ -250,7 +250,7 @@ $paymentGroupName = array(
                     if (parseInt(j) || i == 0) {
                         optionsNot[j].style.display="none";
                         // Fix for IE and Safari
-                        optionsNot[j].attr('disabled', 'disabled').hide();
+                        //optionsNot[j].attr('disabled', 'disabled').hide();
                     }
                 }
                 var options = select.querySelectorAll("option[data-type='" + method +"']");
@@ -259,7 +259,7 @@ $paymentGroupName = array(
                     if (parseInt(i) || i == 0) {
                         options[i].style.display="block";
                         // Fix for IE and Safari
-                        optionsNot[j].removeAttr('disabled').show();
+                        //optionsNot[j].removeAttr('disabled').show();
                     }
                 }
                 document.getElementById(select_id).value = "";
