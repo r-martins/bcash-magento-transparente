@@ -101,7 +101,10 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
     public function getPaymentMethods()
     {
         Mage::log("Bcash_Pagamento_Block_Form_Payment called getPaymentMethods");
-        return Mage::helper('pagamento/paymentMethod')->getPaymentMethods();
+        // Find allowed payment methods
+        $listAllowed = $this->getAllowedPaymentMethods();
+
+        return Mage::helper('pagamento/paymentMethod')->getPaymentMethods($listAllowed);
     }
 
     /**
@@ -115,7 +118,7 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
             $sessionCheckout = Mage::getSingleton('checkout/session');
             $quoteId = $sessionCheckout->getQuoteId();
             $this->quote = Mage::getModel("sales/quote")->load($quoteId);
-            $grandTotal = floatval($this->quote->getData('grand_total'));
+            $grandTotal = floatval(number_format($this->quote->getData('grand_total'), 2, '.', ''));
             $ignoreScheduledDiscount = false;
             if($this->sandbox){
                 $installments->enableSandBox(true);
@@ -135,7 +138,7 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
 
     public function prepareInstallmentsCards($installments)
     {
-        foreach ($installments->paymentTypes as &$obj) {
+        foreach ($installments->paymentTypes as $obj) {
             if ('card' != $obj->name) {
                 unset($obj);
             } else {
@@ -143,7 +146,7 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
                     $subTotal = floatval($this->quote->getSubtotal());
                     $desconto = ($this->desconto_credito_1x / 100) * $subTotal;
                     if ($desconto) {
-                        foreach ($obj->paymentMethods as &$type) {
+                        foreach ($obj->paymentMethods as $type) {
                             foreach ($type->installments as &$installment) {
                                 if ($installment->number == 1) {
                                     $installment->installmentAmount -= $desconto;
@@ -157,6 +160,31 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
             }
         }
         return $installments;
+    }
+
+    private function getAllowedPaymentMethods()
+    {
+        $methods = array();
+        $installments = new Installments($this->email, $this->token);
+        try {
+            $installments->enableSandBox($this->sandbox);
+            // Any param value just for check
+            $response = $installments->calculate(100.00, 1, false);
+            // list methods
+            foreach($response->paymentTypes as $types) {
+                foreach($types->paymentMethods as $method) {
+                    $methods[] = $method->id;
+                }
+            }
+        } catch (ValidationException $e) {
+            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
+            Mage::log($e->getErrors());
+        } catch (ConnectionException $e) {
+            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
+            Mage::log($e->getErrors());
+        }
+
+        return $methods;
     }
 
 
