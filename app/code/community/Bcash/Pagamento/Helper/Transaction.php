@@ -444,7 +444,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             if ($obj && isset($unserialezedDeps['percentual'][$key]) && $unserialezedDeps['percentual'][$key] > 0) {
                 $dependent = new DependentTransaction();
                 $dependent->setEmail($obj);
-                $value = ($this->subTotalBcashsubTotalBcash / 100) * floatval($unserialezedDeps['percentual'][$key]);
+                $value = ($this->subTotalBcash / 100) * floatval($unserialezedDeps['percentual'][$key]);
                 $dependent->setValue(floatval(number_format($value, 2, '.', '')));
                 array_push($this->deps, $dependent);
             }
