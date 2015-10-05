@@ -186,10 +186,22 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             }
         } catch (ValidationException $e) {
             Mage::log($e->getErrors());
-            Mage::throwException($e->getMessage());
+            $errorsArr = $e->getErrors();
+            $errorsList = $errorsArr->list;
+            $messages  = $e->getMessage() . "\n";
+            foreach ($errorsList as $err) {
+                $messages .= "\n- " . urldecode($err->description) . " (" . $err->code . ")";
+            }
+            Mage::throwException($messages);
         } catch (ConnectionException $e) {
             Mage::log($e->getErrors());
-            Mage::throwException($e->getMessage());
+            $errorsArr = $e->getErrors();
+            $errorsList = $errorsArr->list;
+            $messages  = $e->getMessage() . "\n";
+            foreach ($errorsList as $err) {
+                $messages .= "\n- " . urldecode($err->description) . " (" . $err->code . ")";
+            }
+            Mage::throwException($messages);
         }
     }
 
