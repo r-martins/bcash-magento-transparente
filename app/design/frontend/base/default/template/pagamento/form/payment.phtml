@@ -140,27 +140,6 @@ $paymentGroupName = array(
                                             <option value="<?php echo $times ?>"><?php echo $times ?>x - R$ <?php echo number_format($value,2,',','.')?></option>
                                             <?php
                                         endforeach;
-                                        ?>
-                                        <?php
-                                    else :
-                                        $installments = $paymentInstallments["installments"][0]->paymentTypes;
-                                        foreach ($installments as $type) :
-                                            if ($type->name == 'card') :
-                                                foreach ($type->paymentMethods as $typePayment) :
-                                                    foreach ($typePayment->installments as $paymentInstallment) :
-                                                        ?>
-                                                        <option style="display: none;" data-type="<?php echo $typePayment->id ?>" value="<?php echo $paymentInstallment->number ?>">
-                                                            <?php echo  $paymentInstallment->number ?>x - R$ <?php echo number_format($paymentInstallment->installmentAmount,2,',','.')?>
-                                                            <?php echo $paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '' ?>
-                                                            <?php echo isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '' ?>
-                                                        </option>
-                                                        <?php
-                                                    endforeach;
-                                                endforeach;
-                                            endif;
-                                        endforeach;
-                                        ?>
-                                        <?php
                                     endif;
                                     ?>
                                 </select>
@@ -236,6 +215,29 @@ $paymentGroupName = array(
     var banco_hsbc = 62;
     var tefs = [banco_brasil, banco_bradesco, banco_itau, banco_banrisul, banco_hsbc];
 
+    /*
+     * Parcelamentos
+     */
+    <?php
+    echo "var installments_cc = [{ccId : 0, ccName : '', ccNumber : '', ccDescript : '(Selecione o número de parcelas)'}";
+    $okInstallments = $paymentInstallments['ok'];
+    if($okInstallments):
+        $installments = $paymentInstallments["installments"][0]->paymentTypes;
+        foreach ($installments as $type) :
+            if ($type->name == 'card') :
+                foreach ($type->paymentMethods as $typePayment) :
+                    foreach ($typePayment->installments as $paymentInstallment) :
+                    echo ",{ccId : " . $typePayment->id . ", ccName : '" . $typePayment->name . "', ccNumber : " . $paymentInstallment->number . ",
+                            ccDescript : '" . $paymentInstallment->number . "x - R$ " . number_format($paymentInstallment->installmentAmount,2,',','.') .
+                            ($paymentInstallment->rate ? ' ('. number_format($paymentInstallment->rate,2,',','.') . '%)' : '') . (isset($paymentInstallment->installmentAmountDesc) ? $paymentInstallment->installmentAmountDesc : '') . "'}";
+                    endforeach;
+                endforeach;
+            endif;
+        endforeach;
+    endif;
+    echo "];";
+?>
+
     var initBcashPagamento = function () {
         checkPaymentOnLoad();
 
@@ -244,25 +246,32 @@ $paymentGroupName = array(
             if (in_array(method, cards)) {
                 var select_id = 'installments_bcash';
                 var select =  document.getElementById(select_id);
-                var optionsNot = select.querySelectorAll("option");
-                for (var j in optionsNot)
-                {
-                    if (parseInt(j) || i == 0) {
-                        optionsNot[j].style.display="none";
-                        // Fix for IE and Safari
-                        //optionsNot[j].attr('disabled', 'disabled').hide();
+
+                if(installments_cc.length > 1) {
+                    // Remove options
+                    var i; for(i=select.options.length-1; i>=0; i--) { select.remove(i); }
+
+                    // Add options
+                    var option = '';
+                    for (i=0; i < installments_cc.length; i++) {
+                        if(installments_cc[i].ccId == 0) {
+                            option = document.createElement("option");
+                            option.text = installments_cc[i].ccDescript;
+                            option.value = '';
+                            option.disabled = 'disabled';
+                            select.add(option);
+                            option = '';
+                        }
+                        if(installments_cc[i].ccId == method) {
+                            option = document.createElement("option");
+                            option.text = installments_cc[i].ccDescript;
+                            option.value = installments_cc[i].ccNumber;
+                            select.add(option);
+                            option = '';
+                        }
                     }
+                    document.getElementById(select_id).value = "";
                 }
-                var options = select.querySelectorAll("option[data-type='" + method +"']");
-                for (var i in options)
-                {
-                    if (parseInt(i) || i == 0) {
-                        options[i].style.display="block";
-                        // Fix for IE and Safari
-                        //optionsNot[j].removeAttr('disabled').show();
-                    }
-                }
-                document.getElementById(select_id).value = "";
             }
         }
 
@@ -270,10 +279,25 @@ $paymentGroupName = array(
             cvvInput = document.getElementById("cvv_bcash");
             cvvInput.value = '';
             // Amex
-            if(card == 37) {
+            if(card == american_express) {
                 cvvInput.maxLength = 4;
             }else {
                 cvvInput.maxLength = 3;
+            }
+
+            if(cvvInput.hasClassName("validation-passed")) {
+                cvvInput.removeClassName("validation-passed");
+            }
+
+            // CVV não obrigatório
+            if(card == aura) {
+                if(cvvInput.hasClassName("validate-ccv-card")) {
+                    cvvInput.removeClassName("validate-ccv-card");
+                }
+            }else {
+                if(!cvvInput.hasClassName("validate-ccv-card")) {
+                    cvvInput.addClassName("validate-ccv-card");
+                }
             }
         }
 
@@ -725,6 +749,7 @@ $paymentGroupName = array(
             var paymentRadio = getCardSelected();
             if (paymentRadio.isCard) {
                 var cardNumber = document.getElementById("card_number_bcash").value;
+                cardNumber = cardNumber.trim();
                 if(cardNumber.length <= 0) { return false; }
                 var codeCard = paymentRadio.element.value;
                 switch (parseInt(codeCard)) {
