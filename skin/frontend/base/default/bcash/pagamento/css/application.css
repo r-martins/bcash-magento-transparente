@@ -565,12 +565,13 @@ hr {
 
 .icon-tooltip {
   display: inline-block;
-  color: #fff;
-  background-color: #2E8AB8;
-  padding: 2px 7px;
-  border-radius: 40px;
-  font-size: 85%;
   margin-left: 3px;
+  padding: 1px 4px;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 8px;
+  background-color: #2E8AB8;
+  border-radius: 40px;
 }
 
 
