@@ -1,4 +1,6 @@
-*, *:before, *:after {
+.payment-group *,
+.payment-group *:before,
+.payment-group *:after {
   box-sizing: border-box;
 }
 
