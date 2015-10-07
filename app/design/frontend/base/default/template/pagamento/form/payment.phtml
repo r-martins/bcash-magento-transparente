@@ -303,7 +303,7 @@ $paymentGroupName = array(
 
         function checkPaymentOnLoad() {
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') { e.checked = true; }
+                if(e.value == 'pagamento') { e.checked; }
             });
         }
 
@@ -385,7 +385,6 @@ $paymentGroupName = array(
         var cards = ['1', '2', '37', '45', '55', '56', '63'];
 
         function clickFlag(e) {
-            checkPaymentOnLoad();
             var elem, evt = e ? e : event;
             if (evt.srcElement) {
                 elem = evt.srcElement;
@@ -511,14 +510,13 @@ $paymentGroupName = array(
         }
 
         function onlyNumber(key) {
-            if (key == 8 || key == 46 || key == 37 || key == 39) {
+            if (key == 8 || key == 46 || key == 37 || key == 39 || key == 9 || key == 35 || key == 36) {
                 return true;
             }
             else if ( key < 48 || key > 57 ) {
                 return false;
             }
-            else return true;
-
+            return true;
         }
 
         function unformatNumber(pNum) {
