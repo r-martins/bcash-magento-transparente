@@ -303,7 +303,7 @@ $paymentGroupName = array(
 
         function checkPaymentOnLoad() {
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') { e.checked; }
+                if(e.value == 'pagamento') { e.checked = true; }
             });
         }
 
@@ -385,6 +385,7 @@ $paymentGroupName = array(
         var cards = ['1', '2', '37', '45', '55', '56', '63'];
 
         function clickFlag(e) {
+            checkPaymentOnLoad()
             var elem, evt = e ? e : event;
             if (evt.srcElement) {
                 elem = evt.srcElement;
