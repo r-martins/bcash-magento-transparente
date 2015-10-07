@@ -511,7 +511,14 @@ $paymentGroupName = array(
         }
 
         function onlyNumber(key) {
-            return !((key > 31 && (key < 48 || key > 57)) || key == 8 );
+            if (key == 8 || key == 46 || key == 37 || key == 39) {
+                return true;
+            }
+            else if ( key < 48 || key > 57 ) {
+                return false;
+            }
+            else return true;
+
         }
 
         function unformatNumber(pNum) {
