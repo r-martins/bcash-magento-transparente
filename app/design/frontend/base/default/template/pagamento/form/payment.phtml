@@ -301,11 +301,8 @@ $paymentGroupName = array(
             }
         }
 
-        function forceReloadOderReviewOsc(method = '') {
-            if (typeof(OSCPayment) !== 'undefined') {
-                if(method != '') {
-                    OSCPayment.switchToMethod(method);
-                }
+        function forceReloadOrderReviewOsc() {
+            if (typeof(OSCPayment) !== 'undefined') {                
                 OSCPayment.forcesavePayment();
             }
         }
@@ -315,7 +312,7 @@ $paymentGroupName = array(
                 if(e.value == 'pagamento') {
                     e.checked = true;
                     //force order review reload
-                    forceReloadOderReviewOsc('pagamento');
+                    forceReloadOrderReviewOsc();
                 }
             });
         }
@@ -727,7 +724,7 @@ $paymentGroupName = array(
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=parcelas'
             });
-            forceReloadOderReviewOsc();
+            forceReloadOrderReviewOsc();
         });
 
         $('cvv_bcash').observe('blur', function (e) {
