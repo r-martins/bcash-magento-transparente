@@ -61,6 +61,7 @@ class Connection
 	private function send($ch)
 	{
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
 
