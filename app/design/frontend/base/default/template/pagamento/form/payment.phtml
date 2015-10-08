@@ -301,9 +301,19 @@ $paymentGroupName = array(
             }
         }
 
+        function forceReloadOrderReviewOsc() {
+            if (typeof(OSCPayment) !== 'undefined') {                
+                OSCPayment.forcesavePayment();
+            }
+        }
+
         function checkPaymentOnLoad() {
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') { e.checked = true; }
+                if(e.value == 'pagamento') {
+                    e.checked = true;
+                    //force order review reload
+                    forceReloadOrderReviewOsc();
+                }
             });
         }
 
@@ -385,7 +395,6 @@ $paymentGroupName = array(
         var cards = ['1', '2', '37', '45', '55', '56', '63'];
 
         function clickFlag(e) {
-            checkPaymentOnLoad()
             var elem, evt = e ? e : event;
             if (evt.srcElement) {
                 elem = evt.srcElement;
@@ -431,6 +440,7 @@ $paymentGroupName = array(
             disableUnunsed(paymentRadio);
             showInstallmentsOnlyForMethod(paymentRadio.value);
             ableCvv(paymentRadio.value);
+            checkPaymentOnLoad();
         }
 
         function enableCardForm() {
@@ -714,6 +724,7 @@ $paymentGroupName = array(
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=parcelas'
             });
+            forceReloadOrderReviewOsc();
         });
 
         $('cvv_bcash').observe('blur', function (e) {
