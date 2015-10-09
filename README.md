@@ -1,10 +1,5 @@
-# magento-transparente
-Módulo do Magento para a API Bcash
-
-
-## Instalando pelo Magento Connect
-
-   *Download:* [http://www.magentocommerce.com/magento-connect/magento-transparente.html](http://www.magentocommerce.com/magento-connect)
+# Magento Transparente
+> Módulo do Magento para a API Bcash
 
 ## Instalando manualmente
 
@@ -13,6 +8,6 @@ Módulo do Magento para a API Bcash
 3. Em **System > Index Management** selecione todos os campos e clique em **Reindex Data**.
 
 
-## Configuração e utilização do módulo na loja
+### Configuração e utilização do módulo na loja
 
-   *Acesse:* [Manual do usuário](http://bcash.com.br/para-quem-vende)
+Acesse: [Manual do usuário](doc/manual-de-instalacao-bcash-magento-transparente.pdf)
