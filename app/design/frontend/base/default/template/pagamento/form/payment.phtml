@@ -305,6 +305,11 @@ $paymentGroupName = array(
             if (typeof(OSCPayment) !== 'undefined') {                
                 OSCPayment.forcesavePayment();
             }
+            if(typeof(checkout) !== 'undefined') {
+                if ((typeof(checkout.update) !== 'undefined') && (typeof(checkout.urls) !== 'undefined')) {
+                    checkout.update(checkout.urls.payment_method);
+                }
+            }
         }
 
         function checkPaymentOnLoad() {
