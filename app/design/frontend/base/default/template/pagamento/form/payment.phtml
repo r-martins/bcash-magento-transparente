@@ -814,6 +814,21 @@ $paymentGroupName = array(
                 return true;
             }
         }
+
+        $(document).on('change', 'input[type=radio][name=payment[method]]', function (event) {
+            var target = event.target;
+            var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
+            if(target.id == 'p_method_pagamento') {
+                if (hasClass(paymentConteiner, 'b-hide')) {
+                    paymentConteiner.className = paymentConteiner.className.replace(/\bb-hide\b/, '');
+                }
+            } else {
+                if (!hasClass(paymentConteiner, 'b-hide')) {
+                    paymentConteiner.className = paymentConteiner.className + " b-hide";
+                }
+            }
+            event.preventDefault();
+        });
     };
     initBcashPagamento();
     //]]>

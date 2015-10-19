@@ -55,26 +55,6 @@ class Bcash_Pagamento_Model_Observer
         return $this;
     }
 
-    /*
-    <global>
-    - If you want your observer to listen no matter where the event is dispatched from, put it here. You can also put it in "frontend" or "adminhtml".
-    <events>
-    - This is the element that stores all of the events that are registered.
-    <checkout_submit_all_after>
-    - This is the "event" that you are listening to.
-    <observers>
-    - This is the type of event. I don't think there are others.
-    <awesome_example>
-    - This is a unique string that defines this configuration. It can be anything, and just needs to be unique.
-    <type>
-    - I have always used singleton, but other options can be "model" or "object". The "singleton" will create the object as Mage::getSingleton()
-    while both "object" and "model" will use Mage::getModel() when creating the observer object.
-    <class>
-    - This is the observer class.
-    <method>
-    - This is the function to be called in the observer class.
-    */
-
     /**
      * Adiciona o Link do meio de pagamento a página de sucesso.
      * @param $observer
@@ -107,6 +87,53 @@ class Bcash_Pagamento_Model_Observer
         } catch(Exception $e) {
             Mage::log($e->getMessage());
         }
+    }
+
+    public function updateSalesQuotePayment(Varien_Event_Observer $observer)
+    {
+        try {
+            if (!is_null($observer->getQuote())) {
+                $params = Mage::app()->getFrontController()->getRequest()->getParams();
+                $params['installments_bcash'] = isset($params['installments_bcash']) ? $params['installments_bcash'] : 1;
+
+                //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
+                $discountAmount = 0;
+                if ($params['installments_bcash'] == 1) {
+                    $transaction = new Bcash_Pagamento_Helper_Transaction();
+                    $discountAmount = $transaction->calculateDiscount($params['payment-method']);
+                }
+
+                $quote = $observer->getQuote();
+                $quote->collectTotals();
+                $grandTotal = $quote->getGrandTotal();
+                $subTotalWithDiscount = $quote->getSubtotalWithDiscount();
+                $baseGrandTotal = $quote->getBaseGrandTotal();
+                $baseSubTotalWithDiscount = $quote->getBaseSubtotalWithDiscount();
+
+                // Limpa desconto anterior
+                $objDiscountAmount = $quote->getDiscountAmount();
+                if ($objDiscountAmount > 0) {
+                    $grandTotal = $grandTotal + $objDiscountAmount;
+                    $subTotalWithDiscount = $subTotalWithDiscount + $objDiscountAmount;
+                    $baseGrandTotal = $baseGrandTotal + $objDiscountAmount;
+                    $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + $objDiscountAmount;
+                }
+
+                $totalDiscountAmount = $discountAmount;
+                $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
+                $baseTotalDiscountAmount = $discountAmount;
+                $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
+
+                $quote->setDiscountAmount($totalDiscountAmount);
+                $quote->setSubtotalWithDiscount($subtotalWithDiscount);
+                $quote->setBaseDiscountAmount($baseTotalDiscountAmount);
+                $quote->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
+                $quote->setGrandTotal($grandTotal - $totalDiscountAmount);
+                $quote->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
+                $quote->setTotalsCollectedFlag(false)->collectTotals();
+                $quote->save();
+            }
+        } catch (Exception $e) { Mage::log($e->getMessage()); }
     }
 
 }
