@@ -175,15 +175,23 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
                 'title' => "Desconto",
                 'value' => -$discountAmount,
             ));
+
+        $grandTotal = $objShippingAddress->getGrandTotal();
+        $subTotalWithDiscount = $objShippingAddress->getSubtotalWithDiscount();
+        $baseGrandTotal = $objShippingAddress->getBaseGrandTotal();
+        $baseSubTotalWithDiscount = $objShippingAddress->getBaseSubtotalWithDiscount();
+
         $totalDiscountAmount = $discountAmount;
-        $subtotalWithDiscount = $discountAmount;
+        $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
         $baseTotalDiscountAmount = $discountAmount;
-        $baseSubtotalWithDiscount = $discountAmount;
+        $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
+
         $objShippingAddress->setDiscountAmount($totalDiscountAmount);
         $objShippingAddress->setSubtotalWithDiscount($subtotalWithDiscount);
         $objShippingAddress->setBaseDiscountAmount($baseTotalDiscountAmount);
         $objShippingAddress->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
-        $objShippingAddress->setGrandTotal($objShippingAddress->getGrandTotal() - $objShippingAddress->getDiscountAmount());
-        $objShippingAddress->setBaseGrandTotal($objShippingAddress->getBaseGrandTotal() - $objShippingAddress->getBaseDiscountAmount());
+        $objShippingAddress->setGrandTotal($grandTotal - $totalDiscountAmount);
+        $objShippingAddress->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
+        $objShippingAddress->save();
     }
 }

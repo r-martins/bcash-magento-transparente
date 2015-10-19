@@ -55,26 +55,6 @@ class Bcash_Pagamento_Model_Observer
         return $this;
     }
 
-    /*
-    <global>
-    - If you want your observer to listen no matter where the event is dispatched from, put it here. You can also put it in "frontend" or "adminhtml".
-    <events>
-    - This is the element that stores all of the events that are registered.
-    <checkout_submit_all_after>
-    - This is the "event" that you are listening to.
-    <observers>
-    - This is the type of event. I don't think there are others.
-    <awesome_example>
-    - This is a unique string that defines this configuration. It can be anything, and just needs to be unique.
-    <type>
-    - I have always used singleton, but other options can be "model" or "object". The "singleton" will create the object as Mage::getSingleton()
-    while both "object" and "model" will use Mage::getModel() when creating the observer object.
-    <class>
-    - This is the observer class.
-    <method>
-    - This is the function to be called in the observer class.
-    */
-
     /**
      * Adiciona o Link do meio de pagamento a página de sucesso.
      * @param $observer
