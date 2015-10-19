@@ -89,4 +89,51 @@ class Bcash_Pagamento_Model_Observer
         }
     }
 
+    public function updateSalesQuotePayment(Varien_Event_Observer $observer)
+    {
+        try {
+            if (!is_null($observer->getQuote())) {
+                $params = Mage::app()->getFrontController()->getRequest()->getParams();
+                $params['installments_bcash'] = isset($params['installments_bcash']) ? $params['installments_bcash'] : 1;
+
+                //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
+                $discountAmount = 0;
+                if ($params['installments_bcash'] == 1) {
+                    $transaction = new Bcash_Pagamento_Helper_Transaction();
+                    $discountAmount = $transaction->calculateDiscount($params['payment-method']);
+                }
+
+                $quote = $observer->getQuote();
+                $quote->collectTotals();
+                $grandTotal = $quote->getGrandTotal();
+                $subTotalWithDiscount = $quote->getSubtotalWithDiscount();
+                $baseGrandTotal = $quote->getBaseGrandTotal();
+                $baseSubTotalWithDiscount = $quote->getBaseSubtotalWithDiscount();
+
+                // Limpa desconto anterior
+                $objDiscountAmount = $quote->getDiscountAmount();
+                if ($objDiscountAmount > 0) {
+                    $grandTotal = $grandTotal + $objDiscountAmount;
+                    $subTotalWithDiscount = $subTotalWithDiscount + $objDiscountAmount;
+                    $baseGrandTotal = $baseGrandTotal + $objDiscountAmount;
+                    $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + $objDiscountAmount;
+                }
+
+                $totalDiscountAmount = $discountAmount;
+                $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
+                $baseTotalDiscountAmount = $discountAmount;
+                $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
+
+                $quote->setDiscountAmount($totalDiscountAmount);
+                $quote->setSubtotalWithDiscount($subtotalWithDiscount);
+                $quote->setBaseDiscountAmount($baseTotalDiscountAmount);
+                $quote->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
+                $quote->setGrandTotal($grandTotal - $totalDiscountAmount);
+                $quote->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
+                $quote->setTotalsCollectedFlag(false)->collectTotals();
+                $quote->save();
+            }
+        } catch (Exception $e) { Mage::log($e->getMessage()); }
+    }
+
 }

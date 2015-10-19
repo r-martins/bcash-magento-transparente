@@ -151,11 +151,16 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;
 
         //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
-        $discount = 0;
-        if ($params['installments_bcash'] == 1) {
-            $discount = $this->calculateDiscount($params['payment-method']);
+        if(isset($params['payment-method'])) {
+            $discount = 0;
+            if ($params['installments_bcash'] == 1) {
+                $discount = $this->calculateDiscount($params['payment-method']);
+            }
+            if(!empty($params['payment-method'])) {
+                $this->addDiscountToQuote($discount);
+            }
         }
-        $this->addDiscountToQuote($discount);
+
         return $result;
     }
 
@@ -169,6 +174,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     {
         $cart = Mage::getSingleton('checkout/cart');
         $objShippingAddress = $cart->getQuote()->getShippingAddress();
+
+        // Update quote
+        Mage::dispatchEvent(
+            'sales_quote_payment_import_data_before',
+            array(
+                'quote' => $cart->getQuote()
+            )
+        );
+
         $objShippingAddress->setDiscountDescription('Meio de pagamento selecionado');
         $objShippingAddress->addTotal(array(
                 'code' => 'discount',
@@ -180,6 +194,15 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
         $subTotalWithDiscount = $objShippingAddress->getSubtotalWithDiscount();
         $baseGrandTotal = $objShippingAddress->getBaseGrandTotal();
         $baseSubTotalWithDiscount = $objShippingAddress->getBaseSubtotalWithDiscount();
+
+        // Limpa desconto anterior
+        $objDiscountAmount = $objShippingAddress->getDiscountAmount();
+        if ($objDiscountAmount > 0) {
+            $grandTotal = $grandTotal + $objDiscountAmount;
+            $subTotalWithDiscount = $subTotalWithDiscount + $objDiscountAmount;
+            $baseGrandTotal = $baseGrandTotal + $objDiscountAmount;
+            $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + $objDiscountAmount;
+        }
 
         $totalDiscountAmount = $discountAmount;
         $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
