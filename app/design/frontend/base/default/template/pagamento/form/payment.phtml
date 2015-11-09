@@ -49,6 +49,7 @@ $paymentGroupName = array(
         </div>
     </div>
 
+    <div id="payment-bcash-group">
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
         <?php
             $totalPayments = count($payments);
@@ -173,6 +174,7 @@ $paymentGroupName = array(
         <?php
         $size--;
     endforeach; ?>
+    </div>
 </div>
 <!-- div b-col-xs-4 -->
 <script type="text/javascript">
@@ -818,11 +820,47 @@ $paymentGroupName = array(
         $(document).on('change', 'input[type=radio][name=payment[method]]', function (event) {
             var target = event.target;
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
             if(target.id == 'p_method_pagamento') {
+                var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+                for (var i = paymentRadios.length - 1; i >= 0; i--) {
+                    if(!hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
+                        paymentRadios[i].className = paymentRadios[i].className + " validate-one-required-by-name";
+                    }
+                    paymentRadios[i].disabled = false;
+                }
+                if(hasClass(paymentBcashConteiner, 'b-hide')) {
+                    paymentBcashConteiner.className = paymentBcashConteiner.className.replace(/\bb-hide\b/, '');
+                }
                 if (hasClass(paymentConteiner, 'b-hide')) {
                     paymentConteiner.className = paymentConteiner.className.replace(/\bb-hide\b/, '');
                 }
             } else {
+                // cards
+                var cardConteiner = document.getElementById('card-conteiner');
+                if(!hasClass(cardConteiner, 'b-hide')){
+                    cardConteiner.className = cardConteiner.className + " b-hide";
+                }
+                disableCardForm();
+
+                // radios
+                document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+                    if (element.checked) {
+                        element.checked = false;
+                    }
+                });
+                var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+                for (var i = paymentRadios.length - 1; i >= 0; i--) {
+                    if(hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
+                        paymentRadios[i].className = paymentRadios[i].className.replace(/\bvalidate-one-required-by-name\b/, '');
+                    }
+                    paymentRadios[i].disabled = true;
+                }
+
+                // all
+                if(!hasClass(paymentBcashConteiner, 'b-hide')){
+                    paymentBcashConteiner.className = paymentBcashConteiner.className + " b-hide";
+                }
                 if (!hasClass(paymentConteiner, 'b-hide')) {
                     paymentConteiner.className = paymentConteiner.className + " b-hide";
                 }
