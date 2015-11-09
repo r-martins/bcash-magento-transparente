@@ -105,33 +105,37 @@ class Bcash_Pagamento_Model_Observer
 
                 $quote = $observer->getQuote();
                 $quote->collectTotals();
-                $grandTotal = $quote->getGrandTotal();
-                $subTotalWithDiscount = $quote->getSubtotalWithDiscount();
-                $baseGrandTotal = $quote->getBaseGrandTotal();
-                $baseSubTotalWithDiscount = $quote->getBaseSubtotalWithDiscount();
 
-                // Limpa desconto anterior
-                $objDiscountAmount = $quote->getDiscountAmount();
-                if ($objDiscountAmount > 0) {
-                    $grandTotal = $grandTotal + $objDiscountAmount;
-                    $subTotalWithDiscount = $subTotalWithDiscount + $objDiscountAmount;
-                    $baseGrandTotal = $baseGrandTotal + $objDiscountAmount;
-                    $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + $objDiscountAmount;
+                if($discountAmount > 0) {
+                    $grandTotal = $quote->getGrandTotal();
+                    $subTotalWithDiscount = $quote->getSubtotalWithDiscount();
+                    $baseGrandTotal = $quote->getBaseGrandTotal();
+                    $baseSubTotalWithDiscount = $quote->getBaseSubtotalWithDiscount();
+
+                    // Outros descontos aplicados
+                    $objDiscountAmount = $quote->getDiscountAmount();
+                    if ($objDiscountAmount <> 0) {
+                        $discountAmount = (-1 * ((-$discountAmount) + $objDiscountAmount));
+                        $grandTotal = $grandTotal + (-1 * $objDiscountAmount);
+                        $subTotalWithDiscount = $subTotalWithDiscount + (-1 * $objDiscountAmount);
+                        $baseGrandTotal = $baseGrandTotal + (-1 * $objDiscountAmount);
+                        $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + (-1 * $objDiscountAmount);
+                    }
+
+                    $totalDiscountAmount = $discountAmount;
+                    $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
+                    $baseTotalDiscountAmount = $discountAmount;
+                    $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
+
+                    $quote->setDiscountAmount(-$totalDiscountAmount);
+                    $quote->setSubtotalWithDiscount($subtotalWithDiscount);
+                    $quote->setBaseDiscountAmount($baseTotalDiscountAmount);
+                    $quote->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
+                    $quote->setGrandTotal($grandTotal - $totalDiscountAmount);
+                    $quote->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
+                    $quote->setTotalsCollectedFlag(false)->collectTotals();
+                    $quote->save();
                 }
-
-                $totalDiscountAmount = $discountAmount;
-                $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
-                $baseTotalDiscountAmount = $discountAmount;
-                $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
-
-                $quote->setDiscountAmount($totalDiscountAmount);
-                $quote->setSubtotalWithDiscount($subtotalWithDiscount);
-                $quote->setBaseDiscountAmount($baseTotalDiscountAmount);
-                $quote->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
-                $quote->setGrandTotal($grandTotal - $totalDiscountAmount);
-                $quote->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
-                $quote->setTotalsCollectedFlag(false)->collectTotals();
-                $quote->save();
             }
         } catch (Exception $e) { Mage::log($e->getMessage()); }
     }
