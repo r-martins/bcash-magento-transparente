@@ -430,9 +430,6 @@ $paymentGroupName = array(
                 cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/, '');
                 enableCardForm();
 
-                //force order review reload
-                forceReloadOrderReviewOsc();
-
                 new Ajax.Request(requestUrl, {
                     method: 'POST',
                     parameters: 'input=cartao&tipo=' + paymentRadio.value
@@ -442,6 +439,9 @@ $paymentGroupName = array(
                 cardConteiner.className = cardConteiner.className + " b-hide";
                 disableCardForm();
 
+                //force order review reload
+                forceReloadOrderReviewOsc();
+                
                 new Ajax.Request(requestUrl, {
                     method: 'POST',
                     parameters: 'input=boleto&tipo=' + paymentRadio.value
