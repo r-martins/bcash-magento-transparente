@@ -339,8 +339,6 @@ $paymentGroupName = array(
             if(hasChecked == 1 && isBcash == 0) {
                 hideBcashPaymentMethod();
             }
-
-            alert(hasChecked + ' - ' + isBcash);
         }
 
         function checkIsCardSelected() {
@@ -907,11 +905,9 @@ $paymentGroupName = array(
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
             var paymentBcashConteiner = document.getElementById('payment-bcash-group');
             if(target.id == 'p_method_pagamento') {
-                alert('selecionado: bcash');
 
                 showBcashPaymentMethod();
             } else {
-                alert('selecionado: outro');
 
                 hideBcashPaymentMethod();
             }
