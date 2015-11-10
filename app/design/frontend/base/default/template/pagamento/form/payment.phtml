@@ -315,13 +315,24 @@ $paymentGroupName = array(
         }
 
         function checkPaymentOnLoad() {
+            var hasChecked = 0;
+            var isBcash = 0;
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') {
-                    e.checked = true;
-                    //force order review reload
-                    forceReloadOrderReviewOsc();
+                if(e.checked == true) {
+                    hasChecked = 1;
+                    if(e.value == 'pagamento') {
+                        isBcash = 1;
+                    }
                 }
             });
+
+            if(hasChecked == 1 && isBcash == 0) {
+                document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
+                    if(e.value == 'pagamento') {
+                        e.checked = true;
+                    }
+                });
+            }
         }
 
         function checkIsCardSelected() {
@@ -418,6 +429,9 @@ $paymentGroupName = array(
             if (isCard(paymentRadio) && hasClass(cardConteiner, 'b-hide')) {
                 cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/, '');
                 enableCardForm();
+
+                //force order review reload
+                forceReloadOrderReviewOsc();
 
                 new Ajax.Request(requestUrl, {
                     method: 'POST',
