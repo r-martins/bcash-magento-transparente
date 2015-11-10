@@ -420,6 +420,7 @@ $paymentGroupName = array(
                 elem = evt.target;
             }
 
+            var needReaload = 0;
             var paymentMethodBcash = elem.attributes['for'].value;
             var paymentRadio = document.getElementById(paymentMethodBcash);
             document.getElementById(paymentMethodBcash).disabled = true;
@@ -439,13 +440,12 @@ $paymentGroupName = array(
                 cardConteiner.className = cardConteiner.className + " b-hide";
                 disableCardForm();
 
-                //force order review reload
-                forceReloadOrderReviewOsc();
-                
                 new Ajax.Request(requestUrl, {
                     method: 'POST',
                     parameters: 'input=boleto&tipo=' + paymentRadio.value
                 });
+
+                needReaload = 1;
             } else {
                 var option = paymentRadio.value;
                 var typePayment = 'boleto';
@@ -454,6 +454,8 @@ $paymentGroupName = array(
                         method: 'POST',
                         parameters: 'input=' + typePayment + '&tipo=' + option
                     });
+
+                    needReaload = 1;
                 } else {
                     saveCardNumber();
                 }
@@ -462,6 +464,10 @@ $paymentGroupName = array(
             showInstallmentsOnlyForMethod(paymentRadio.value);
             ableCvv(paymentRadio.value);
             checkPaymentOnLoad();
+            if(needReaload == 1) {
+                //force order review reload
+                forceReloadOrderReviewOsc();
+            }
         }
 
         function enableCardForm() {
