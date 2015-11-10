@@ -49,6 +49,7 @@ $paymentGroupName = array(
         </div>
     </div>
 
+    <div id="payment-bcash-group">
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
         <?php
             $totalPayments = count($payments);
@@ -173,6 +174,7 @@ $paymentGroupName = array(
         <?php
         $size--;
     endforeach; ?>
+    </div>
 </div>
 <!-- div b-col-xs-4 -->
 <script type="text/javascript">
@@ -313,13 +315,30 @@ $paymentGroupName = array(
         }
 
         function checkPaymentOnLoad() {
+            var hasChecked = 0;
+            var isBcash = 0;
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') {
-                    e.checked = true;
-                    //force order review reload
-                    forceReloadOrderReviewOsc();
+                if(e.checked == true) {
+                    hasChecked = 1;
+                    if(e.value == 'pagamento') {
+                        isBcash = 1;
+                        showBcashPaymentMethod();
+                    }
                 }
             });
+
+            if(hasChecked == 0 && isBcash == 0) {
+                document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
+                    if(e.value == 'pagamento') {
+                        e.checked = true;
+                        showBcashPaymentMethod();
+                    }
+                });
+            }
+
+            if(hasChecked == 1 && isBcash == 0) {
+                hideBcashPaymentMethod();
+            }
         }
 
         function checkIsCardSelected() {
@@ -407,6 +426,7 @@ $paymentGroupName = array(
                 elem = evt.target;
             }
 
+            var needReaload = 0;
             var paymentMethodBcash = elem.attributes['for'].value;
             var paymentRadio = document.getElementById(paymentMethodBcash);
             document.getElementById(paymentMethodBcash).disabled = true;
@@ -430,6 +450,8 @@ $paymentGroupName = array(
                     method: 'POST',
                     parameters: 'input=boleto&tipo=' + paymentRadio.value
                 });
+
+                needReaload = 1;
             } else {
                 var option = paymentRadio.value;
                 var typePayment = 'boleto';
@@ -438,6 +460,8 @@ $paymentGroupName = array(
                         method: 'POST',
                         parameters: 'input=' + typePayment + '&tipo=' + option
                     });
+
+                    needReaload = 1;
                 } else {
                     saveCardNumber();
                 }
@@ -445,7 +469,15 @@ $paymentGroupName = array(
             disableUnunsed(paymentRadio);
             showInstallmentsOnlyForMethod(paymentRadio.value);
             ableCvv(paymentRadio.value);
-            checkPaymentOnLoad();
+            document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
+                if(e.value == 'pagamento') {
+                    e.checked = true;
+                }
+            });
+            if(needReaload == 1) {
+                //force order review reload
+                forceReloadOrderReviewOsc();
+            }
         }
 
         function enableCardForm() {
@@ -815,17 +847,69 @@ $paymentGroupName = array(
             }
         }
 
+        function hideBcashPaymentMethod() {
+            var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
+
+            // cards
+            var cardConteiner = document.getElementById('card-conteiner');
+            if(!hasClass(cardConteiner, 'b-hide')){
+                cardConteiner.className = cardConteiner.className + " b-hide";
+            }
+            disableCardForm();
+
+            // radios
+            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+                if (element.checked) {
+                    element.checked = false;
+                }
+            });
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            for (var i = paymentRadios.length - 1; i >= 0; i--) {
+                if(hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
+                    paymentRadios[i].className = paymentRadios[i].className.replace(/\bvalidate-one-required-by-name\b/, '');
+                }
+                paymentRadios[i].disabled = true;
+            }
+
+            // all
+            if(!hasClass(paymentBcashConteiner, 'b-hide')){
+                paymentBcashConteiner.className = paymentBcashConteiner.className + " b-hide";
+            }
+            if (!hasClass(paymentConteiner, 'b-hide')) {
+                paymentConteiner.className = paymentConteiner.className + " b-hide";
+            }
+        }
+
+        function showBcashPaymentMethod() {
+            var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
+
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            for (var i = paymentRadios.length - 1; i >= 0; i--) {
+                if(!hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
+                    paymentRadios[i].className = paymentRadios[i].className + " validate-one-required-by-name";
+                }
+                paymentRadios[i].disabled = false;
+            }
+            if(hasClass(paymentBcashConteiner, 'b-hide')) {
+                paymentBcashConteiner.className = paymentBcashConteiner.className.replace(/\bb-hide\b/, '');
+            }
+            if (hasClass(paymentConteiner, 'b-hide')) {
+                paymentConteiner.className = paymentConteiner.className.replace(/\bb-hide\b/, '');
+            }
+        }
+
         $(document).on('change', 'input[type=radio][name=payment[method]]', function (event) {
             var target = event.target;
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
             if(target.id == 'p_method_pagamento') {
-                if (hasClass(paymentConteiner, 'b-hide')) {
-                    paymentConteiner.className = paymentConteiner.className.replace(/\bb-hide\b/, '');
-                }
+
+                showBcashPaymentMethod();
             } else {
-                if (!hasClass(paymentConteiner, 'b-hide')) {
-                    paymentConteiner.className = paymentConteiner.className + " b-hide";
-                }
+
+                hideBcashPaymentMethod();
             }
             event.preventDefault();
         });
