@@ -238,10 +238,12 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $this->transactionRequest->setInstallments($this->installments);
         }
 
-        if ($this->installments == 1) {
+        /*if ($this->installments == 1) {
             $discount = $this->calculateDiscount($this->payment_method);
             $this->setDiscountBcash($discount);
-        }
+        }*/
+
+        $this->setDiscountBcash();
     }
 
     /**
@@ -410,6 +412,9 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function setDiscountBcash($discount)
     {
+        $discount = $this->quoteBcash->getShippingAddress()->getDiscountAmount();
+        if($discount < 0) { $discount = ((-1) * $discount); }
+        $discount = floatval(number_format($discount, 2, '.', ''));
         $this->discountBcash = $discount;
         $this->transactionRequest->setDiscount($discount);
     }
