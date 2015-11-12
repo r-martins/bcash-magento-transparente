@@ -958,18 +958,11 @@ $paymentGroupName = array(
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
             var paymentBcashConteiner = document.getElementById('payment-bcash-group');
             if(target.id == 'p_method_pagamento') {
-
                 showBcashPaymentMethod();
             } else {
 
                 hideBcashPaymentMethod();
             }
-            event.preventDefault();
-        });
-
-        $(document).on('change', '#checkout-review-load', function (event) {
-            var target = event.target;
-            alert('Order review alterado');
             event.preventDefault();
         });
 
