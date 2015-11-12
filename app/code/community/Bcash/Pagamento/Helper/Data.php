@@ -98,8 +98,8 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
                 unset($obj);
             } else {
                 if ($this->desconto_credito_1x) {
-                    $subTotal = floatval($this->quote->getSubtotal());
-                    $desconto = ($this->desconto_credito_1x / 100) * $subTotal;
+                    $total = floatval($this->quote->getData('grand_total'));
+                    $desconto = ($this->desconto_credito_1x / 100) * $total;
                     if ($desconto) {
                         foreach ($obj->paymentMethods as $type) {
                             foreach ($type->installments as &$installment) {
