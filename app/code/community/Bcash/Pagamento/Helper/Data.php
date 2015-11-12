@@ -24,6 +24,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
         $this->token = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');
         $this->max_installments = $this->obj->getConfigData('max_installments');
+        $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
     }
 
     public function getTransaction($transactionId = null, $orderId = null)
