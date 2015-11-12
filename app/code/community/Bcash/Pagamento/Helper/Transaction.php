@@ -223,7 +223,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $transactionRequest->setViewedContract("S");
         $transactionRequest->setDependentTransactions($this->createDependentTransactionsBcash());
         $transactionRequest->setPlatformId(565);
-        //var_dump($transactionRequest);
         return $transactionRequest;
     }
 
