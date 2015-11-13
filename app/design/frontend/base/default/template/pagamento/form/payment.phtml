@@ -782,8 +782,7 @@ $paymentGroupName = array(
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=parcelas'
             });
-            // Desconto possível somente para 1x no cartão
-            if(id == 1) { forceReloadOrderReviewOsc(); }
+            forceReloadOrderReviewOsc();
         });
 
         $('cvv_bcash').observe('blur', function (e) {
