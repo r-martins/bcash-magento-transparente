@@ -261,7 +261,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
         if ($percent) {
             //$discount = floatval(($this->subTotalBcash / 100) * $percent);
-            $discount = floatval(number_format(($this->subTotalBcash / 100) * $percent, 2, '.', ''));
+            $discount = floatval(number_format(($this->grandTotalBcash / 100) * $percent, 2, '.', ''));
             $this->discountPercentBcash = $percent;
             $this->discountBcash = $discount;
         }
