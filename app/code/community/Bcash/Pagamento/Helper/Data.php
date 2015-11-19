@@ -98,7 +98,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
      * @param $quoteId
      * @throws Exception
      */
-    public function updateOrderSincBcashDataWithQuote($orderId, $quoteId)
+    public function updateOrderSyncBcashDataWithQuote($orderId, $quoteId)
     {
         $quote = Mage::getModel('sales/quote')->load($quoteId);
         $order = Mage::getModel('sales/order')->load($orderId);

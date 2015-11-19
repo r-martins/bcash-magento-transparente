@@ -228,7 +228,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
         }
 
         // Sinc datas
-        Mage::helper('pagamento')->updateOrderSincBcashDataWithQuote($orderId, $quoteId);
+        Mage::helper('pagamento')->updateOrderSyncBcashDataWithQuote($orderId, $quoteId);
     }
 
     /**
