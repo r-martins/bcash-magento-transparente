@@ -34,16 +34,23 @@ class Bcash_Pagamento_Model_Observer
      */
     public function saveOrderQuoteToSession($observer)
     {
-        /* @var $event Varien_Event */
+        // @var $event Varien_Event
         $event = $observer->getEvent();
-        /* @var $order Mage_Sales_Model_Order */
+        // @var $order Mage_Sales_Model_Order
         $order = $event->getOrder();
-        /* @var $quote Mage_Sales_Model_Quote */
+        // @var $quote Mage_Sales_Model_Quote
         $quote = $event->getQuote();
-        $session = Mage::getSingleton('checkout/session');
+
+
         $quoteId = $quote->getId();
         $orderId = $order->getId();
         $incrId = $order->getIncrementId();
+
+        // Sync datas
+        Mage::helper('pagamento')->updateOrderSyncBcashDataWithQuote($orderId, $quoteId);
+
+        // Session values
+        $session = Mage::getSingleton('checkout/session');
         Mage::log("Saving quote  [$quoteId] and order [$incrId] to checkout/session");
         $session->setData('OrderIdBcash', $orderId);
         $session->setData('OrderIncrementIdBcash', $incrId);
