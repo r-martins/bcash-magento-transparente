@@ -91,6 +91,27 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
     }
 
+    /**
+     * Sincronização de informações da transação Bcash entre Quote e Order
+     *
+     * @param $orderId
+     * @param $quoteId
+     * @throws Exception
+     */
+    public function updateOrderSincBcashDataWithQuote($orderId, $quoteId)
+    {
+        $quote = Mage::getModel('sales/quote')->load($quoteId);
+        $order = Mage::getModel('sales/order')->load($orderId);
+
+        $order->setTransactionIdBcash($quote->getTransactionIdBcash())
+              ->setStatusBcash($quote->getStatusBcash())
+              ->setDescriptionStatusBcash($quote->getDescriptionStatusBcash())
+              ->setPaymentLinkBcash($quote->getPaymentLinkBcash())
+              ->setPaymentMethodBcash($quote->getPaymentMethodBcash())
+              ->setInstallmentsBcash($quote->getInstallmentsBcash());
+        $order->save();
+    }
+
     private function prepareInstallmentsCards($installments)
     {
         foreach ($installments->paymentTypes as $obj) {

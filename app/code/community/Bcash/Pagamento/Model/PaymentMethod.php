@@ -56,7 +56,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
 
         try {
             $result = $this->_customBeginPayment();
-            Mage::log(print_r($result, true));
+            //Mage::log(print_r($result, true));
             $response = $result['response'];
             $payment_method = $result['payment_method'];
             $installments = $result['installments'];
