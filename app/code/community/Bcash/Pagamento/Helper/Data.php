@@ -91,6 +91,27 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
     }
 
+    /**
+     * Sincronização de informações da transação Bcash entre Quote e Order
+     *
+     * @param $orderId
+     * @param $quoteId
+     * @throws Exception
+     */
+    public function updateOrderSyncBcashDataWithQuote($orderId, $quoteId)
+    {
+        $quote = Mage::getModel('sales/quote')->load($quoteId);
+        $order = Mage::getModel('sales/order')->load($orderId);
+
+        $order->setTransactionIdBcash($quote->getTransactionIdBcash())
+              ->setStatusBcash($quote->getStatusBcash())
+              ->setDescriptionStatusBcash($quote->getDescriptionStatusBcash())
+              ->setPaymentLinkBcash($quote->getPaymentLinkBcash())
+              ->setPaymentMethodBcash($quote->getPaymentMethodBcash())
+              ->setInstallmentsBcash($quote->getInstallmentsBcash());
+        $order->save();
+    }
+
     private function prepareInstallmentsCards($installments)
     {
         foreach ($installments->paymentTypes as $obj) {
@@ -98,8 +119,8 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
                 unset($obj);
             } else {
                 if ($this->desconto_credito_1x) {
-                    $total = floatval($this->quote->getData('grand_total'));
-                    $desconto = ($this->desconto_credito_1x / 100) * $total;
+                    $subTotal = floatval($this->quote->getSubtotal());
+                    $desconto = ($this->desconto_credito_1x / 100) * $subTotal;
                     if ($desconto) {
                         foreach ($obj->paymentMethods as $type) {
                             foreach ($type->installments as &$installment) {
