@@ -179,7 +179,7 @@ $paymentGroupName = array(
 <!-- div b-col-xs-4 -->
 <script type="text/javascript">
     //<![CDATA[
-    var requestUrl = '<?php echo Mage::getUrl('pagamento/payment/dados',array('_secure'=>true)) ?>';
+    var requestUrl = '<?php echo Mage::getUrl('bcash/payment/dados',array('_secure'=>true)) ?>';
 
     function in_array(needle, haystack, argStrict) {
         var key = '',
@@ -869,7 +869,7 @@ $paymentGroupName = array(
         }
 
         function updateInstallments(method) {
-            new Ajax.Request('<?php echo Mage::getUrl('pagamento/payment/installments',array('_secure'=>true)) ?>', {
+            new Ajax.Request('<?php echo Mage::getUrl('bcash/payment/installments',array('_secure'=>true)) ?>', {
                 method: 'post',
                 parameters: 'method=' + method,
                 onSuccess: successGetInstallments,

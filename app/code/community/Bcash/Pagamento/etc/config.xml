@@ -67,17 +67,17 @@
             </sales_convert_order>
         </fieldsets>
         <helpers>
-            <pagamento>
+            <bcash>
                 <class>Bcash_Pagamento_Helper</class>
-            </pagamento>
+            </bcash>
         </helpers>
         <blocks>
-            <pagamento>
+            <bcash>
                 <class>Bcash_Pagamento_Block</class>
-            </pagamento>
-            <pagamento_adminhtml>
+            </bcash>
+            <bcash_adminhtml>
                 <class>Bcash_Pagamento_Block_Adminhtml</class>
-            </pagamento_adminhtml>
+            </bcash_adminhtml>
             <adminhtml>
                 <rewrite>
                     <sales_order_view>Bcash_Pagamento_Block_Adminhtml_Sales_Order_View</sales_order_view>
@@ -86,9 +86,9 @@
             </adminhtml>
         </blocks>
         <models>
-            <pagamento>
+            <bcash>
                 <class>Bcash_Pagamento_Model</class>
-            </pagamento>
+            </bcash>
         </models>
         <resources>
             <pagamento_setup>
@@ -128,13 +128,13 @@
     </global>
     <admin>
         <routers>
-            <pagamento>
+            <bcash>
                 <use>admin</use>
                 <args>
                     <module>Bcash_Pagamento</module>
-                    <frontName>pagamento</frontName>
+                    <frontName>bcash</frontName>
                 </args>
-            </pagamento>
+            </bcash>
         </routers>
     </admin>
     <adminhtml>
@@ -143,7 +143,7 @@
                 <observers>
                     <sales_order_save_commit_after_handler>
                         <type>model</type>
-                        <class>pagamento/observer</class>
+                        <class>bcash/observer</class>
                         <method>checkOrderState</method>
                         <args></args>
                     </sales_order_save_commit_after_handler>
@@ -181,25 +181,25 @@
     </frontend>
     <default>
         <payment>
-            <pagamento>
+            <bcash>
                 <title>Bcash</title>
                 <active>1</active>
-                <model>pagamento/paymentMethod</model>
+                <model>bcash/paymentMethod</model>
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
-            </pagamento>
+            </bcash>
         </payment>
     </default>
     <frontend>
         <routers>
-            <pagamento>
+            <bcash>
                 <use>standard</use>
                 <args>
                     <module>Bcash_Pagamento</module>
-                    <frontName>pagamento</frontName>
+                    <frontName>bcash</frontName>
                 </args>
-            </pagamento>
+            </bcash>
         </routers>
         <layout>
             <updates>

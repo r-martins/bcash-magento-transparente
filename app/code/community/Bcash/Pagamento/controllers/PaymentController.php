@@ -132,7 +132,7 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
     {
         $method = Mage::app()->getRequest()->getPost('method');
 
-        $paymentInstallments = Mage::helper('pagamento')->getInstallments();
+        $paymentInstallments = Mage::helper('bcash')->getInstallments();
         $response =  "[{ccId : 0, ccName : '', ccNumber : '', ccDescript : '(Selecione o número de parcelas)'}";
         $okInstallments = $paymentInstallments['ok'];
         if($okInstallments):

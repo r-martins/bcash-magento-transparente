@@ -12,7 +12,7 @@ use Bcash\Domain\PaymentMethodEnum;
  */
 class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
 {
-    protected $_code = 'pagamento';
+    protected $_code = 'bcash';
 
     /**
      * @var Mage_Core_Model_Abstract
@@ -104,7 +104,7 @@ class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
-        return Mage::helper('pagamento/paymentMethod')->getPaymentMethods($listAllowed);
+        return Mage::helper('bcash/paymentMethod')->getPaymentMethods($listAllowed);
     }
 
     /**
