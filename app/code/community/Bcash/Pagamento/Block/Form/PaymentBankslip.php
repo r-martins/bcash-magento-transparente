@@ -8,11 +8,11 @@ use Bcash\Exception\ConnectionException;
 use Bcash\Domain\PaymentMethodEnum;
 
 /**
- * Class Bcash_Pagamento_Block_Form_Payment
+ * Class Bcash_Pagamento_Block_Form_PaymentBankslip
  */
-class Bcash_Pagamento_Block_Form_Payment extends Mage_Payment_Block_Form
+class Bcash_Pagamento_Block_Form_PaymentBankslip extends Mage_Payment_Block_Form
 {
-    protected $_code = 'bcash';
+    protected $_code = 'bcash_pagamentoboleto';
 
     /**
      * @var Mage_Core_Model_Abstract

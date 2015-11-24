@@ -1,10 +1,25 @@
 <?xml version="1.0"?>
 <config>
     <modules>
+
         <Bcash_Pagamento>
             <version>2.0.0</version>
         </Bcash_Pagamento>
+
+        <Bcash_PagamentoCartao>
+            <version>2.0.0</version>
+        </Bcash_PagamentoCartao>
+
+        <Bcash_PagamentoBoleto>
+            <version>2.0.0</version>
+        </Bcash_PagamentoBoleto>
+
+        <Bcash_PagamentoTef>
+            <version>2.0.0</version>
+        </Bcash_PagamentoTef>
+
     </modules>
+
     <global>
         <fieldsets>
             <sales_convert_quote>
@@ -70,6 +85,15 @@
             <bcash>
                 <class>Bcash_Pagamento_Helper</class>
             </bcash>
+            <bcash_pagamentocartao>
+                <class>Bcash_Pagamento_Helper</class>
+            </bcash_pagamentocartao>
+            <bcash_pagamentoboleto>
+                <class>Bcash_Pagamento_Helper</class>
+            </bcash_pagamentoboleto>
+            <bcash_pagamentotef>
+                <class>Bcash_Pagamento_Helper</class>
+            </bcash_pagamentotef>
         </helpers>
         <blocks>
             <bcash>
@@ -126,6 +150,7 @@
             </order>
         </sales>
     </global>
+
     <admin>
         <routers>
             <bcash>
@@ -179,18 +204,7 @@
             </sales_quote_payment_import_data_before>
         </events>
     </frontend>
-    <default>
-        <payment>
-            <bcash>
-                <title>Bcash</title>
-                <active>1</active>
-                <model>bcash/paymentMethod</model>
-                <order_status>1</order_status>
-                <payment_action>sale</payment_action>
-                <allowspecific>0</allowspecific>
-            </bcash>
-        </payment>
-    </default>
+
     <frontend>
         <routers>
             <bcash>
@@ -209,4 +223,44 @@
             </updates>
         </layout>
     </frontend>
+
+    <default>
+        <payment>
+            <bcash>
+                <order_status>1</order_status>
+                <logs>0</logs>
+            </bcash>
+
+            <bcash_pagamentocartao>
+                <title>Bcash - Cartão de Crédito</title>
+                <active>1</active>
+                <model>bcash/paymentCard</model>
+                <order_status>1</order_status>
+                <payment_action>sale</payment_action>
+                <allowspecific>0</allowspecific>
+                <sort_order>-9</sort_order>
+                <max_installments>24</max_installments>
+            </bcash_pagamentocartao>
+
+            <bcash_pagamentoboleto>
+                <title>Bcash - Boleto</title>
+                <active>1</active>
+                <model>bcash/paymentBankslip</model>
+                <order_status>1</order_status>
+                <payment_action>sale</payment_action>
+                <allowspecific>0</allowspecific>
+                <sort_order>-8</sort_order>
+            </bcash_pagamentoboleto>
+
+            <bcash_pagamentotef>
+                <title>Bcash - Transferência Online (TEF)</title>
+                <active>1</active>
+                <model>bcash/paymentTransfer</model>
+                <order_status>1</order_status>
+                <payment_action>sale</payment_action>
+                <allowspecific>0</allowspecific>
+                <sort_order>-7</sort_order>
+            </bcash_pagamentotef>
+        </payment>
+    </default>
 </config>
