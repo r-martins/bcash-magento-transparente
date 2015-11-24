@@ -9,12 +9,12 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     /**
      * @var string
      */
-    protected $_code = 'pagamento';
+    protected $_code = 'bcash';
 
     /**
      * @var string
      */
-    protected $_formBlockType = 'pagamento/form_payment';
+    protected $_formBlockType = 'bcash/form_payment';
 
     /** Flag executa o método initalize() com o checkout completo.
      * @var bool

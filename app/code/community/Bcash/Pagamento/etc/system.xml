@@ -3,8 +3,8 @@
     <sections>
         <payment>
             <groups>
-                <pagamento translate="label" module="pagamento">
-                    <label>Bcash - Pagamento Transparente</label>
+                <bcash translate="label" module="bcash">
+                    <label>Bcash - Configuração (Credenciais/Preferências)</label>
                     <sort_order>1</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -24,6 +24,7 @@
 
                         <sandbox translate="label">
                             <label>Sandbox</label>
+                            <comment>Habilite para utilização de credenciais em ambiente de testes.</comment>
                             <tooltip>Deseja utilizar o m&#243;dulo em ambiente de testes?</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -45,7 +46,7 @@
 
                         <email translate="label">
                             <label>Email cadastrado no Bcash</label>
-                            <comment>Clique &lt;a href=&quot;https://www.bcash.com.br/criar-conta-comprador/&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se.</comment>
+                            <comment>Não possui? Clique &lt;a href=&quot;https://www.bcash.com.br/criar-conta-comprador/&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se agora.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-email</validate>
                             <sort_order>4</sort_order>
@@ -56,7 +57,8 @@
 
                         <token translate="label">
                             <label>Token</label>
-                            <tooltip>Acesse a area de Gerenciamento de APIs no menu ferramentas do Bcash</tooltip>
+                            <comment>Acesse o menu do seu painel Bcash em "Ferramentas" > "Códigos Integração" > "Sua Chave acesso"</comment>
+                            <tooltip>Acesse o menu do seu painel Bcash em Ferramentas > Códigos Integração e copie o código em "Sua Chave acesso"</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
@@ -66,7 +68,8 @@
 
                         <consumer_key translate="label">
                             <label>Consumer Key</label>
-                            <tooltip>Solicite no atendimento do Bcash sua chave OAuth</tooltip>
+                            <comment>Acesse o menu do seu painel Bcash em "Ferramentas" > "Gerenciamento de APIs"</comment>
+                            <tooltip>Acesse o menu do seu painel Bcash em Ferramentas > Gerenciamento de APIs. Caso não esteja disponível essa opção entre em contato com a equipe do comercial solicitando a liberação da API através do e-mail: comercial@bcash.com.br.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
@@ -77,9 +80,9 @@
                         <transacao_dependente>
                             <label>Transação dependente</label>
                             <tooltip>Adicione a comissão por transação dependente via Bcash, são válidos até 6 emails.</tooltip>
-                            <frontend_model>pagamento/adminhtml_dependentes</frontend_model>
+                            <frontend_model>bcash/adminhtml_dependentes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized</backend_model>
-                            <comment><![CDATA[Acesse seu painel no bcash.com.br e vá até "Ferramentas > Transação Dependente", o limite definido aqui não deve ultrapassar o valor definido no painel.]]></comment>
+                            <comment><![CDATA[Acesse o menu do seu painel Bcash em "Ferramentas > Transação Dependente", o limite definido aqui não deve ultrapassar o valor definido no painel.]]></comment>
                             <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
@@ -124,7 +127,7 @@
                             <label>Quantidade Máxima de Parcelas</label>
                             <tooltip>Define o limite do número de parcelas</tooltip>
                             <frontend_type>select</frontend_type>
-                            <source_model>pagamento/system_config_source_installments</source_model>
+                            <source_model>bcash/system_config_source_installments</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>2</show_in_default>
                             <show_in_website>2</show_in_website>
@@ -155,7 +158,7 @@
 
                     </fields>
 
-                </pagamento>
+                </bcash>
             </groups>
         </payment>
     </sections>

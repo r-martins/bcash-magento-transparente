@@ -47,7 +47,7 @@ class Bcash_Pagamento_Model_Observer
         $incrId = $order->getIncrementId();
 
         // Sync datas
-        Mage::helper('pagamento')->updateOrderSyncBcashDataWithQuote($orderId, $quoteId);
+        Mage::helper('bcash')->updateOrderSyncBcashDataWithQuote($orderId, $quoteId);
 
         // Session values
         $session = Mage::getSingleton('checkout/session');
