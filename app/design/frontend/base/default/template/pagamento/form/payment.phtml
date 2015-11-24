@@ -347,7 +347,7 @@ $paymentGroupName = array(
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
                 if(e.checked == true) {
                     hasChecked = 1;
-                    if(e.value == 'pagamento') {
+                    if(e.value == 'bcash') {
                         isBcash = 1;
                         showBcashPaymentMethod();
                     }
@@ -356,7 +356,7 @@ $paymentGroupName = array(
 
             if(hasChecked == 0 && isBcash == 0) {
                 document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                    if(e.value == 'pagamento') {
+                    if(e.value == 'bcash') {
                         e.checked = true;
                         showBcashPaymentMethod();
                     }
@@ -492,7 +492,7 @@ $paymentGroupName = array(
             showInstallmentsOnlyForMethod(paymentRadio.value);
             ableCvv(paymentRadio.value);
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'pagamento') {
+                if(e.value == 'bcash') {
                     e.checked = true;
                 }
             });
@@ -956,7 +956,7 @@ $paymentGroupName = array(
             var target = event.target;
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
             var paymentBcashConteiner = document.getElementById('payment-bcash-group');
-            if(target.id == 'p_method_pagamento') {
+            if(target.id == 'p_method_bcash') {
                 showBcashPaymentMethod();
             } else {
 

@@ -212,7 +212,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     public function createTransactionRequestBcash()
     {
         //Id:Plataforma => 565
-        $url = Mage::getUrl('pagamento/notification/request',array('_secure'=>true));
+        $url = Mage::getUrl('bcash/notification/request',array('_secure'=>true));
         $transactionRequest = new TransactionRequest();
         $transactionRequest->setSellerMail($this->email);
         $transactionRequest->setOrderId($this->quoteBcash->getReservedOrderId());

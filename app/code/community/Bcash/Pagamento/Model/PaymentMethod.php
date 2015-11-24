@@ -9,7 +9,7 @@ class Bcash_Pagamento_Model_PaymentMethod extends Mage_Payment_Model_Method_Abst
     /**
      * @var string
      */
-    protected $_code = 'pagamento';
+    protected $_code = 'bcash';
 
     /**
      * @var string
