@@ -10,19 +10,17 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
     private $email;
     private $token;
-    private $obj;
     private $sandbox;
     private $quote;
     private $max_installments;
 
     public function __construct()
     {
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_CreditCard');
-        $this->email = $this->obj->getConfigData('email');
-        $this->token = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
-        $this->max_installments = $this->obj->getConfigData('max_installments');
-        $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
+        $this->email = Mage::getStoreConfig('payment/bcash/email');
+        $this->token = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
+        $this->max_installments = Mage::getStoreConfig('payment/bcash_creditcard/max_installments');
+        $this->desconto_credito_1x = 0;
     }
 
     public function getTransaction($transactionId = null, $orderId = null)
@@ -76,7 +74,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         } catch (ConnectionException $e) {
             Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e);
+            Mage::log($e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         }
     }

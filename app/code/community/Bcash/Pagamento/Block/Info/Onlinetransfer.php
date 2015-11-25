@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class Bcash_Pagamento_Block_Info_Payment
+ * Class Bcash_Pagamento_Block_Info_Onlinetransfer
  */
-class Bcash_Pagamento_Block_Info_Payment extends Mage_Payment_Block_Info
+class Bcash_Pagamento_Block_Info_Onlinetransfer extends Mage_Payment_Block_Info
 {
 
 	/**

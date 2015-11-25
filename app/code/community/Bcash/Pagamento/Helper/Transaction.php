@@ -30,10 +30,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     private $token;
     /**
-     * @var Mage_Core_Model_Abstract
-     */
-    private $obj;
-    /**
      * @var
      */
     private $sandbox;
@@ -123,14 +119,14 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
 
     public function __construct()
     {
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Creditcard');
-        $this->email = $this->obj->getConfigData('email');
-        $this->token = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
-        $this->consumer_key = $this->obj->getConfigData('consumer_key');
-        $this->dependents = $this->obj->getConfigData('transacao_dependente');
-        $this->cpf = $this->obj->getConfigData('cpf');
-        $this->phone = $this->obj->getConfigData('phone');
+        $this->email = Mage::getStoreConfig('payment/bcash/email');
+        $this->token = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
+        $this->consumer_key = Mage::getStoreConfig('payment/bcash/consumer_key');
+        $this->dependents = Mage::getStoreConfig('payment/bcash/transacao_dependente');
+        $this->cpf = Mage::getStoreConfig('payment/bcash/cpf');
+        $this->phone = Mage::getStoreConfig('payment/bcash/phone');
+
         $sessionCheckout = Mage::getSingleton('checkout/session');
         $quoteId = $sessionCheckout->getQuoteId();
         $sessionCheckout->setData('QuoteIdBcash', $quoteId);
@@ -251,11 +247,11 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     {
         $discount = 0;
         if (in_array($payment_method, $this->cards)) {
-            $percent = $this->obj->getConfigData('desconto_credito_1x');
+            $percent = 0;
         } elseif (in_array($payment_method, $this->tefs)) {
-            $percent = $this->obj->getConfigData('desconto_tef');
+            $percent = 0;
         } else {
-            $percent = $this->obj->getConfigData('desconto_boleto');
+            $percent = 0;
         }
         if ($percent) {
             $discount = floatval(number_format(($this->subTotalBcash / 100) * $percent, 2, '.', ''));

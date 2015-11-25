@@ -10,6 +10,9 @@ use Bcash\Domain\PaymentMethodEnum;
  */
 class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
 {
+    /**
+     * @var string
+     */
     protected $_code = 'bcash_bankslip';
 
     /**
@@ -69,14 +72,13 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
     {
         parent::__construct();
         $this->setTemplate('bcash/pagamento/form/bankslip.phtml');
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Bankslip');
-        $this->email   = $this->obj->getConfigData('email');
-        $this->token   = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
-        $this->max_installments = $this->obj->getConfigData('max_installments');
-        $this->cpf = $this->obj->getConfigData('cpf');
-        $this->phone = $this->obj->getConfigData('phone');
-        $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
+        $this->email   = Mage::getStoreConfig('payment/bcash/email');
+        $this->token   = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
+        $this->max_installments = Mage::getStoreConfig('payment/bcash_creditcard/max_installments');
+        $this->cpf = Mage::getStoreConfig('payment/bcash/cpf');
+        $this->phone = Mage::getStoreConfig('payment/bcash/phone');
+        $this->desconto_credito_1x = 0;
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
@@ -98,7 +100,7 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::log("Bcash_Pagamento_Block_Form_Payment called getPaymentMethods");
+        Mage::log("Bcash_Pagamento_Block_Form_Bankslip called getPaymentMethods");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
@@ -106,60 +108,10 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
     }
 
     /**
-     * Retorna os parcelamentos possíveis via cartão de crédito.
+     * Método para buscar métodos de pagamentos permitidos pela API
+     *
      * @return array
      */
-    public function getInstallments()
-    {
-        $installments = new Installments($this->email, $this->token);
-        try {
-            $sessionCheckout = Mage::getSingleton('checkout/session');
-            $quoteId = $sessionCheckout->getQuoteId();
-            $this->quote = Mage::getModel("sales/quote")->load($quoteId);
-            $grandTotal = floatval(number_format($this->quote->getData('grand_total'), 2, '.', ''));
-            $ignoreScheduledDiscount = false;
-            if($this->sandbox){
-                $installments->enableSandBox(true);
-            }
-            $response = $installments->calculate($grandTotal, $this->max_installments, $ignoreScheduledDiscount);
-            return array("ok" => true, "installments" => array(0 => $this->prepareInstallmentsCards($response)));
-        } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
-            Mage::log($e->getErrors());
-            return array("ok" => false, "installments" => array("1" => $grandTotal));
-        } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
-            return array("ok" => false, "installments" => array("1" => $grandTotal));
-        }
-    }
-
-    public function prepareInstallmentsCards($installments)
-    {
-        foreach ($installments->paymentTypes as $obj) {
-            if ('card' != $obj->name) {
-                unset($obj);
-            } else {
-                if ($this->desconto_credito_1x) {
-                    $subTotal = floatval($this->quote->getSubtotal());
-                    $desconto = ($this->desconto_credito_1x / 100) * $subTotal;
-                    if ($desconto) {
-                        foreach ($obj->paymentMethods as $type) {
-                            foreach ($type->installments as &$installment) {
-                                if ($installment->number == 1) {
-                                    $installment->installmentAmount -= $desconto;
-                                    $installment->installmentAmountDesc = " ({$this->desconto_credito_1x} % de desconto)";
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $installments;
-    }
-
     private function getAllowedPaymentMethods()
     {
         $methods = array();
@@ -184,9 +136,6 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
 
         return $methods;
     }
-
-
-
 }
 
 

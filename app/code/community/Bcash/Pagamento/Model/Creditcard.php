@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Class Bcash_Pagamento_Model_Creditcard
  */
@@ -16,7 +15,8 @@ class Bcash_Pagamento_Model_Creditcard extends Mage_Payment_Model_Method_Abstrac
      */
     protected $_formBlockType = 'bcash/form_creditcard';
 
-    /** Flag executa o método initalize() com o checkout completo.
+    /**
+     * Flag executa o método initalize() com o checkout completo.
      * @var bool
      */
     protected $_isInitializeNeeded = true;
@@ -24,11 +24,9 @@ class Bcash_Pagamento_Model_Creditcard extends Mage_Payment_Model_Method_Abstrac
     protected $_isGateway = true;
     protected $_canAuthorize = true;
     protected $_canUseCheckout = true;
-    //Disable multi-shipping for this payment module.
     protected $_canUseForMultishipping  = false;
 
     protected $transaction;
-
 
     /**
      * Inicializa o método de pagamento. Chamado quando a compra é completa.

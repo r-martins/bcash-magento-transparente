@@ -1,10 +1,5 @@
-<!-- <h1>Bcash</h1> -->
-<link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>" type="text/css"/>
-<!-- Script Start -->
-<!--<script type="text/javascript" src="<?php echo $this->getSkinUrl('bcash/pagamento/js/payment.js'); ?>"></script>//-->
-<!-- Script End -->
 <?php
-$code = $this->getCode();
+$code = $this->getMethodCode();
 $paymentMethods = $this->getPaymentMethods();
 $paymentInstallments = $this->getInstallments();
 $size = count($paymentMethods);
@@ -15,8 +10,8 @@ $paymentGroupName = array(
 );
 ?>
 <div id="payment-<?php echo $code; ?>">
-
-    <div class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>?v=<?php echo rand();?>" type="text/css"/>
+    <div class="form-list" id="payment_form_<?php echo $code; ?>" style="display:none;">
         <div class="payment-group" >
 
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
@@ -492,7 +487,7 @@ $paymentGroupName = array(
             showInstallmentsOnlyForMethod(paymentRadio.value);
             ableCvv(paymentRadio.value);
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                if(e.value == 'bcash') {
+                if(e.value == 'bcash_creditcard') {
                     e.checked = true;
                 }
             });
@@ -956,7 +951,7 @@ $paymentGroupName = array(
             var target = event.target;
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
             var paymentBcashConteiner = document.getElementById('payment-bcash-group');
-            if(target.id == 'p_method_bcash') {
+            if(target.id == 'p_method_bcash_creditcard') {
                 showBcashPaymentMethod();
             } else {
 

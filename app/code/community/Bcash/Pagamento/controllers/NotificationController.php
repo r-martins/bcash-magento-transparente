@@ -24,10 +24,9 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
         // access log (debug)
         Mage::log('Notification visitor: ' . Mage::helper('core/http')->getRemoteAddr());
 
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
-        $this->email = $this->obj->getConfigData('email');
-        $this->token = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
+        $this->email = Mage::getStoreConfig('payment/bcash/email');
+        $this->token = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
     }
 
     /**

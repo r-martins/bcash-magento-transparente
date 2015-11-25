@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Class Bcash_Pagamento_Model_Bankslip
  */
@@ -16,7 +15,8 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      */
     protected $_formBlockType = 'bcash/form_bankslip';
 
-    /** Flag executa o método initalize() com o checkout completo.
+    /**
+     * Flag executa o método initalize() com o checkout completo.
      * @var bool
      */
     protected $_isInitializeNeeded = true;
@@ -24,11 +24,9 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
     protected $_isGateway = true;
     protected $_canAuthorize = true;
     protected $_canUseCheckout = true;
-    //Disable multi-shipping for this payment module.
     protected $_canUseForMultishipping  = false;
 
     protected $transaction;
-
 
     /**
      * Inicializa o método de pagamento. Chamado quando a compra é completa.

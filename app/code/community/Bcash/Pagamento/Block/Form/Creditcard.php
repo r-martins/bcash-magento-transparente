@@ -10,12 +10,10 @@ use Bcash\Domain\PaymentMethodEnum;
  */
 class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
 {
-    protected $_code = 'bcash_creditcard';
-
     /**
-     * @var Mage_Core_Model_Abstract
+     * @var string
      */
-    private $obj;
+    protected $_code = 'bcash_creditcard';
     /**
      * @var
      */
@@ -69,14 +67,13 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
     {
         parent::__construct();
         $this->setTemplate('bcash/pagamento/form/creditcard.phtml');
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Creditcard');
-        $this->email   = $this->obj->getConfigData('email');
-        $this->token   = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
-        $this->max_installments = $this->obj->getConfigData('max_installments');
-        $this->cpf = $this->obj->getConfigData('cpf');
-        $this->phone = $this->obj->getConfigData('phone');
-        $this->desconto_credito_1x = $this->obj->getConfigData('desconto_credito_1x');
+        $this->email   = Mage::getStoreConfig('payment/bcash/email');
+        $this->token   = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
+        $this->max_installments = Mage::getStoreConfig('payment/bcash_creditcard/max_installments');
+        $this->cpf = Mage::getStoreConfig('payment/bcash/cpf');
+        $this->phone = Mage::getStoreConfig('payment/bcash/phone');
+        $this->desconto_credito_1x = 0;
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
@@ -98,7 +95,7 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::log("Bcash_Pagamento_Block_Form_Payment called getPaymentMethods");
+        Mage::log("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
@@ -184,9 +181,6 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
 
         return $methods;
     }
-
-
-
 }
 
 
