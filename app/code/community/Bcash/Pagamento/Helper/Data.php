@@ -79,14 +79,6 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
         }
     }
 
-    public function setTransaction()
-    {
-        //Create Transaction with Bcash
-
-        die('setTransaction');
-
-    }
-
     /**
      * Sincronização de informações da transação Bcash entre Quote e Order
      *
@@ -106,6 +98,25 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
               ->setPaymentMethodBcash($quote->getPaymentMethodBcash())
               ->setInstallmentsBcash($quote->getInstallmentsBcash());
         $order->save();
+    }
+
+
+    /**
+     * Método para registrar logs
+     *
+     * @param $text
+     * @param null $array
+     */
+    public function saveLog($text, $array = null){
+        if(!is_null($array)) {
+            $text .= " - Detalhes: " . json_encode($array);
+        }
+
+        $logAtivo = Mage::getStoreConfig('payment/bcash/logfile');
+        
+        if($logAtivo) {
+            Mage::log($text, null, "bcash-magento.log");
+        }
     }
 
     private function prepareInstallmentsCards($installments)
