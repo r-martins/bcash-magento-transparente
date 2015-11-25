@@ -22,7 +22,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     protected function _construct()
     {
         // access log (debug)
-        Mage::log('Notification visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::helper("bcash")->saveLog('Notification visitor: ' . Mage::helper('core/http')->getRemoteAddr());
 
         $this->email = Mage::getStoreConfig('payment/bcash/email');
         $this->token = Mage::getStoreConfig('payment/bcash/token');
@@ -107,18 +107,16 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                     // Processamento da notificação no pedido
                     $this->processNotification($transactionId, $orderId, $statusId);
                 }else {
-                    Mage::log("Invalid bcash notification: Transaction: " . $transactionId . " - Status: " . $statusId);
+                    Mage::helper("bcash")->saveLog("Atencao!!! Notificacao invalida recebida: Transaction: " . $transactionId . " - Status: " . $statusId);
                 }
             } else {
-                Mage::log("Pedido " . $orderId . " não identificado. ");
+                Mage::helper("bcash")->saveLog("Atencao!!! Pedido " . $orderId . " nao identificado na notificacao recebida. ");
             }
         } catch (ValidationException $e) {
-            Mage::log("Validation error: " . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("Validation error - NotificationController->requestAction: " . $e->getMessage(), $e->getErrors());
 
         } catch (ConnectionException $e) {
-            Mage::log("Connection error: " . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("Connection error - NotificationController->requestAction: " . $e->getMessage(), $e->getErrors());
         }
     }
 

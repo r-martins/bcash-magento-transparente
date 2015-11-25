@@ -39,8 +39,8 @@ class Bcash_Pagamento_Model_Onlinetransfer extends Mage_Payment_Model_Method_Abs
      */
     public function initialize($paymentAction, $stateObject)
     {
-        Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::log('Payment Onlinetransfer visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
+        Mage::helper("bcash")->saveLog('Payment Onlinetransfer visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {
@@ -116,7 +116,7 @@ class Bcash_Pagamento_Model_Onlinetransfer extends Mage_Payment_Model_Method_Abs
             $cart->save();
 
         } catch (Exception $e) {
-            Mage::log($e->getMessage());
+            Mage::helper("bcash")->saveLog("Exception: Model_Onlinetransfer->initialize: " . $e->getMessage());
             throw new Mage_Payment_Model_Info_Exception($e->getMessage());
         }
 
@@ -143,7 +143,7 @@ class Bcash_Pagamento_Model_Onlinetransfer extends Mage_Payment_Model_Method_Abs
      */
     public function assignData($data)
     {
-        Mage::log('Assign Data with Bcash');
+        Mage::helper("bcash")->saveLog('OnlineTransfer :: Assign Data with Bcash');
         $result = parent::assignData($data);
         $params = Mage::app()->getFrontController()->getRequest()->getParams();
         $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;

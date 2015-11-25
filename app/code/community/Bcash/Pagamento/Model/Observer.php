@@ -51,7 +51,7 @@ class Bcash_Pagamento_Model_Observer
 
         // Session values
         $session = Mage::getSingleton('checkout/session');
-        Mage::log("Saving quote  [$quoteId] and order [$incrId] to checkout/session");
+        Mage::helper("bcash")->saveLog("Saving quote  [$quoteId] and order [$incrId] to checkout/session");
         $session->setData('OrderIdBcash', $orderId);
         $session->setData('OrderIncrementIdBcash', $incrId);
         $session->setData('QuoteIdBcash', $quoteId);
@@ -68,7 +68,6 @@ class Bcash_Pagamento_Model_Observer
      */
     public function orderSuccessEvent($observer)
     {
-        Mage::log("Bcash_Pagamento_Model_Observer::showPaymentLink");
         try {
             $order = new Mage_Sales_Model_Order();
             $lastOrderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
@@ -85,14 +84,16 @@ class Bcash_Pagamento_Model_Observer
             $block = $layout->createBlock(
                 'Mage_Core_Block_Template',
                 'link_pagamento_bcash',
-                array('template' => 'pagamento/checkout/success.phtml')
+                array('template' => 'bcash/pagamento/checkout/success.phtml')
             );
             $block->setOrder($order);
             $block->setQuote($quote);
             $block->setType($type);
             $layout->getBlock('content')->append($block);
+
+            Mage::helper("bcash")->saveLog("Pedido realizado com sucesso.");
         } catch(Exception $e) {
-            Mage::log($e->getMessage());
+            Mage::helper("bcash")->saveLog($e->getMessage());
         }
     }
 
@@ -144,7 +145,9 @@ class Bcash_Pagamento_Model_Observer
                     $quote->save();
                 }
             }
-        } catch (Exception $e) { Mage::log($e->getMessage()); }
+        } catch (Exception $e) {
+            Mage::helper("bcash")->saveLog("Exception- Model_Observer->updateSalesQuotePayment: " . $e->getMessage());
+        }
     }
 
 }

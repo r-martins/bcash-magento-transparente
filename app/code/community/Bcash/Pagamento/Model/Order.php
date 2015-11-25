@@ -40,11 +40,11 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
             }
         } catch (ValidationException $e) {
             Mage::getSingleton('adminhtml/session')->addError('Erro: ' . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Model_Order->cancellation: " . $e->getMessage(), $e->getErrors());
 
         } catch (ConnectionException $e) {
             Mage::getSingleton('adminhtml/session')->addError($e->getMessage() . ' (Confirme se o serviço de cancelamento está habilitado para sua conta Bcash)');
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Model_Order->cancellation: " . $e->getMessage(), $e->getErrors());
         }
 
         return $response;

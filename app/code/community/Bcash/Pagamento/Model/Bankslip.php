@@ -39,8 +39,8 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      */
     public function initialize($paymentAction, $stateObject)
     {
-        Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::log('Payment Bankslip visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
+        Mage::helper("bcash")->saveLog('Payment Bankslip visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {
@@ -116,7 +116,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
             $cart->save();
 
         } catch (Exception $e) {
-            Mage::log($e->getMessage());
+            Mage::helper("bcash")->saveLog($e->getMessage());
             throw new Mage_Payment_Model_Info_Exception($e->getMessage());
         }
 
@@ -143,7 +143,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      */
     public function assignData($data)
     {
-        Mage::log('Assign Data with Bcash');
+        Mage::helper("bcash")->saveLog('Bankslip :: Assign Data with Bcash');
         $result = parent::assignData($data);
         $params = Mage::app()->getFrontController()->getRequest()->getParams();
         $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;
@@ -172,9 +172,6 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
     {
         $cart = Mage::getSingleton('checkout/cart');
         $objShippingAddress = $cart->getQuote()->getShippingAddress();
-
-
-        //Mage::log($objShippingAddress);
 
         if($discountAmount > 0) {
             // Update quote

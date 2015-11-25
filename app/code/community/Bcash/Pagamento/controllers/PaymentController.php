@@ -110,7 +110,7 @@ class Bcash_Pagamento_PaymentController extends Mage_Core_Controller_Front_Actio
         $block = $this->getLayout()->createBlock(
             'Mage_Core_Block_Template',
             'link_pagamento_bcash',
-            array('template' => 'pagamento/checkout/success.phtml')
+            array('template' => 'bcash/pagamento/checkout/success.phtml')
         );
 
         $block->setOrder($order);

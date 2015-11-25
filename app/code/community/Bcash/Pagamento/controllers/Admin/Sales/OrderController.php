@@ -138,7 +138,7 @@ class Bcash_Pagamento_Admin_Sales_OrderController extends Mage_Adminhtml_Control
                 $this->_getSession()->addError($e->getMessage());
             } catch (Exception $e) {
                 $this->_getSession()->addError($this->__('The order has not been cancelled.'));
-                Mage::log("Cancellation error: " . $e->getMessage());
+                Mage::helper("bcash")->saveLog("Cancellation error - OrderController->cancelBcashTransaction: " . $e->getMessage(), $e->getErrors());
             }
         }
 

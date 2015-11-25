@@ -96,7 +96,7 @@ class Bcash_Pagamento_Block_Form_Onlinetransfer extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::log("Bcash_Pagamento_Block_Form_Onlinetransfer called getPaymentMethods");
+        Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Onlinetransfer called getPaymentMethods OK");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
@@ -123,11 +123,9 @@ class Bcash_Pagamento_Block_Form_Onlinetransfer extends Mage_Payment_Block_Form
                 }
             }
         } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Form_Onlinetransfer->getAllowedPaymentMethods: " . $e->getMessage(), $e->getErrors());
         } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Form_Onlinetransfer->getAllowedPaymentMethods: " . $e->getMessage(), $e->getErrors());
         }
 
         return $methods;
