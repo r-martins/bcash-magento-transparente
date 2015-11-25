@@ -165,8 +165,10 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
             $response = $installments->calculate(100.00, 1, false);
             // list methods
             foreach($response->paymentTypes as $types) {
-                foreach($types->paymentMethods as $method) {
-                    $methods[] = $method->id;
+                if($types->name == 'card') {
+                    foreach($types->paymentMethods as $method) {
+                        $methods[] = $method->id;
+                    }
                 }
             }
         } catch (ValidationException $e) {

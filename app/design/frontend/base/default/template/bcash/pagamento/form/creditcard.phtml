@@ -3,11 +3,6 @@ $code = $this->getMethodCode();
 $paymentMethods = $this->getPaymentMethods();
 $paymentInstallments = $this->getInstallments();
 $size = count($paymentMethods);
-$paymentGroupName = array(
-    'CARD' => "Cartão de cr&eacute;dito",
-    'BANKSLIP' => "Boleto Banc&aacute;rio",
-    'ONLINE_TRANSFER' => "Transfer&ecirc;ncia Banc&aacute;ria"
-);
 ?>
 <div id="payment-<?php echo $code; ?>">
     <link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>?v=<?php echo rand();?>" type="text/css"/>
@@ -44,7 +39,7 @@ $paymentGroupName = array(
         </div>
     </div>
 
-    <div id="payment-bcash-group">
+    <div id="payment-bcash-group-<?php echo $code; ?>">
     <?php foreach ($paymentMethods as $paymentType => $payments): ?>
         <?php
             $totalPayments = count($payments);
@@ -52,11 +47,10 @@ $paymentGroupName = array(
         ?>
             <div class="payment-group">
                 <div>
-                    <h3><?php echo $paymentGroupName[$paymentType] ?></h3>
                     <ul>
                         <?php foreach ($payments as $payment): ?>
                             <li>
-                                <input type="radio" class="payment-method-bcash validate-one-required-by-name"
+                                <input type="radio" class="payment-method-bcash-<?php echo $code; ?> validate-one-required-by-name"
                                        id="payment-method-<?php echo $payment->id ?>" name="payment-method"
                                        value="<?php echo $payment->id ?>" class/>
                                 <label class="bandeira band-<?php echo $payment->id ?>"
@@ -235,7 +229,7 @@ $paymentGroupName = array(
     echo "];";
 ?>
 
-    var initBcashPagamento = function () {
+    var initBcashCreditCardPagamento = function () {
         checkPaymentOnLoad();
         uncheckBcashPaymentMethods();
 
@@ -342,7 +336,7 @@ $paymentGroupName = array(
             document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
                 if(e.checked == true) {
                     hasChecked = 1;
-                    if(e.value == 'bcash') {
+                    if(e.value == 'bcash_creditcard') {
                         isBcash = 1;
                         showBcashPaymentMethod();
                     }
@@ -351,7 +345,7 @@ $paymentGroupName = array(
 
             if(hasChecked == 0 && isBcash == 0) {
                 document.body.select('input[type=radio][name="payment[method]"]').each(function (e) {
-                    if(e.value == 'bcash') {
+                    if(e.value == 'bcash_creditcard') {
                         e.checked = true;
                         showBcashPaymentMethod();
                     }
@@ -511,7 +505,7 @@ $paymentGroupName = array(
         }
 
         function disableUnunsed(paymentRadio) {
-            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash-<?php echo $code; ?>");
             for (var i = paymentRadios.length - 1; i >= 0; i--) {
                 paymentRadios[i].disabled = true;
             }
@@ -888,7 +882,7 @@ $paymentGroupName = array(
 
         function hideBcashPaymentMethod() {
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
-            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group-<?php echo $code; ?>');
 
             // cards
             var cardConteiner = document.getElementById('card-conteiner');
@@ -903,7 +897,7 @@ $paymentGroupName = array(
                     element.checked = false;
                 }
             });
-            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash-<?php echo $code; ?>");
             for (var i = paymentRadios.length - 1; i >= 0; i--) {
                 if(hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
                     paymentRadios[i].className = paymentRadios[i].className.replace(/\bvalidate-one-required-by-name\b/, '');
@@ -930,9 +924,9 @@ $paymentGroupName = array(
 
         function showBcashPaymentMethod() {
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
-            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group-<?php echo $code; ?>');
 
-            var paymentRadios = document.getElementsByClassName("payment-method-bcash");
+            var paymentRadios = document.getElementsByClassName("payment-method-bcash-<?php echo $code; ?>");
             for (var i = paymentRadios.length - 1; i >= 0; i--) {
                 if(!hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
                     paymentRadios[i].className = paymentRadios[i].className + " validate-one-required-by-name";
@@ -950,7 +944,7 @@ $paymentGroupName = array(
         $(document).on('change', 'input[type=radio][name=payment[method]]', function (event) {
             var target = event.target;
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
-            var paymentBcashConteiner = document.getElementById('payment-bcash-group');
+            var paymentBcashConteiner = document.getElementById('payment-bcash-group-<?php echo $code; ?>');
             if(target.id == 'p_method_bcash_creditcard') {
                 showBcashPaymentMethod();
             } else {
@@ -981,6 +975,6 @@ $paymentGroupName = array(
             event.preventDefault();
         });
     };
-    initBcashPagamento();
+    initBcashCreditCardPagamento();
     //]]>
 </script>
