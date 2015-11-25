@@ -179,7 +179,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 return $arRet;
             }
         } catch (ValidationException $e) {
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Helper_Transaction->startTransaction: " . $e->getMessage(), $e->getErrors());
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = $e->getMessage() . "\n";
@@ -188,7 +188,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             }
             Mage::throwException($messages);
         } catch (ConnectionException $e) {
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Helper_Transaction->startTransaction: " . $e->getMessage(), $e->getErrors());
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
             $messages  = $e->getMessage() . "\n";

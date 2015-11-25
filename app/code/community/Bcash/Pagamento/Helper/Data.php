@@ -40,11 +40,11 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
         } catch (ValidationException $e) {
             Mage::getSingleton('adminhtml/session')->addError('Error:' . $e->getMessage());
-            Mage::log($e->getMessage() . " :: " . $e->getErrors());
+            Mage::helper("bcash")->saveLog($e->getMessage(), $e->getErrors());
 
         } catch (ConnectionException $e) {
             Mage::getSingleton('adminhtml/session')->addError('Error:' . $e->getMessage());
-            Mage::log($e->getMessage() . " :: " . $e->getErrors());
+            Mage::helper("bcash")->saveLog($e->getMessage(), $e->getErrors());
         }
 
         return $response;
@@ -69,22 +69,12 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
             $response = $installments->calculate($grandTotal, $this->max_installments, $ignoreScheduledDiscount);
             return array("ok" => true, "installments" => array(0 => $this->prepareInstallmentsCards($response)));
         } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Helper_Data->getInstallments:" . $e->getMessage(), $e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Helper_Data->getInstallments:" . $e->getMessage(), $e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         }
-    }
-
-    public function setTransaction()
-    {
-        //Create Transaction with Bcash
-
-        die('setTransaction');
-
     }
 
     /**
@@ -106,6 +96,27 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
               ->setPaymentMethodBcash($quote->getPaymentMethodBcash())
               ->setInstallmentsBcash($quote->getInstallmentsBcash());
         $order->save();
+    }
+
+
+    /**
+     * Método para registrar logs
+     *
+     * @param $text
+     * @param null $array
+     */
+    public function saveLog($text, $array = null){
+        if(!is_null($array)) {
+            $text .= " - Detalhes: " . json_encode($array);
+        }
+
+        $logAtivo = Mage::getStoreConfig('payment/bcash/logfile');
+
+        if($logAtivo) {
+            $urlCurrent = Mage::helper('core/url')->getCurrentUrl();
+            Mage::log("Local loja: " . $urlCurrent, null, "bcash-magento.log");
+            Mage::log($text, null, "bcash-magento.log");
+        }
     }
 
     private function prepareInstallmentsCards($installments)

@@ -95,7 +95,7 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::log("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods");
+        Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods OK");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
@@ -121,12 +121,10 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
             $response = $installments->calculate($grandTotal, $this->max_installments, $ignoreScheduledDiscount);
             return array("ok" => true, "installments" => array(0 => $this->prepareInstallmentsCards($response)));
         } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Form_Creditcard::getInstallments:" . $e->getMessage(), $e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Form_Creditcard::getInstallments:" . $e->getMessage(), $e->getErrors());
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         }
     }
@@ -172,11 +170,9 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
                 }
             }
         } catch (ValidationException $e) {
-            Mage::log("Erro Bcash ValidationException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ValidationException - Form_Creditcard::getAllowedPaymentMethods:" . $e->getMessage(), $e->getErrors());
         } catch (ConnectionException $e) {
-            Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::helper("bcash")->saveLog("ConnectionException - Form_Creditcard::getAllowedPaymentMethods:" . $e->getMessage(), $e->getErrors());
         }
 
         return $methods;
