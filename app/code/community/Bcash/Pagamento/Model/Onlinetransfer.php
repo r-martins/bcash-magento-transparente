@@ -2,19 +2,19 @@
 
 
 /**
- * Class Bcash_Pagamento_Model_PaymentCreditcard
+ * Class Bcash_Pagamento_Model_Onlinetransfer
  */
-class Bcash_Pagamento_Model_PaymentCreditcard extends Mage_Payment_Model_Method_Abstract
+class Bcash_Pagamento_Model_Onlinetransfer extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * @var string
      */
-    protected $_code = 'bcash_pagamentocartao';
+    protected $_code = 'bcash_onlinetransfer';
 
     /**
      * @var string
      */
-    protected $_formBlockType = 'bcash/form_paymentCreditcard';
+    protected $_formBlockType = 'bcash/form_onlinetransfer';
 
     /** Flag executa o método initalize() com o checkout completo.
      * @var bool
@@ -42,7 +42,7 @@ class Bcash_Pagamento_Model_PaymentCreditcard extends Mage_Payment_Model_Method_
     public function initialize($paymentAction, $stateObject)
     {
         Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::log('Payment Creditcard visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::log('Payment Onlinetransfer visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {

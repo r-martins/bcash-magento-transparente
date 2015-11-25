@@ -8,11 +8,11 @@ use Bcash\Exception\ConnectionException;
 use Bcash\Domain\PaymentMethodEnum;
 
 /**
- * Class Bcash_Pagamento_Block_Form_PaymentBankslip
+ * Class Bcash_Pagamento_Block_Form_BankSlip
  */
-class Bcash_Pagamento_Block_Form_PaymentBankslip extends Mage_Payment_Block_Form
+class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
 {
-    protected $_code = 'bcash_pagamentoboleto';
+    protected $_code = 'bcash_bankslip';
 
     /**
      * @var Mage_Core_Model_Abstract
@@ -70,8 +70,8 @@ class Bcash_Pagamento_Block_Form_PaymentBankslip extends Mage_Payment_Block_Form
     public function __construct()
     {
         parent::__construct();
-        $this->setTemplate('pagamento/form/payment.phtml');
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
+        $this->setTemplate('bcash/pagamento/form/bankslip.phtml');
+        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Bankslip');
         $this->email   = $this->obj->getConfigData('email');
         $this->token   = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');

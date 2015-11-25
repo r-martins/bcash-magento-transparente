@@ -20,7 +20,7 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 
     public function __construct()
     {
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
+        $this->obj = Mage::getSingleton('Mage_Payment_Model_Creditcard');
         $this->email = $this->obj->getConfigData('email');
         $this->token = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');

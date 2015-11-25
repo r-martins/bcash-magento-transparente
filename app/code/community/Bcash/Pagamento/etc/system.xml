@@ -35,8 +35,7 @@
 
                         <token translate="label">
                             <label>Token</label>
-                            <comment>Acesse o menu do seu painel Bcash em "Ferramentas" > "Códigos Integração" > "Sua Chave acesso"</comment>
-                            <tooltip>Acesse o menu do seu painel Bcash em Ferramentas > Códigos Integração e copie o código em "Sua Chave acesso"</tooltip>
+                            <comment>Acesse o menu do seu painel Bcash em "Ferramentas" > "Códigos Integração" > copie o código em "Sua Chave acesso"</comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
@@ -102,16 +101,14 @@
                             <comment></comment>
                         </logs>
                     </fields>
-
                 </bcash>
 
-                <bcash_pagamentocartao translate="label" module="bcash_pagamentocartao">
+                <bcash_creditcard translate="label" module="bcash_creditcard">
                     <label>Bcash - Cartão de Crédito</label>
                     <sort_order>2</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
-
                     <fields>
                         <active translate="label">
                             <label>Habilitado?</label>
@@ -145,15 +142,14 @@
                             <show_in_store>0</show_in_store>
                         </max_installments>
                     </fields>
-                </bcash_pagamentocartao>
+                </bcash_creditcard>
 
-                <bcash_pagamentoboleto translate="label" module="bcash_pagamentoboleto">
+                <bcash_bankslip translate="label" module="bcash_bankslip">
                     <label>Bcash - Boleto</label>
                     <sort_order>3</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
-
                     <fields>
                         <active translate="label">
                             <label>Habilitado?</label>
@@ -176,15 +172,14 @@
                             <show_in_store>0</show_in_store>
                         </title>
                     </fields>
-                </bcash_pagamentoboleto>
+                </bcash_bankslip>
 
-                <bcash_pagamentotef translate="label" module="bcash_pagamentotef">
-                    <label>Bcash - TEF</label>
+                <bcash_onlinetransfer translate="label" module="bcash_onlinetransfer">
+                    <label>Bcash - Transferência Online (TEF)</label>
                     <sort_order>4</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
-
                     <fields>
                         <active translate="label">
                             <label>Habilitado?</label>
@@ -207,7 +202,7 @@
                             <show_in_store>0</show_in_store>
                         </title>
                     </fields>
-                </bcash_pagamentotef>
+                </bcash_onlinetransfer>
             </groups>
         </payment>
     </sections>

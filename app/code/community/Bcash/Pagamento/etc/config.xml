@@ -6,17 +6,17 @@
             <version>2.0.0</version>
         </Bcash_Pagamento>
 
-        <Bcash_PagamentoCartao>
+        <Bcash_Creditcard>
             <version>2.0.0</version>
-        </Bcash_PagamentoCartao>
+        </Bcash_Creditcard>
 
-        <Bcash_PagamentoBoleto>
+        <Bcash_Bankslip>
             <version>2.0.0</version>
-        </Bcash_PagamentoBoleto>
+        </Bcash_Bankslip>
 
-        <Bcash_PagamentoTef>
+        <Bcash_Onlinetransfer>
             <version>2.0.0</version>
-        </Bcash_PagamentoTef>
+        </Bcash_Onlinetransfer>
 
     </modules>
 
@@ -85,15 +85,15 @@
             <bcash>
                 <class>Bcash_Pagamento_Helper</class>
             </bcash>
-            <bcash_pagamentocartao>
+            <bcash_creditcard>
                 <class>Bcash_Pagamento_Helper</class>
-            </bcash_pagamentocartao>
-            <bcash_pagamentoboleto>
+            </bcash_creditcard>
+            <bcash_bankslip>
                 <class>Bcash_Pagamento_Helper</class>
-            </bcash_pagamentoboleto>
-            <bcash_pagamentotef>
+            </bcash_bankslip>
+            <bcash_onlinetransfer>
                 <class>Bcash_Pagamento_Helper</class>
-            </bcash_pagamentotef>
+            </bcash_onlinetransfer>
         </helpers>
         <blocks>
             <bcash>
@@ -231,36 +231,36 @@
                 <logs>0</logs>
             </bcash>
 
-            <bcash_pagamentocartao>
+            <bcash_creditcard>
                 <title>Bcash - Cartão de Crédito</title>
                 <active>1</active>
-                <model>bcash/paymentCard</model>
+                <model>bcash/creditCard</model>
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
                 <sort_order>-9</sort_order>
                 <max_installments>24</max_installments>
-            </bcash_pagamentocartao>
+            </bcash_creditcard>
 
-            <bcash_pagamentoboleto>
+            <bcash_bankslip>
                 <title>Bcash - Boleto</title>
                 <active>1</active>
-                <model>bcash/paymentBankslip</model>
+                <model>bcash/bankSlip</model>
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
                 <sort_order>-8</sort_order>
-            </bcash_pagamentoboleto>
+            </bcash_bankslip>
 
-            <bcash_pagamentotef>
+            <bcash_onlinetransfer>
                 <title>Bcash - Transferência Online (TEF)</title>
                 <active>1</active>
-                <model>bcash/paymentTransfer</model>
+                <model>bcash/onlineTransfer</model>
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
                 <sort_order>-7</sort_order>
-            </bcash_pagamentotef>
+            </bcash_onlinetransfer>
         </payment>
     </default>
 </config>

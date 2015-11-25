@@ -8,11 +8,11 @@ use Bcash\Exception\ConnectionException;
 use Bcash\Domain\PaymentMethodEnum;
 
 /**
- * Class Bcash_Pagamento_Block_Form_PaymentTransfer
+ * Class Bcash_Pagamento_Block_Form_OnlineTransfer
  */
-class Bcash_Pagamento_Block_Form_PaymentTransfer extends Mage_Payment_Block_Form
+class Bcash_Pagamento_Block_Form_Onlinetransfer extends Mage_Payment_Block_Form
 {
-    protected $_code = 'bcash_pagamentotef';
+    protected $_code = 'bcash_onlinetransfer';
 
     /**
      * @var Mage_Core_Model_Abstract
@@ -70,8 +70,8 @@ class Bcash_Pagamento_Block_Form_PaymentTransfer extends Mage_Payment_Block_Form
     public function __construct()
     {
         parent::__construct();
-        $this->setTemplate('pagamento/form/payment.phtml');
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
+        $this->setTemplate('bcash/pagamento/form/onlinetransfer.phtml');
+        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Onlinetransfer');
         $this->email   = $this->obj->getConfigData('email');
         $this->token   = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');

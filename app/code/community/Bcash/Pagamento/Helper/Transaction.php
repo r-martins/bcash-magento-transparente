@@ -125,7 +125,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
 
     public function __construct()
     {
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
+        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_Creditcard');
         $this->email = $this->obj->getConfigData('email');
         $this->token = $this->obj->getConfigData('token');
         $this->sandbox = $this->obj->getConfigData('sandbox');

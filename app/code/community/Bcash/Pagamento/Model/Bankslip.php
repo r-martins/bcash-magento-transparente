@@ -2,19 +2,19 @@
 
 
 /**
- * Class Bcash_Pagamento_Model_PaymentTef
+ * Class Bcash_Pagamento_Model_Bankslip
  */
-class Bcash_Pagamento_Model_PaymentTef extends Mage_Payment_Model_Method_Abstract
+class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * @var string
      */
-    protected $_code = 'bcash_pagamentotef';
+    protected $_code = 'bcash_bankslip';
 
     /**
      * @var string
      */
-    protected $_formBlockType = 'bcash/form_paymentTef';
+    protected $_formBlockType = 'bcash/form_bankslip';
 
     /** Flag executa o método initalize() com o checkout completo.
      * @var bool
@@ -42,7 +42,7 @@ class Bcash_Pagamento_Model_PaymentTef extends Mage_Payment_Model_Method_Abstrac
     public function initialize($paymentAction, $stateObject)
     {
         Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::log('Payment visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::log('Payment Bankslip visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {

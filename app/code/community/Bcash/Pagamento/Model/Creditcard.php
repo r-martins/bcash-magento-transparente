@@ -2,19 +2,19 @@
 
 
 /**
- * Class Bcash_Pagamento_Model_PaymentBillet
+ * Class Bcash_Pagamento_Model_Creditcard
  */
-class Bcash_Pagamento_Model_PaymentBillet extends Mage_Payment_Model_Method_Abstract
+class Bcash_Pagamento_Model_Creditcard extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * @var string
      */
-    protected $_code = 'bcash_pagamentoboleto';
+    protected $_code = 'bcash_creditcard';
 
     /**
      * @var string
      */
-    protected $_formBlockType = 'bcash/form_paymentBillet';
+    protected $_formBlockType = 'bcash/form_creditcard';
 
     /** Flag executa o método initalize() com o checkout completo.
      * @var bool
@@ -42,7 +42,7 @@ class Bcash_Pagamento_Model_PaymentBillet extends Mage_Payment_Model_Method_Abst
     public function initialize($paymentAction, $stateObject)
     {
         Mage::log('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::log('Payment visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        Mage::log('Payment Creditcard visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {
