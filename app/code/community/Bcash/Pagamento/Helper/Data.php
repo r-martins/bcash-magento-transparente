@@ -1,7 +1,5 @@
 <?php
 
-require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
-
 use Bcash\Service\Consultation;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
@@ -78,7 +76,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         } catch (ConnectionException $e) {
             Mage::log("Erro Bcash ConnectionException:" . $e->getMessage());
-            Mage::log($e->getErrors());
+            Mage::log($e);
             return array("ok" => false, "installments" => array("1" => $grandTotal));
         }
     }

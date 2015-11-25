@@ -11,7 +11,7 @@
                     <show_in_store>0</show_in_store>
                     <fields>
                         <sandbox translate="label">
-                            <label>Sandbox</label>
+                            <label>Habilitar Sandbox?</label>
                             <comment>Deixe o Sandbox habilitado somente para utilização de credenciais em ambiente de testes/homologação.</comment>
                             <tooltip>Deseja utilizar o m&#243;dulo em ambiente de testes?</tooltip>
                             <frontend_type>select</frontend_type>

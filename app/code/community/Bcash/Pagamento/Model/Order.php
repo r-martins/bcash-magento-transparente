@@ -1,8 +1,5 @@
 <?php
 
-require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
-
-use Bcash_Pagamento_Helper_RegisterSdk;
 use Bcash\Service\Cancellation;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;

@@ -1,7 +1,5 @@
 <?php
 
-require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
-
 use Bcash\Service\Installments;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;

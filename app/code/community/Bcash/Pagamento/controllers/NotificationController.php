@@ -1,7 +1,5 @@
 <?php
 
-require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
-
 use Bcash\Service\Notification;
 use Bcash\Domain\NotificationContent;
 use Bcash\Domain\NotificationStatusEnum;
