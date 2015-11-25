@@ -1,8 +1,5 @@
 <?php
 
-require_once(Mage::getBaseDir("lib") . "/BcashApi/autoloader.php");
-
-use Bcash_Pagamento_Helper_RegisterSdk;
 use Bcash\Service\Cancellation;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
@@ -12,18 +9,15 @@ use Bcash\Exception\ConnectionException;
  */
 class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
 {
-
     private $email;
     private $token;
-    private $obj;
     private $sandbox;
 
     public function __construct()
     {
-        $this->obj = Mage::getSingleton('Bcash_Pagamento_Model_PaymentMethod');
-        $this->email = $this->obj->getConfigData('email');
-        $this->token = $this->obj->getConfigData('token');
-        $this->sandbox = $this->obj->getConfigData('sandbox');
+        $this->email = Mage::getStoreConfig('payment/bcash/email');
+        $this->token = Mage::getStoreConfig('payment/bcash/token');
+        $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
     }
 
     /**
