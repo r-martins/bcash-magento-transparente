@@ -57,7 +57,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
             //Mage::log(print_r($result, true));
             $response = $result['response'];
             $payment_method = $result['payment_method'];
-            $installments = $result['installments'];
+            $installments = 1;
 
             /*
             1 – Em andamento
@@ -146,16 +146,16 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
         Mage::helper("bcash")->saveLog('Bankslip :: Assign Data with Bcash');
         $result = parent::assignData($data);
         $params = Mage::app()->getFrontController()->getRequest()->getParams();
-        $params['installments_bcash'] = isset($params['installments_bcash']) ?$params['installments_bcash']:1;
+        $params['installments_bcash'] = 1;
 
         //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
-        if(isset($params['payment-method'])) {
+        if(isset($params['bcash-payment-method'])) {
             $discount = 0;
             if ($params['installments_bcash'] == 1) {
-                $discount = $this->calculateDiscount($params['payment-method']);
+                //$discount = $this->calculateDiscount($params['payment-method']);
             }
-            if(!empty($params['payment-method'])) {
-                $this->addDiscountToQuote($discount);
+            if(!empty($params['bcash-payment-method'])) {
+                //$this->addDiscountToQuote($discount);
             }
         }
 

@@ -140,7 +140,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
-        $this->payment_method = Mage::app()->getRequest()->getPost('payment-method');
+        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method');
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
 
     }
@@ -151,6 +151,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function startTransaction()
     {
+        Mage::helper("bcash")->saveLog("POST: " . Mage::app()->getRequest()->getPost('bcash-payment-method'));
         $this->transactionRequest = $this->createTransactionRequestBcash();
         $this->setShippingBcash();
         $this->setPaymentMethodBcash();
@@ -217,6 +218,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $transactionRequest->setViewedContract("S");
         $transactionRequest->setDependentTransactions($this->createDependentTransactionsBcash());
         $transactionRequest->setPlatformId(565);
+        Mage::helper("bcash")->saveLog("-----------", $transactionRequest);
         return $transactionRequest;
     }
 
@@ -225,17 +227,12 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function setPaymentMethodBcash()
     {
+        Mage::helper("bcash")->saveLog("setPaymentMethodBcash: " . $this->payment_method);
         $this->transactionRequest->setPaymentMethod($this->payment_method);
         if (in_array($this->payment_method, $this->cards)) {
             $this->transactionRequest->setCreditCard($this->createCreditCardBcash());
             $this->transactionRequest->setInstallments($this->installments);
         }
-
-        /*if ($this->installments == 1) {
-            $discount = $this->calculateDiscount($this->payment_method);
-            $this->setDiscountBcash($discount);
-        }*/
-
         $this->setDiscountBcash();
     }
 
@@ -402,7 +399,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      * @param null $addition
      * @param null $discount
      */
-    public function setDiscountBcash($discount)
+    public function setDiscountBcash()
     {
         $discount = $this->quoteBcash->getShippingAddress()->getDiscountAmount();
         if($discount < 0) { $discount = ((-1) * $discount); }

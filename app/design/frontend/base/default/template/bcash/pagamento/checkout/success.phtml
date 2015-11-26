@@ -6,9 +6,10 @@
 $url = Mage::getUrl('', array('_secure'=>true)) . 'sales/order/view/order_id/' . $this->getOrder()->getId();
 $idPedido = $this->getQuote()->getReservedOrderId();
 $type = $this->getType();
+Mage::helper("bcash")->saveLog("checkout/success type: " . $type->type);
 if ($type && $type->type == Bcash_Pagamento_Helper_PaymentMethod::CARD_TYPE): ?>
 <!-- Compra realizada via Cartão de Crédito -->
-<?php elseif ($type &&$type->type == Bcash_Pagamento_Helper_PaymentMethod::ONLINE_TRANSFER_TYPE): ?>
+<?php elseif ($type && $type->type == Bcash_Pagamento_Helper_PaymentMethod::ONLINE_TRANSFER_TYPE): ?>
     <!-- Compra realizada via Transferência -->
     Clique no icone ao lado para acessar seu banco para realizar a transferência
     <a href="<?php echo $this->getQuote()->getPaymentLinkBcash() ?>" >

@@ -17,7 +17,7 @@
 .payment-group li {
   display: inline-block;
   height: 42px;
-  padding: 10px 5px;
+  padding: 0px 5px;
 }
 
 .payment-group input[type='radio'] {

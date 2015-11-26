@@ -95,7 +95,7 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods OK");
+        //Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods OK");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
