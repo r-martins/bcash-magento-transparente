@@ -646,3 +646,19 @@ hr {
   filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
+
+/* Clear */
+.bcash-clr {
+  clear: both;
+}
+
+.bcash-checkout-success {
+  float:left;
+  width: 100%;
+  padding: 10px;
+}
+
+.bcash-checkout-success p {
+  padding-bottom: 10px;
+}
+

@@ -24,7 +24,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
     protected $_isGateway = true;
     protected $_canAuthorize = true;
     protected $_canUseCheckout = true;
-    protected $_canUseForMultishipping  = false;
+    protected $_canUseForMultishipping = false;
 
     protected $transaction;
 
@@ -39,8 +39,8 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      */
     public function initialize($paymentAction, $stateObject)
     {
-        Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::helper("bcash")->saveLog('Payment Bankslip visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        //Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
+        //Mage::helper("bcash")->saveLog('Payment Bankslip visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {
@@ -54,7 +54,6 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
 
         try {
             $result = $this->_customBeginPayment();
-            //Mage::log(print_r($result, true));
             $response = $result['response'];
             $payment_method = $result['payment_method'];
             $installments = 1;
@@ -73,8 +72,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
             if ($response->status != 1 && $response->status != 2) {
 
                 $setIsNotified = false;
-                switch($response->status)
-                {
+                switch ($response->status) {
                     case 3: //3 – Aprovada
                     case 4: //4 – Concluída
                         $state = Mage_Sales_Model_Order::STATE_PROCESSING;
@@ -92,7 +90,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
                         break;
                 }
 
-                if(!is_null($state)){
+                if (!is_null($state)) {
                     $stateObject->setState($state);
                     $stateObject->setStatus($state);
                     $stateObject->setIsNotified($setIsNotified);
@@ -108,11 +106,11 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
 
             $cart = Mage::getSingleton('checkout/cart')->getQuote();
             $cart->setTransactionIdBcash($response->transactionId)
-                 ->setStatusBcash($response->status)
-                 ->setDescriptionStatusBcash(urldecode($response->descriptionStatus))
-                 ->setPaymentLinkBcash(isset($response->paymentLink) ? urldecode($response->paymentLink) : null)
-                 ->setPaymentMethodBcash($payment_method)
-                 ->setInstallmentsBcash($installments);
+                ->setStatusBcash($response->status)
+                ->setDescriptionStatusBcash(urldecode($response->descriptionStatus))
+                ->setPaymentLinkBcash(isset($response->paymentLink) ? urldecode($response->paymentLink) : null)
+                ->setPaymentMethodBcash($payment_method)
+                ->setInstallmentsBcash($installments);
             $cart->save();
 
         } catch (Exception $e) {
@@ -143,83 +141,11 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      */
     public function assignData($data)
     {
-        Mage::helper("bcash")->saveLog('Bankslip :: Assign Data with Bcash');
+        //Mage::helper("bcash")->saveLog('Bankslip :: Assign Data with Bcash');
         $result = parent::assignData($data);
         $params = Mage::app()->getFrontController()->getRequest()->getParams();
         $params['installments_bcash'] = 1;
 
-        //Adiciona Desconto ao Pedido caso 1x Credito, Boleto ou TEF (configurados no Backend)
-        if(isset($params['bcash-payment-method'])) {
-            $discount = 0;
-            if ($params['installments_bcash'] == 1) {
-                //$discount = $this->calculateDiscount($params['payment-method']);
-            }
-            if(!empty($params['bcash-payment-method'])) {
-                //$this->addDiscountToQuote($discount);
-            }
-        }
-
         return $result;
-    }
-
-    public function calculateDiscount($payment_method)
-    {
-        $transaction = new Bcash_Pagamento_Helper_Transaction();
-        return $transaction->calculateDiscount($payment_method);
-    }
-
-    public function addDiscountToQuote($discountAmount = 0)
-    {
-        $cart = Mage::getSingleton('checkout/cart');
-        $objShippingAddress = $cart->getQuote()->getShippingAddress();
-
-        if($discountAmount > 0) {
-            // Update quote
-            Mage::dispatchEvent(
-                'sales_quote_payment_import_data_before',
-                array(
-                    'quote' => $cart->getQuote()
-                )
-            );
-            $discountDescription = $objShippingAddress->getDiscountDescription();
-            if(!empty($discountDescription)) { $discountDescription .= " + "; }
-
-            $objShippingAddress->setDiscountDescription($discountDescription . 'Meio de pagamento');
-
-
-            $grandTotal = $objShippingAddress->getGrandTotal();
-            $subTotalWithDiscount = $objShippingAddress->getSubtotalWithDiscount();
-            $baseGrandTotal = $objShippingAddress->getBaseGrandTotal();
-            $baseSubTotalWithDiscount = $objShippingAddress->getBaseSubtotalWithDiscount();
-
-            // Outros descontos aplicados
-            $objDiscountAmount = $objShippingAddress->getDiscountAmount();
-            if ($objDiscountAmount <> 0) {
-                $discountAmount = (-1 * ((-$discountAmount) + $objDiscountAmount));
-                $grandTotal = $grandTotal + (-1 * $objDiscountAmount);
-                $subTotalWithDiscount = $subTotalWithDiscount + (-1 * $objDiscountAmount);
-                $baseGrandTotal = $baseGrandTotal + (-1 * $objDiscountAmount);
-                $baseSubTotalWithDiscount = $baseSubTotalWithDiscount + (-1 * $objDiscountAmount);
-            }
-
-            $objShippingAddress->addTotal(array(
-                'code' => 'discount',
-                'title' => "Desconto",
-                'value' => -$discountAmount,
-            ));
-
-            $totalDiscountAmount = $discountAmount;
-            $subtotalWithDiscount = $subTotalWithDiscount - $discountAmount;
-            $baseTotalDiscountAmount = $discountAmount;
-            $baseSubtotalWithDiscount = $baseSubTotalWithDiscount - $discountAmount;
-
-            $objShippingAddress->setDiscountAmount(-$totalDiscountAmount);
-            $objShippingAddress->setSubtotalWithDiscount($subtotalWithDiscount);
-            $objShippingAddress->setBaseDiscountAmount($baseTotalDiscountAmount);
-            $objShippingAddress->setBaseSubtotalWithDiscount($baseSubtotalWithDiscount);
-            $objShippingAddress->setGrandTotal($grandTotal - $totalDiscountAmount);
-            $objShippingAddress->setBaseGrandTotal($baseGrandTotal - $baseTotalDiscountAmount);
-            $objShippingAddress->save();
-        }
     }
 }

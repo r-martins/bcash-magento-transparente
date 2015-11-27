@@ -99,15 +99,6 @@
             <bcash>
                 <class>Bcash_Pagamento_Block</class>
             </bcash>
-            <bcash_creditcard>
-                <class>Bcash_Pagamento_Block</class>
-            </bcash_creditcard>
-            <bcash_bankslip>
-                <class>Bcash_Pagamento_Block</class>
-            </bcash_bankslip>
-            <bcash_onlinetransfer>
-                <class>Bcash_Pagamento_Block</class>
-            </bcash_onlinetransfer>
             <bcash_adminhtml>
                 <class>Bcash_Pagamento_Block_Adminhtml</class>
             </bcash_adminhtml>

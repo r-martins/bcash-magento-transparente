@@ -104,7 +104,7 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
-        return Mage::helper('bcash/paymentMethod')->getPaymentMethods($listAllowed);
+        return Mage::helper('bcash/paymentMethod')->getPaymentMethods($listAllowed, "bankslip");
     }
 
     /**

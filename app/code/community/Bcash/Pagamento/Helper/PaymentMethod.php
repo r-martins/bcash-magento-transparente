@@ -2,7 +2,6 @@
 
 class Bcash_Pagamento_Helper_PaymentMethod
 {
-
     const CARD_TYPE = "CARD";
     const BANKSLIP_TYPE = "BANKSLIP";
     const ONLINE_TRANSFER_TYPE = "ONLINE_TRANSFER";
@@ -29,7 +28,7 @@ class Bcash_Pagamento_Helper_PaymentMethod
         return $payment;
     }
 
-    public function getPaymentMethods($allowedMethods = null)
+    public function getPaymentMethods($allowedMethods = null, $paymentChosen = "")
     {
         try {
             if (!is_null($allowedMethods)) {
@@ -38,21 +37,21 @@ class Bcash_Pagamento_Helper_PaymentMethod
                 $this->createAllPaymentMethods();
             }
 
-            if (count(self::$cards) > 0) {
+            if ($paymentChosen == "creditcard") {
                 $returnArray = self::$cards;
                 self::$cards = array();
                 return array(
                     self::CARD_TYPE => $returnArray
                 );
             }
-            if (count(self::$bankSlip) > 0) {
+            if ($paymentChosen == "bankslip") {
                 $returnArray = self::$bankSlip;
                 self::$bankSlip = array();
                 return array(
                     self::BANKSLIP_TYPE => $returnArray
                 );
             }
-            if (count(self::$onlineTransfer) > 0) {
+            if ($paymentChosen == "onlinetransfer") {
                 $returnArray = self::$onlineTransfer;
                 self::$onlineTransfer = array();
                 return array(
