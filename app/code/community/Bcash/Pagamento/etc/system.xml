@@ -139,6 +139,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </max_installments>
+
+                        <sort_order translate="label">
+                            <label>Posição no Checkout</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </bcash_creditcard>
 
@@ -164,11 +174,21 @@
                             <label>Titulo do método de pagamento</label>
                             <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </title>
+
+                        <sort_order translate="label">
+                            <label>Posição no Checkout</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </bcash_bankslip>
 
@@ -194,11 +214,21 @@
                             <label>Titulo do método de pagamento</label>
                             <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </title>
+
+                        <sort_order translate="label">
+                            <label>Posição no Checkout</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </bcash_onlinetransfer>
             </groups>

@@ -228,7 +228,8 @@
         <payment>
             <bcash>
                 <order_status>1</order_status>
-                <logs>0</logs>
+                <logfile>0</logfile>
+                <sandbox>1</sandbox>
             </bcash>
 
             <bcash_creditcard>
@@ -238,7 +239,7 @@
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
-                <sort_order>-9</sort_order>
+                <sort_order>-3</sort_order>
                 <max_installments>24</max_installments>
             </bcash_creditcard>
 
@@ -249,7 +250,7 @@
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
-                <sort_order>-8</sort_order>
+                <sort_order>-2</sort_order>
             </bcash_bankslip>
 
             <bcash_onlinetransfer>
@@ -259,7 +260,7 @@
                 <order_status>1</order_status>
                 <payment_action>sale</payment_action>
                 <allowspecific>0</allowspecific>
-                <sort_order>-7</sort_order>
+                <sort_order>-1</sort_order>
             </bcash_onlinetransfer>
         </payment>
     </default>

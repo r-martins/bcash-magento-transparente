@@ -137,10 +137,10 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->billingDataBcash = $this->quoteBcash->getBillingAddress()->getData();
         $this->quoteIdTransaction = (str_pad($quoteId, 9, 0, STR_PAD_LEFT));
         $this->itemsBcash = $this->quoteBcash->getItemsCollection()->getItems();
-        $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
+        $this->cards = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
-        $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
-        $this->payment_method = Mage::app()->getRequest()->getPost('payment-method');
+        $this->tefs = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
+        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method');
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
 
     }
@@ -169,20 +169,20 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 'deps' => $this->deps,
                 'installments' => $this->installments
             );
-            if(isset($response->cancellationCode) && $response->cancellationCode){
-                if($response->cancellationCode == "700001"){
+            if (isset($response->cancellationCode) && $response->cancellationCode) {
+                if ($response->cancellationCode == "700001") {
                     Mage::throwException("A transação não pode ser processada utilizando este cartão. Por favor, selecione outro meio de pagamento.");
-                }else{
-                    Mage::throwException( Mage::helper('sales')->__(urldecode($arRet['response']->message)));
+                } else {
+                    Mage::throwException(Mage::helper('sales')->__(urldecode($arRet['response']->message)));
                 }
-            }else{
+            } else {
                 return $arRet;
             }
         } catch (ValidationException $e) {
             Mage::helper("bcash")->saveLog("ValidationException - Helper_Transaction->startTransaction: " . $e->getMessage(), $e->getErrors());
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
-            $messages  = $e->getMessage() . "\n";
+            $messages = $e->getMessage() . "\n";
             foreach ($errorsList as $err) {
                 $messages .= "\n- " . urldecode($err->description) . " (" . $err->code . ")";
             }
@@ -191,7 +191,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             Mage::helper("bcash")->saveLog("ConnectionException - Helper_Transaction->startTransaction: " . $e->getMessage(), $e->getErrors());
             $errorsArr = $e->getErrors();
             $errorsList = $errorsArr->list;
-            $messages  = $e->getMessage() . "\n";
+            $messages = $e->getMessage() . "\n";
             foreach ($errorsList as $err) {
                 $messages .= "\n- " . urldecode($err->description) . " (" . $err->code . ")";
             }
@@ -205,8 +205,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createTransactionRequestBcash()
     {
-        //Id:Plataforma => 565
-        $url = Mage::getUrl('bcash/notification/request',array('_secure'=>true));
+        $url = Mage::getUrl('bcash/notification/request', array('_secure' => true));
+
         $transactionRequest = new TransactionRequest();
         $transactionRequest->setSellerMail($this->email);
         $transactionRequest->setOrderId($this->quoteBcash->getReservedOrderId());
@@ -217,6 +217,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $transactionRequest->setViewedContract("S");
         $transactionRequest->setDependentTransactions($this->createDependentTransactionsBcash());
         $transactionRequest->setPlatformId(565);
+
         return $transactionRequest;
     }
 
@@ -230,37 +231,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $this->transactionRequest->setCreditCard($this->createCreditCardBcash());
             $this->transactionRequest->setInstallments($this->installments);
         }
-
-        /*if ($this->installments == 1) {
-            $discount = $this->calculateDiscount($this->payment_method);
-            $this->setDiscountBcash($discount);
-        }*/
-
         $this->setDiscountBcash();
     }
-
-    /**
-     * @param $payment_method
-     * @return float|int
-     */
-    public function calculateDiscount($payment_method)
-    {
-        $discount = 0;
-        if (in_array($payment_method, $this->cards)) {
-            $percent = 0;
-        } elseif (in_array($payment_method, $this->tefs)) {
-            $percent = 0;
-        } else {
-            $percent = 0;
-        }
-        if ($percent) {
-            $discount = floatval(number_format(($this->subTotalBcash / 100) * $percent, 2, '.', ''));
-            $this->discountPercentBcash = $percent;
-            $this->discountBcash = $discount;
-        }
-        return $discount;
-    }
-
 
     /**
      * Adiciona o endereço a transação atual.
@@ -268,11 +240,11 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function createAddressBcash()
     {
-        $address     = $this->quoteBcash->getShippingAddress();
-        $street      = $address->getStreet(1);
-        $numero      = $address->getStreet(2);
+        $address = $this->quoteBcash->getShippingAddress();
+        $street = $address->getStreet(1);
+        $numero = $address->getStreet(2);
         $complemento = $address->getStreet(3);
-        $bairro      = $address->getStreet(4);
+        $bairro = $address->getStreet(4);
         $addressObj = new Address();
         $addressObj->setAddress($street);
         $addressObj->setNumber($numero ? $numero : 'SN');
@@ -295,16 +267,16 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $prefix = "";
 
         $customer_id = $this->quoteBcash->getCustomerId();
-        if(!is_null($customer_id)) {
+        if (!is_null($customer_id)) {
             $customer = Mage::getModel('customer/customer')->load($customer_id);
             $customerData = $customer->getData();
-        }else {
+        } else {
             $customerData = $this->quoteBcash->getData();
             $prefix = "customer_";
         }
 
-        if(!is_null($customerData)) {
-            $cpf_cnpj_bcash = isset($customerData[$prefix."taxvat"]) ? $customerData[$prefix."taxvat"] : null;
+        if (!is_null($customerData)) {
+            $cpf_cnpj_bcash = isset($customerData[$prefix . "taxvat"]) ? $customerData[$prefix . "taxvat"] : null;
             $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
 
             if ($this->cpf) {
@@ -313,15 +285,17 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             }
 
 
-            $buyer->setMail($customerData[$prefix.'email']);
-            $name  = ($customerData[$prefix.'firstname']);
-            $name .= isset($customerData[$prefix.'middlename']) ? ' ' . $customerData[$prefix.'middlename'] : '';
-            $name .= isset($customerData[$prefix.'lastname'])   ? ' ' . $customerData[$prefix.'lastname']   : '';
+            $buyer->setMail($customerData[$prefix . 'email']);
+            $name = ($customerData[$prefix . 'firstname']);
+            $name .= isset($customerData[$prefix . 'middlename']) ? ' ' . $customerData[$prefix . 'middlename'] : '';
+            $name .= isset($customerData[$prefix . 'lastname']) ? ' ' . $customerData[$prefix . 'lastname'] : '';
             $buyer->setName($name);
-            if(strlen($cpf_cnpj_bcash) > 11) {
+            if (strlen($cpf_cnpj_bcash) > 11) {
                 $buyer->setCnpj($cpf_cnpj_bcash);
                 $buyer->setCompanyName($name);
-            }else { $buyer->setCpf($cpf_cnpj_bcash); }
+            } else {
+                $buyer->setCpf($cpf_cnpj_bcash);
+            }
             $buyer->setPhone($this->completePhoneBcash('telephone'));
             $buyer->setCellPhone($this->completePhoneBcash('fax'));
             $buyer->setAddress($this->createAddressBcash());
@@ -341,7 +315,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $phone = preg_replace('/[^0-9]+/', '', $phone);
             return $this->parsePhone($phone);
         }
-        $address  = $this->quoteBcash->getBillingAddress()->getData();
+        $address = $this->quoteBcash->getBillingAddress()->getData();
         if (!is_null($attr)) {
             $phone = $this->parsePhone($address[$attr]);
             return $phone;
@@ -402,10 +376,12 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      * @param null $addition
      * @param null $discount
      */
-    public function setDiscountBcash($discount)
+    public function setDiscountBcash()
     {
         $discount = $this->quoteBcash->getShippingAddress()->getDiscountAmount();
-        if($discount < 0) { $discount = ((-1) * $discount); }
+        if ($discount < 0) {
+            $discount = ((-1) * $discount);
+        }
         $discount = floatval(number_format($discount, 2, '.', ''));
         $this->discountBcash = $discount;
         $this->transactionRequest->setDiscount($discount);
@@ -470,24 +446,24 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
     public static function normalizeChars($s)
     {
         $replace = array(
-            'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ă'=>'A',
-            'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'ă'=>'a', 'æ'=>'ae',
-            'þ'=>'b', 'Þ'=>'B',
-            'Ç'=>'C', 'ç'=>'c',
-            'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
-            'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e',
-            'Ğ'=>'G', 'ğ'=>'g',
-            'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'İ'=>'I', 'ı'=>'i', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i',
-            'Ñ'=>'N',
-            'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'Oe', 'Ø'=>'O', 'ö'=>'oe', 'ø'=>'o',
-            'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
-            'Š'=>'S', 'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ß'=>'ss',
-            'ț'=>'t', 'Ț'=>'T',
-            'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'Ue',
-            'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'ue',
-            'Ý'=>'Y',
-            'ý'=>'y', 'ý'=>'y', 'ÿ'=>'y',
-            'Ž'=>'Z', 'ž'=>'z'
+            'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Å' => 'A', 'Æ' => 'A', 'Ă' => 'A',
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'å' => 'a', 'ă' => 'a', 'æ' => 'ae',
+            'þ' => 'b', 'Þ' => 'B',
+            'Ç' => 'C', 'ç' => 'c',
+            'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'Ğ' => 'G', 'ğ' => 'g',
+            'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'İ' => 'I', 'ı' => 'i', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+            'Ñ' => 'N',
+            'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ø' => 'O', 'ö' => 'oe', 'ø' => 'o',
+            'ð' => 'o', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'Š' => 'S', 'š' => 's', 'Ş' => 'S', 'ș' => 's', 'Ș' => 'S', 'ş' => 's', 'ß' => 'ss',
+            'ț' => 't', 'Ț' => 'T',
+            'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue',
+            'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue',
+            'Ý' => 'Y',
+            'ý' => 'y', 'ý' => 'y', 'ÿ' => 'y',
+            'Ž' => 'Z', 'ž' => 'z'
         );
         return strtr($s, $replace);
     }

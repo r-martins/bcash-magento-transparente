@@ -114,7 +114,7 @@ class Bcash_Pagamento_Helper_Data extends Mage_Payment_Helper_Data
 
         if($logAtivo) {
             $urlCurrent = Mage::helper('core/url')->getCurrentUrl();
-            Mage::log("Local loja: " . $urlCurrent, null, "bcash-magento.log");
+            //Mage::log("Local loja: " . $urlCurrent, null, "bcash-magento.log");
             Mage::log($text, null, "bcash-magento.log");
         }
     }

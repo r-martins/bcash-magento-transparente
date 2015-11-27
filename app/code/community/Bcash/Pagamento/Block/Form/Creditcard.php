@@ -95,11 +95,11 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods OK");
+        //Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Creditcard called getPaymentMethods OK");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 
-        return Mage::helper('bcash/paymentMethod')->getPaymentMethods($listAllowed);
+        return Mage::helper('bcash/paymentMethod')->getPaymentMethods($listAllowed, "creditcard");
     }
 
     /**
@@ -165,8 +165,10 @@ class Bcash_Pagamento_Block_Form_Creditcard extends Mage_Payment_Block_Form
             $response = $installments->calculate(100.00, 1, false);
             // list methods
             foreach($response->paymentTypes as $types) {
-                foreach($types->paymentMethods as $method) {
-                    $methods[] = $method->id;
+                if($types->name == 'card') {
+                    foreach($types->paymentMethods as $method) {
+                        $methods[] = $method->id;
+                    }
                 }
             }
         } catch (ValidationException $e) {
