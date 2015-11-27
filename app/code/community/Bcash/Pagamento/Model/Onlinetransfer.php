@@ -14,6 +14,7 @@ class Bcash_Pagamento_Model_Onlinetransfer extends Mage_Payment_Model_Method_Abs
      * @var string
      */
     protected $_formBlockType = 'bcash/form_onlinetransfer';
+    protected $_infoBlockType = 'bcash/info_onlinetransfer';
 
     /**
      * Flag executa o método initalize() com o checkout completo.

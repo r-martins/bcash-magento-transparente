@@ -56,12 +56,12 @@ class Bcash_Pagamento_Model_Order extends Mage_Core_Model_Abstract
         $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
 
         $info_payments = array(
-            array("titulo" => "Transação Bcash", "valor" => $quote->getTransactionIdBcash()),
+            array("titulo" => "method_payment", "valor" => $quote->getPaymentMethodBcash()),
+            array("titulo" => "Id transação Bcash", "valor" => $quote->getTransactionIdBcash()),
             array("titulo" => "Cod. do Status", "valor" => $quote->getStatusBcash()),
             array("titulo" => "Descrição do Status", "valor" =>  $quote->getDescriptionStatusBcash()),
             array("titulo" => "Link", "valor" => $quote->getPaymentLinkBcash()),
             array("titulo" => "Parcelas", "valor" => $quote->getInstallmentsBcash() . "x")
-            /*array("titulo" => "Cod. do Meio de pagamento", "valor" => $quote->getPaymentMethodBcash())*/
         );
 
         return $info_payments;

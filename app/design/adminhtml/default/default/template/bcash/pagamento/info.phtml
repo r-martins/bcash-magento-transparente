@@ -11,8 +11,11 @@ $info_payment = $this->getInfoPayment();
     <?php foreach ($info_payment as $detalhes): ?>
         <tr>
             <?php if (!empty($detalhes['valor'])):
-                echo '<td class="label"><label>' . $detalhes['titulo'] . '</label></td>';
-                echo '<td class="value"><label><strong>' . ($detalhes['titulo'] == "Link" ? '<a href="' . $detalhes['valor'] . '" target="_blank">Acessar link de pagamento</a>' : $detalhes['valor']) . '</strong></label></td>';
+                if ($detalhes['titulo'] == "method_payment"):
+                else:
+                    echo '<td class="label"><label>' . $detalhes['titulo'] . '</label></td>';
+                    echo '<td class="value"><label>' . ($detalhes['titulo'] == "Link" ? '<a href="' . $detalhes['valor'] . '" target="_blank">Acessar link de pagamento</a>' : $detalhes['valor']) . '</strong></label></td>';
+                endif;
             endif; ?>
         </tr>
     <?php endforeach; ?>

@@ -34,6 +34,17 @@
   opacity: 0;
 }
 
+/* logo bcash */
+
+.logo-bcash {
+  display: inline-block;
+  background: url(../images/application-sprite.png) no-repeat;
+  width: 48px;
+  height: 60px;
+  text-indent: -9999px;
+  background-position: 0 0;
+}
+
 .bandeira {
   display: inline-block;
   background: url(../images/application-sprite.png) no-repeat;
@@ -42,7 +53,6 @@
   text-indent: -9999px;
   cursor: pointer;
 }
-
 
 /* visa */
 

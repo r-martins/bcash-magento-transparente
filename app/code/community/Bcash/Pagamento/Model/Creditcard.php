@@ -14,6 +14,7 @@ class Bcash_Pagamento_Model_Creditcard extends Mage_Payment_Model_Method_Abstrac
      * @var string
      */
     protected $_formBlockType = 'bcash/form_creditcard';
+    protected $_infoBlockType = 'bcash/info_creditcard';
 
     /**
      * Flag executa o método initalize() com o checkout completo.
