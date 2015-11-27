@@ -109,7 +109,7 @@ $size = count($paymentMethods);
                 if (!hasClass(paymentRadios[i], 'validate-one-required-by-name')) {
                     paymentRadios[i].className = paymentRadios[i].className + " validate-one-required-by-name";
                 }
-                console.log(paymentRadios[i]);
+
                 //Caso houver somente 1 item, carregar selecionado
                 if(paymentRadios.length == 1) {
                     paymentRadios[i].disabled = false;

@@ -5,6 +5,18 @@
  */
 class Bcash_Pagamento_Block_Info_Bankslip extends Mage_Payment_Block_Info
 {
+    protected function _construct(){
+        parent::_construct();
+        $this->setTemplate('bcash/pagamento/info.phtml');
+    }
+
+    public function getInfoPayment(){
+
+        $order_id = $this->getInfo()->getOrder()->getIncrementId();
+        $info_payments = Mage::getModel('bcash/order')->getBcashInfoPayment($order_id);
+
+        return $info_payments;
+    }
 
 	/**
 	 * @param null $transport

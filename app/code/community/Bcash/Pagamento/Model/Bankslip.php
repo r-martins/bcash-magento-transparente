@@ -14,6 +14,7 @@ class Bcash_Pagamento_Model_Bankslip extends Mage_Payment_Model_Method_Abstract
      * @var string
      */
     protected $_formBlockType = 'bcash/form_bankslip';
+    protected $_infoBlockType = 'bcash/info_bankslip';
 
     /**
      * Flag executa o método initalize() com o checkout completo.
