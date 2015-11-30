@@ -1,5 +1,8 @@
 <?php
 
+require_once(Mage::getBaseDir("lib") . "/Bcash/AutoLoader.php");
+Bcash\AutoLoader::register();
+
 use Bcash\Service\Installments;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
@@ -96,7 +99,7 @@ class Bcash_Pagamento_Block_Form_Onlinetransfer extends Mage_Payment_Block_Form
      */
     public function getPaymentMethods()
     {
-        Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Onlinetransfer called getPaymentMethods OK");
+        //Mage::helper("bcash")->saveLog("Bcash_Pagamento_Block_Form_Onlinetransfer called getPaymentMethods OK");
         // Find allowed payment methods
         $listAllowed = $this->getAllowedPaymentMethods();
 

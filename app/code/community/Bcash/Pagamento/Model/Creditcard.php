@@ -40,8 +40,8 @@ class Bcash_Pagamento_Model_Creditcard extends Mage_Payment_Model_Method_Abstrac
      */
     public function initialize($paymentAction, $stateObject)
     {
-        Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
-        Mage::helper("bcash")->saveLog('Payment Creditcard visitor: ' . Mage::helper('core/http')->getRemoteAddr());
+        //Mage::helper("bcash")->saveLog('Called ' . __METHOD__ . ' with payment ' . $paymentAction);
+        //Mage::helper("bcash")->saveLog('Payment Creditcard visitor: ' . Mage::helper('core/http')->getRemoteAddr());
         parent::initialize($paymentAction, $stateObject);
 
         if ($paymentAction != 'sale') {

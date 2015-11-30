@@ -1,5 +1,8 @@
 <?php
 
+require_once(Mage::getBaseDir("lib") . "/Bcash/AutoLoader.php");
+Bcash\AutoLoader::register();
+
 use Bcash\Domain\PaymentMethodEnum;
 use Bcash\Domain\CurrencyEnum;
 use Bcash\Domain\StateEnum;

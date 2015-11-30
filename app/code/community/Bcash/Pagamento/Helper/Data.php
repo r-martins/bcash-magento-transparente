@@ -1,5 +1,8 @@
 <?php
 
+require_once(Mage::getBaseDir("lib") . "/Bcash/AutoLoader.php");
+Bcash\AutoLoader::register();
+
 use Bcash\Service\Consultation;
 use Bcash\Exception\ValidationException;
 use Bcash\Exception\ConnectionException;
