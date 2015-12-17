@@ -128,5 +128,5 @@ try {
     $installer->endSetup();
 
 } catch (Exception $e) {
-    Mage::helper("bcash")->saveLog("Exception - sql/pagamento_setup/mysql4-install-1.2.0.php: " . $e->getMessage());
+    Mage::log("Exception - sql/pagamento_setup/mysql4-install-1.2.0.php: " . $e->getMessage());
 }
