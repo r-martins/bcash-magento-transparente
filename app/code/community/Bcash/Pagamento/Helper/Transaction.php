@@ -207,6 +207,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             Mage::throwException($messages);
         } catch (Exception $e) {
             Mage::helper("bcash")->saveLog($e->getMessage());
+            Mage::throwException($e->getMessage());
         }
     }
 
