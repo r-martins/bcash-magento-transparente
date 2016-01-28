@@ -94,6 +94,26 @@ class Bcash_Pagamento_Block_Form_Onlinetransfer extends Mage_Payment_Block_Form
     }
 
     /**
+     * Retorna valor de CPF/CNPJ do comprador
+     *
+     * @return mixed
+     */
+    public function getCurrentCustomerTaxvat()
+    {
+        $taxvat = "";
+        try {
+            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $customerData = Mage::getSingleton('customer/session')->getCustomer();
+                $taxvat = $customerData->getData('taxvat');
+            }
+        } catch (Exception $e) {
+            Mage::helper("bcash")->saveLog("Form_Bankslip::getCurrentCustomerTaxvat Exception: " . $e->getMessage(), $e->getErrors());
+        }
+
+        return preg_replace('/[^0-9]+/', '', $taxvat);
+    }
+
+    /**
      * Retorna os meios de pagamento disponíveis no módulo Bcash.
      * @return mixed
      */

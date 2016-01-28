@@ -2,6 +2,7 @@
 $code = $this->getMethodCode();
 $paymentMethods = $this->getPaymentMethods();
 $size = count($paymentMethods);
+$customer_taxvat = $this->getCurrentCustomerTaxvat();
 ?>
 <div id="payment-<?php echo $code; ?>">
     <link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>?v=<?php echo rand();?>" type="text/css"/>

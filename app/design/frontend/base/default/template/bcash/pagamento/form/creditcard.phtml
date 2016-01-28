@@ -3,6 +3,7 @@ $code = $this->getMethodCode();
 $paymentMethods = $this->getPaymentMethods();
 $paymentInstallments = $this->getInstallments();
 $size = count($paymentMethods);
+$customer_taxvat = $this->getCurrentCustomerTaxvat();
 ?>
 <div id="payment-<?php echo $code; ?>">
     <link rel="stylesheet"

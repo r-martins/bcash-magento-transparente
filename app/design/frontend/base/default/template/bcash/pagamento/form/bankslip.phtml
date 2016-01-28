@@ -2,18 +2,28 @@
 $code = $this->getMethodCode();
 $paymentMethods = $this->getPaymentMethods();
 $size = count($paymentMethods);
+$customer_taxvat = $this->getCurrentCustomerTaxvat();
 ?>
 <div id="payment-<?php echo $code; ?>">
     <link rel="stylesheet" href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>?v=<?php echo rand();?>" type="text/css"/>
     <div class="form-list" id="payment_form_<?php echo $code; ?>" style="display:none;">
         <div class="payment-group" >
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
-                <?php if($this->getCpf()) : ?>
+                <?php if($this->getCpf() || empty($customer_taxvat)) : ?>
                     <div class="" style="float:left; width:40%; margin:2px">
                         <label>CPF/CNPJ do titular</label>
                         <input type="text" class="b-form-control validate-cpf-cnpj-bankslip" id="cpf_cnpj_<?php echo $code; ?>"
                                name="cpf_cnpj_<?php echo $code; ?>" value=""
                                maxlength="18" autocomplete="off"/>
+                    </div>
+                <?php endif; ?>
+                <?php if(strlen($customer_taxvat) > 11) : ?>
+                    <div class="" style="float:left; width:53%; margin:3px; margin-left:10px">
+                        <label>CPF do respons&aacute;vel pela compra no CNPJ</label>
+                        <input type="text" class="b-form-control validate-cpf-resp-bankslip" id="cpf_resp_compra_<?php echo $code; ?>"
+                               name="cpf_resp_compra_<?php echo $code; ?>" value=""
+                               maxlength="11" autocomplete="off"/>
+                        <desc><i>(para o Cnpj: <?php echo $customer_taxvat; ?> )</i></desc>
                     </div>
                 <?php endif; ?>
                 <?php if($this->getPhone()) : ?>
@@ -29,7 +39,6 @@ $size = count($paymentMethods);
                                    name="phone_<?php echo $code; ?>"
                                    id="phone_<?php echo $code; ?>">
                         </div>
-
                     </div>
                 <?php endif; ?>
             </div>

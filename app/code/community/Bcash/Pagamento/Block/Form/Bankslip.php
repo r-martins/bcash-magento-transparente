@@ -44,12 +44,12 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
      */
     private $cards;
     /**
-    * @var
-    */
+     * @var
+     */
     private $boleto;
     /**
-    * @var
-    */
+     * @var
+     */
     private $tefs;
     /**
      * @var
@@ -75,16 +75,16 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
     {
         parent::__construct();
         $this->setTemplate('bcash/pagamento/form/bankslip.phtml');
-        $this->email   = Mage::getStoreConfig('payment/bcash/email');
-        $this->token   = Mage::getStoreConfig('payment/bcash/token');
+        $this->email = Mage::getStoreConfig('payment/bcash/email');
+        $this->token = Mage::getStoreConfig('payment/bcash/token');
         $this->sandbox = Mage::getStoreConfig('payment/bcash/sandbox');
         $this->max_installments = Mage::getStoreConfig('payment/bcash_creditcard/max_installments');
         $this->cpf = Mage::getStoreConfig('payment/bcash/cpf');
         $this->phone = Mage::getStoreConfig('payment/bcash/phone');
         $this->desconto_credito_1x = 0;
-        $this->cards  = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
+        $this->cards = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
-        $this->tefs   = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
+        $this->tefs = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
     }
 
     public function getCpf()
@@ -95,6 +95,26 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
     public function getPhone()
     {
         return $this->phone;
+    }
+
+    /**
+     * Retorna valor de CPF/CNPJ do comprador
+     *
+     * @return mixed
+     */
+    public function getCurrentCustomerTaxvat()
+    {
+        $taxvat = "";
+        try {
+            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $customerData = Mage::getSingleton('customer/session')->getCustomer();
+                $taxvat = $customerData->getData('taxvat');
+            }
+        } catch (Exception $e) {
+            Mage::helper("bcash")->saveLog("Form_Bankslip::getCurrentCustomerTaxvat Exception: " . $e->getMessage(), $e->getErrors());
+        }
+
+        return preg_replace('/[^0-9]+/', '', $taxvat);
     }
 
     /**
@@ -124,8 +144,8 @@ class Bcash_Pagamento_Block_Form_Bankslip extends Mage_Payment_Block_Form
             // Any param value just for check
             $response = $installments->calculate(100.00, 1, false);
             // list methods
-            foreach($response->paymentTypes as $types) {
-                if($types->name == 'boleto') {
+            foreach ($response->paymentTypes as $types) {
+                if ($types->name == 'boleto') {
                     foreach ($types->paymentMethods as $method) {
                         $methods[] = $method->id;
                     }
