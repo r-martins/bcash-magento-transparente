@@ -15,26 +15,35 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
                 <?php if ($this->getCpf()) : ?>
-                    <div class="" style="float:left; width:40%; margin:2px">
+                    <div class="" style="float:left; width:40%; margin:2px; margin-right: 10px;">
                         <label>CPF/CNPJ do titular</label>
-                        <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_bcash"
-                               name="cpf_cnpj_bcash" value=""
+                        <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_<?php echo $code; ?>"
+                               name="cpf_cnpj_<?php echo $code; ?>" value=""
                                maxlength="18" autocomplete="off"/>
                     </div>
                 <?php endif; ?>
+                <?php if(strlen($customer_taxvat) > 11) : ?>
+                    <div class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
+                        <label>CPF da pessoa respons&aacute;vel pela compra</label>
+                        <input type="text" class="b-form-control validate-cpf-resp" id="cpf_resp_compra_<?php echo $code; ?>"
+                               name="cpf_resp_compra_<?php echo $code; ?>" value=""
+                               maxlength="14" autocomplete="off"/>
+                        <desc><i>(para o Cnpj: <?php echo $customer_taxvat; ?> )</i></desc>
+                    </div>
+                <?php endif; ?>
                 <?php if ($this->getPhone()) : ?>
-                    <div class="" style="float:left; width:53%; margin:3px; margin-left:10px">
+                    <div class="" style="float:left; width:53%; margin:3px;">
                         <label>Telefone do titular</label><br/>
 
                         <div style="width: 53px; float: left;">
                             <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
-                                   name="ddd_bcash"
-                                   id="ddd_bcash">
+                                   name="ddd_<?php echo $code; ?>"
+                                   id="ddd_<?php echo $code; ?>">
                         </div>
                         <div style="width: 123px; float: left; margin-left:3px">
                             <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
-                                   name="phone_bcash"
-                                   id="phone_bcash">
+                                   name="phone_<?php echo $code; ?>"
+                                   id="phone_<?php echo $code; ?>">
                         </div>
 
                     </div>
@@ -59,7 +68,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                     <li>
                                         <input type="radio"
                                                class="payment-method-bcash-<?php echo $code; ?> validate-one-required-by-name"
-                                               id="payment-method-<?php echo $payment->id ?>" name="bcash-payment-method"
+                                               id="payment-method-<?php echo $payment->id ?>" name="bcash-payment-method_<?php echo $code; ?>"
                                                value="<?php echo $payment->id ?>" class/>
                                         <label
                                             class="bandeira bandeira-<?php echo $code; ?> band-<?php echo $payment->id ?>"
@@ -75,7 +84,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                 <div class="b-n-row">
                                     <div class="b-form-group b-col-xs-8">
                                         <label>N&uacute;mero do cart&atilde;o</label>
-                                        <input type="text" class="b-form-control validate-number-card" maxlength="20"
+                                        <input type="text" class="b-card-field b-form-control validate-number-card" maxlength="20"
                                                value=""
                                                id="card_number_bcash"
                                                name="card_number_bcash"
@@ -85,7 +94,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                         <div>
                                             <label>CVV <span class="icon-tooltip"
                                                              data-tooltip="Código de segurança do cartão de crédito.">?</span></label>
-                                            <input type="text" class="b-form-control validate-ccv-card" maxlength="3"
+                                            <input type="text" class="b-card-field b-form-control validate-ccv-card" maxlength="3"
                                                    value=""
                                                    name="cvv_bcash"
                                                    id="cvv_bcash">
@@ -98,7 +107,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
                                         <div class="b-form-group">
                                             <div class="b-col-xs-5" style="padding:0px">
-                                                <select class="b-form-control validate-month-bcash" id="month_bcash"
+                                                <select class="b-card-field b-form-control validate-month-bcash" id="month_bcash"
                                                         name="month_bcash" style="padding: 2px;">
                                                     <option value=""></option>
                                                     <?php
@@ -112,7 +121,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                                 </select>
                                             </div>
                                             <div class="b-col-xs-7" style="padding:0px; padding-left:4px">
-                                                <select class="b-form-control validate-year-bcash" id="year_bcash"
+                                                <select class="b-card-field b-form-control validate-year-bcash" id="year_bcash"
                                                         name="year_bcash" style="padding: 2px;">
                                                     <option value=""></option>
                                                     <?php
@@ -131,7 +140,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                     </div>
                                     <div class="b-form-group b-col-xs-7" style="padding-right:0px">
                                         <label>Parcelas</label>
-                                        <select class="b-form-control validate-installments-bcash" name="installments_bcash"
+                                        <select class="b-card-field b-form-control validate-installments-bcash" name="installments_bcash"
                                                 id="installments_bcash" style="max-width:100% !important">
                                             <option value="" disabled> (Selecione o número de parcelas)</option>
                                             <?php
@@ -153,7 +162,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                 <div class="b-n-row">
                                     <div class="b-form-group" style="padding-left:17px">
                                         <label>Nome titular</label>
-                                        <input type="text" class="b-form-control validate-name-card" value=""
+                                        <input type="text" class="b-card-field b-form-control validate-name-card" value=""
                                                name="name_card_bcash"
                                                id="name_card_bcash" maxlength="100"
                                                autocomplete="off" style="width:100%">
@@ -513,14 +522,14 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         }
 
         function enableCardForm() {
-            var formCardBcash = document.getElementsByClassName("b-form-control");
+            var formCardBcash = document.getElementsByClassName("b-card-field");
             for (i in formCardBcash) {
                 formCardBcash[i].disabled = false;
             }
         }
 
         function disableCardForm() {
-            var formCardBcash = document.getElementsByClassName("b-form-control");
+            var formCardBcash = document.getElementsByClassName("b-card-field");
             for (i in formCardBcash) {
                 formCardBcash[i].disabled = true;
             }
@@ -544,7 +553,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         }
 
         function mascaraCpfCnpj() {
-            var str = document.getElementById('cpf_cnpj_bcash');
+            var str = document.getElementById('cpf_cnpj_<?php echo $code; ?>');
             var $value = str.value.replace(/\D/g, "");
             /* Caso passe de 14 caracteres será formatado como CNPJ */
             if ($value.length < 12)
@@ -553,6 +562,13 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                 str.value = cnpj($value);
             else
                 str.value = cnpj(cut($value));
+        }
+
+        function mascaraCpfResp() {
+            var str = document.getElementById('cpf_resp_compra_<?php echo $code; ?>');
+            var $value = str.value.replace(/\D/g, "");
+            if ($value.length < 12)
+                str.value = cpf($value);
         }
 
         function cut(str) {
@@ -694,7 +710,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             paymentFlags.onclick = clickFlag;
         }
         <?php if($this->getCpf()) : ?>
-        document.getElementById("cpf_cnpj_bcash").onkeypress = function (event) {
+        document.getElementById("cpf_cnpj_<?php echo $code; ?>").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
                 return false;
@@ -702,16 +718,16 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             mascaraCpfCnpj();
         };
 
-        document.getElementById("cpf_cnpj_bcash").onblur = function (event) {
+        document.getElementById("cpf_cnpj_<?php echo $code; ?>").onblur = function (event) {
             mascaraCpfCnpj();
         };
         <?php endif; ?>
         <?php if($this->getPhone()) : ?>
-        document.getElementById("ddd_bcash").onkeypress = function (event) {
+        document.getElementById("ddd_<?php echo $code; ?>").onkeypress = function (event) {
             return validateNumber(event);
         };
 
-        document.getElementById("phone_bcash").onkeypress = function (event) {
+        document.getElementById("phone_<?php echo $code; ?>").onkeypress = function (event) {
             return validateNumber(event);
         };
         <?php endif; ?>
@@ -732,16 +748,16 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         }
 
         <?php if($this->getCpf()) : ?>
-        $('cpf_cnpj_bcash').observe('blur', function (e) {
+        $('cpf_cnpj_<?php echo $code; ?>').observe('blur', function (e) {
             var RegExp = /^[0-9]{11,14}$/;
-            var cpf_cnpj_bcash = document.getElementById("cpf_cnpj_bcash");
-            var valor = cpf_cnpj_bcash.value.replace(/\D/g, "");
+            var cpf_cnpj_<?php echo $code; ?> = document.getElementById("cpf_cnpj_<?php echo $code; ?>");
+            var valor = cpf_cnpj_<?php echo $code; ?>.value.replace(/\D/g, "");
             if (RegExp.test(valor) == false && valor.length > 0) {
                 alert('Informe corretamente seu CPF/CNPJ ');
-                cpf_cnpj_bcash.value = '';
+                cpf_cnpj_<?php echo $code; ?>.value = '';
             }
             else if (valor.length > 0) {
-                var id = document.getElementById("cpf_cnpj_bcash").value;
+                var id = document.getElementById("cpf_cnpj_<?php echo $code; ?>").value;
                 new Ajax.Request(requestUrl, {
                     method: 'POST',
                     parameters: 'pid=' + id + '&input=cpf'
@@ -803,17 +819,47 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                 parameters: 'pid=' + id + '&input=cvv'
             });
         });
+        <?php if(strlen($customer_taxvat) > 11) : ?>
+        document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onkeypress = function (event) {
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
+            }
+            mascaraCpfResp();
+        };
+
+        document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onblur = function (event) {
+            mascaraCpfResp();
+        };
+
+        $('cpf_resp_compra_<?php echo $code; ?>').observe('blur', function (e) {
+            var RegExp = /^[0-9]{11,14}$/;
+            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_cnpj_<?php echo $code; ?>");
+            var valor = cpf_resp_compra_<?php echo $code; ?>.value.replace(/\D/g, "");
+            if (RegExp.test(valor) == false && valor.length > 0) {
+                alert('Informe corretamente o CPF');
+                cpf_resp_compra_<?php echo $code; ?>.value = '';
+            }
+            else if (valor.length > 0) {
+                var id = document.getElementById("cpf_resp_compra_<?php echo $code; ?>").value;
+                new Ajax.Request(requestUrl, {
+                    method: 'POST',
+                    parameters: 'pid=' + id + '&input=cpfresp'
+                });
+            }
+        });
+        <?php endif; ?>
         <?php if($this->getPhone()) : ?>
-        $('ddd_bcash').observe('blur', function (e) {
-            var id = document.getElementById("ddd_bcash").value;
+        $('ddd_<?php echo $code; ?>').observe('blur', function (e) {
+            var id = document.getElementById("ddd_<?php echo $code; ?>").value;
             new Ajax.Request(requestUrl, {
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=ddd'
             });
         });
 
-        $('phone_bcash').observe('blur', function (e) {
-            var id = document.getElementById("phone_bcash").value;
+        $('phone_<?php echo $code; ?>').observe('blur', function (e) {
+            var id = document.getElementById("phone_<?php echo $code; ?>").value;
             new Ajax.Request(requestUrl, {
                 method: 'POST',
                 parameters: 'pid=' + id + '&input=telefone'

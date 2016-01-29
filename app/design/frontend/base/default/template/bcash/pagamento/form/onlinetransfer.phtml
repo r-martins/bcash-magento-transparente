@@ -10,7 +10,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         <div class="payment-group" >
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
                 <?php if($this->getCpf()) : ?>
-                    <div class="" style="float:left; width:40%; margin:2px">
+                    <div class="" style="float:left; width:40%; margin:2px; margin-right: 10px;">
                         <label>CPF/CNPJ do titular</label>
                         <input type="text" class="b-form-control validate-cpf-cnpj-onlinetransfer" id="cpf_cnpj_<?php echo $code; ?>"
                                name="cpf_cnpj_<?php echo $code; ?>" value=""
@@ -18,7 +18,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                     </div>
                 <?php endif; ?>
                 <?php if($this->getPhone()) : ?>
-                    <div class="" style="float:left; width:53%; margin:3px; margin-left:10px">
+                    <div class="" style="float:left; width:53%; margin:3px;">
                         <label>Telefone do titular</label><br />
                         <div style="width: 53px; float: left;">
                             <input type="text" class="b-form-control validate-ddd-onlinetransfer" maxlength="2" value=""
@@ -52,7 +52,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                     <li>
                                         <input type="radio"
                                                class="payment-method-bcash-<?php echo $code; ?> validate-one-required-by-name"
-                                               id="payment-method-<?php echo $payment->id ?>" name="bcash-payment-method"
+                                               id="payment-method-<?php echo $payment->id ?>" name="bcash-payment-method_<?php echo $code; ?>"
                                                value="<?php echo $payment->id ?>" class/>
                                         <label class="bandeira bandeira-<?php echo $code; ?> band-<?php echo $payment->id ?>"
                                                for="payment-method-<?php echo $payment->id ?>"></label>
@@ -100,7 +100,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
     }
 
     var initBcashOnlinetransferPagamento = function () {
-
+        hideBcashOnlinetransferPaymentMethod();
         function showBcashOnlinetransferPaymentMethod() {
             var paymentConteiner = document.getElementById('payment-<?php echo $code; ?>');
             var paymentBcashConteiner = document.getElementById('payment-bcash-group-<?php echo $code; ?>');

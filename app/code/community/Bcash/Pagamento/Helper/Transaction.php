@@ -148,7 +148,8 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->cards = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
-        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method');
+        $payment_method_request = Mage::app()->getRequest()->getPost('payment')['method'];
+        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method_' . $payment_method_request);
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
 
     }
@@ -288,14 +289,18 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         }
 
         if (!is_null($customerData)) {
+            $mage_request = Mage::app()->getRequest()->getPost();
+            $payment_method = $mage_request['payment']['method'];
             $cpf_cnpj_bcash = isset($customerData[$prefix . "taxvat"]) ? $customerData[$prefix . "taxvat"] : null;
             $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
 
-            if ($this->cpf) {
-                $cpf_cnpj_bcash = Mage::app()->getRequest()->getPost('cpf_cnpj_bcash');
-                $cpf_cnpj_bcash = preg_replace('/[^0-9]+/', '', $cpf_cnpj_bcash);
+            if ($this->cpf || empty($cpf_cnpj_bcash)) {
+                $cpf_cnpj_request = $mage_request['cpf_cnpj_' . $payment_method];
+                $cpf_cnpj_request = preg_replace('/[^0-9]+/', '', $cpf_cnpj_request);
+                if (!empty($cpf_cnpj_request) && !is_null($cpf_cnpj_request)) {
+                    $cpf_cnpj_bcash = $cpf_cnpj_request;
+                }
             }
-
 
             $buyer->setMail($customerData[$prefix . 'email']);
             $name = ($customerData[$prefix . 'firstname']);
@@ -303,8 +308,20 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $name .= isset($customerData[$prefix . 'lastname']) ? ' ' . $customerData[$prefix . 'lastname'] : '';
             $buyer->setName($name);
             if (strlen($cpf_cnpj_bcash) > 11) {
+                // Cnpj
                 $buyer->setCnpj($cpf_cnpj_bcash);
-                $buyer->setCompanyName($name);
+                // Cpf do responsável pela compra na empresa
+                $cpf_resp_compra = $mage_request['cpf_resp_compra_' . $payment_method];
+                $cpf_resp_compra = preg_replace('/[^0-9]+/', '', $cpf_resp_compra);
+                $buyer->setCpf($cpf_resp_compra);
+                // Razão social/Nome empresa
+                $billingAddress = $this->quoteBcash->getBillingAddress()->getData();
+                $nomeEmpresa = $billingAddress['company'];
+                if (!empty($nomeEmpresa) && !is_null($nomeEmpresa)) {
+                    $buyer->setCompanyName($nomeEmpresa);
+                } else {
+                    $buyer->setCompanyName($name);
+                }
             } else {
                 $buyer->setCpf($cpf_cnpj_bcash);
             }
@@ -322,8 +339,10 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
      */
     public function completePhoneBcash($attr = null)
     {
+        $mage_request = Mage::app()->getRequest()->getPost();
+        $payment_method = $mage_request['payment']['method'];
         if ($this->phone) {
-            $phone = Mage::app()->getRequest()->getPost('ddd_bcash') . Mage::app()->getRequest()->getPost('phone_bcash');
+            $phone = Mage::app()->getRequest()->getPost('ddd_' . $payment_method) . Mage::app()->getRequest()->getPost('phone_' . $payment_method);
             $phone = preg_replace('/[^0-9]+/', '', $phone);
             return $this->parsePhone($phone);
         }
