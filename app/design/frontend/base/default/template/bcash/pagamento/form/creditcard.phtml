@@ -9,26 +9,26 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
     <link rel="stylesheet"
           href="<?php echo $this->getSkinUrl('bcash/pagamento/css/application.css') ?>?v=<?php echo rand(); ?>"
           type="text/css"/>
-    <?php if ($this->getCpf() || $this->getPhone()) : ?>
+    <?php if ($this->getCpf() || $this->getPhone() || empty($customer_taxvat) || (strlen($customer_taxvat) > 11)) : ?>
     <div class="form-list" id="payment_form_<?php echo $code; ?>" style="display:none;">
         <div class="payment-group">
 
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
-                <?php if ($this->getCpf()) : ?>
+                <?php if ($this->getCpf() || empty($customer_taxvat)) : ?>
                     <div class="" style="float:left; width:40%; margin:2px; margin-right: 10px;">
                         <label>CPF/CNPJ do titular</label>
-                        <input type="text" class="b-form-control validate-cpf-cnpj" id="cpf_cnpj_<?php echo $code; ?>"
+                        <input type="text" class="b-form-control validate-cpf-cnpj-creditcard" id="cpf_cnpj_<?php echo $code; ?>"
                                name="cpf_cnpj_<?php echo $code; ?>" value=""
                                maxlength="18" autocomplete="off"/>
                     </div>
                 <?php endif; ?>
-                <?php if(strlen($customer_taxvat) > 11) : ?>
-                    <div class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
+                <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
+                    <div id="cpf-resp-cnpj-creditcard" class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
                         <label>CPF da pessoa respons&aacute;vel pela compra</label>
-                        <input type="text" class="b-form-control validate-cpf-resp" id="cpf_resp_compra_<?php echo $code; ?>"
+                        <input type="text" class="b-form-control validate-cpf-resp-creditcard" id="cpf_resp_compra_<?php echo $code; ?>"
                                name="cpf_resp_compra_<?php echo $code; ?>" value=""
                                maxlength="14" autocomplete="off"/>
-                        <desc><i>(para o Cnpj: <?php echo $customer_taxvat; ?> )</i></desc>
+                        <desc><i>(<?php echo ((empty($customer_taxvat) || $this->getCpf())  ? 'somente para compra com CNPJ' : 'para o CNPJ ' . $customer_taxvat); ?> )</i></desc>
                     </div>
                 <?php endif; ?>
                 <?php if ($this->getPhone()) : ?>
@@ -36,12 +36,12 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                         <label>Telefone do titular</label><br/>
 
                         <div style="width: 53px; float: left;">
-                            <input type="text" class="b-form-control validate-ddd" maxlength="2" value=""
+                            <input type="text" class="b-form-control validate-ddd-creditcard" maxlength="2" value=""
                                    name="ddd_<?php echo $code; ?>"
                                    id="ddd_<?php echo $code; ?>">
                         </div>
                         <div style="width: 123px; float: left; margin-left:3px">
-                            <input type="text" class="b-form-control validate-phone" maxlength="9" value=""
+                            <input type="text" class="b-form-control validate-phone-creditcard" maxlength="9" value=""
                                    name="phone_<?php echo $code; ?>"
                                    id="phone_<?php echo $code; ?>">
                         </div>
@@ -390,7 +390,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
         function checkIsCardSelected() {
             var ElementPaymentMethod = [];
-            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+            document.body.select('input[type=radio][name="bcash-payment-method_<?php echo $code; ?>"]:checked').each(function (element) {
                 if (element.checked) {
                     ElementPaymentMethod = element;
                 }
@@ -399,15 +399,22 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             return $isCard;
         }
 
-        Validation.add('validate-cpf-cnpj', 'Documento inválido.', function (v) {
+        Validation.add('validate-cpf-cnpj-creditcard', 'Documento inválido.', function (v) {
             return isCpfCnpj(v);
         });
 
-        Validation.add('validate-ddd', 'Preencha o ddd.', function (v) {
+        Validation.add('validate-cpf-resp-creditcard', 'Documento inválido.', function (v) {
+            if(isAbleCpfRespCnpj()) {
+                return isCpf(unformatNumber(v));
+            }
+            return true;
+        });
+
+        Validation.add('validate-ddd-creditcard', 'Preencha o ddd.', function (v) {
             return v.length == 2;
         });
 
-        Validation.add('validate-phone', 'Preencha o telefone.', function (v) {
+        Validation.add('validate-phone-creditcard', 'Preencha o telefone.', function (v) {
             return v.length == 8 || v.length == 9;
         });
 
@@ -483,19 +490,22 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                 cardConteiner.className = cardConteiner.className.replace(/\bb-hide\b/, '');
                 enableCardForm();
 
-                new Ajax.Request(requestUrl, {
-                    method: 'POST',
-                    parameters: 'input=cartao&tipo=' + paymentRadio.value
-                });
-
+                if(paymentRadio.value != null) {
+                    new Ajax.Request(requestUrl, {
+                        method: 'POST',
+                        parameters: 'input=cartao&tipo=' + paymentRadio.value
+                    });
+                }                
             } else if (!isCard(paymentRadio) && !hasClass(cardConteiner, 'b-hide')) {
                 cardConteiner.className = cardConteiner.className + " b-hide";
                 disableCardForm();
 
-                new Ajax.Request(requestUrl, {
-                    method: 'POST',
-                    parameters: 'input=boleto&tipo=' + paymentRadio.value
-                });
+                if(paymentRadio.value != null) {
+                    new Ajax.Request(requestUrl, {
+                        method: 'POST',
+                        parameters: 'input=boleto&tipo=' + paymentRadio.value
+                    });
+                }                
             } else {
                 var option = paymentRadio.value;
                 var typePayment = 'boleto';
@@ -519,7 +529,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             //force order review reload
             forceReloadOrderReviewOsc();
 
-        }
+        }    
 
         function enableCardForm() {
             var formCardBcash = document.getElementsByClassName("b-card-field");
@@ -556,12 +566,18 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             var str = document.getElementById('cpf_cnpj_<?php echo $code; ?>');
             var $value = str.value.replace(/\D/g, "");
             /* Caso passe de 14 caracteres será formatado como CNPJ */
-            if ($value.length < 12)
+            if ($value.length < 12){
                 str.value = cpf($value);
-            else if ($value.length >= 12 && $value.length < 15)
+                hideCpfRespCnpj();
+            }
+            else if ($value.length >= 12 && $value.length < 15){
                 str.value = cnpj($value);
-            else
+                showCpfRespCnpj();
+            }
+            else {
                 str.value = cnpj(cut($value));
+                showCpfRespCnpj();
+            }
         }
 
         function mascaraCpfResp() {
@@ -686,7 +702,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             var numero = valor;
             numero = unformatNumber(numero);
             if (numero.length > 11) {
-                if (isCnpj(numero)) {
+                if (isCnpj(numero)) {                    
                     retorno = true;
                 }
             } else {
@@ -710,6 +726,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             paymentFlags.onclick = clickFlag;
         }
         <?php if($this->getCpf()) : ?>
+        hideCpfRespCnpj();
         document.getElementById("cpf_cnpj_<?php echo $code; ?>").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -737,7 +754,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
         function getCardSelected() {
             var ElementPaymentMethod = [];
-            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+            document.body.select('input[type=radio][name="bcash-payment-method_<?php echo $code; ?>"]:checked').each(function (element) {
                 if (element.checked) {
                     ElementPaymentMethod = element;
                 }
@@ -819,7 +836,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                 parameters: 'pid=' + id + '&input=cvv'
             });
         });
-        <?php if(strlen($customer_taxvat) > 11) : ?>
+        <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
         document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -834,7 +851,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
         $('cpf_resp_compra_<?php echo $code; ?>').observe('blur', function (e) {
             var RegExp = /^[0-9]{11,14}$/;
-            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_cnpj_<?php echo $code; ?>");
+            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
             var valor = cpf_resp_compra_<?php echo $code; ?>.value.replace(/\D/g, "");
             if (RegExp.test(valor) == false && valor.length > 0) {
                 alert('Informe corretamente o CPF');
@@ -878,6 +895,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             var RegExpAura = /^(5078\d{2})(\d{2})(\d{11})$/;
             var RegexFinal = '';
             var paymentRadio = getCardSelected();
+            debugger;
             if (paymentRadio.isCard) {
                 var cardNumber = document.getElementById("card_number_bcash").value;
                 cardNumber = cardNumber.trim();
@@ -969,7 +987,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             disableCardForm();
 
             // radios
-            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+            document.body.select('input[type=radio][name="bcash-payment-method_<?php echo $code; ?>"]:checked').each(function (element) {
                 if (element.checked) {
                     element.checked = false;
                 }
@@ -992,7 +1010,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         }
 
         function uncheckBcashPaymentMethods() {
-            document.body.select('input[type=radio][name="payment-method"]:checked').each(function (element) {
+            document.body.select('input[type=radio][name="bcash-payment-method_<?php echo $code; ?>"]:checked').each(function (element) {
                 if (element.checked) {
                     element.checked = false;
                 }
@@ -1015,6 +1033,41 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             }
             if (hasClass(paymentConteiner, 'b-hide')) {
                 paymentConteiner.className = paymentConteiner.className.replace(/\bb-hide\b/, '');
+            }
+        }
+
+        function isAbleCpfRespCnpj() {
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-creditcard");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                return true;
+            }
+            return false;
+        }
+        
+        function hideCpfRespCnpj() {
+            var fieldCpfResp = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
+            fieldCpfResp.disabled = true;
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-creditcard");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className + " b-hide";
+            }
+            if(hasClass(divCpfResp, 'validate-cpf-resp-bankslip')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bvalidate-cpf-resp-creditcard\b/, '');
+            }
+            if(hasClass(divCpfResp, 'validation-failed')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bvalidation-failed\b/, '');
+            }
+        }
+
+        function showCpfRespCnpj() {
+            var fieldCpfResp = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
+            fieldCpfResp.disabled = false;
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-creditcard");
+            if (hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bb-hide\b/, '');
+            }
+            if(!hasClass(divCpfResp, 'validate-cpf-resp-creditcard')) {
+                divCpfResp.className = divCpfResp.className + " validate-cpf-resp-creditcard";                
             }
         }
 

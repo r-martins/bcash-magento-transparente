@@ -17,13 +17,13 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                                maxlength="18" autocomplete="off"/>
                     </div>
                 <?php endif; ?>
-                <?php if(strlen($customer_taxvat) > 11) : ?>
-                    <div class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
+                <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
+                    <div id="cpf-resp-cnpj-bankslip" class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
                         <label>CPF da pessoa respons&aacute;vel pela compra</label>
                         <input type="text" class="b-form-control validate-cpf-resp-bankslip" id="cpf_resp_compra_<?php echo $code; ?>"
                                name="cpf_resp_compra_<?php echo $code; ?>" value=""
                                maxlength="14" autocomplete="off"/>
-                        <desc><i>(para o Cnpj: <?php echo $customer_taxvat; ?> )</i></desc>
+                        <desc><i>(<?php echo ((empty($customer_taxvat) || $this->getCpf())  ? 'somente para compra com CNPJ' : 'para o CNPJ ' . $customer_taxvat); ?> )</i></desc>
                     </div>
                 <?php endif; ?>
                 <?php if($this->getPhone()) : ?>
@@ -168,7 +168,10 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         });
 
         Validation.add('validate-cpf-resp-bankslip', 'Documento inválido.', function (v) {
-            return isCpf(unformatNumber(v));
+            if(isAbleCpfRespCnpj()) {
+                return isCpf(unformatNumber(v));
+            }
+            return true;
         });
 
         Validation.add('validate-ddd-bankslip', 'Preencha o ddd.', function (v) {
@@ -183,12 +186,18 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             var str = document.getElementById('cpf_cnpj_<?php echo $code; ?>');
             var $value = str.value.replace(/\D/g, "");
             /* Caso passe de 14 caracteres será formatado como CNPJ */
-            if ($value.length < 12)
+            if ($value.length < 12){
                 str.value = cpf($value);
-            else if ($value.length >= 12 && $value.length < 15)
+                hideCpfRespCnpj();
+            }
+            else if ($value.length >= 12 && $value.length < 15){
                 str.value = cnpj($value);
-            else
+                showCpfRespCnpj();
+            }
+            else {
                 str.value = cnpj(cut($value));
+                showCpfRespCnpj();
+            }
         }
 
         function mascaraCpfResp() {
@@ -332,6 +341,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
         }
 
         <?php if($this->getCpf()) : ?>
+        hideCpfRespCnpj();
         document.getElementById("cpf_cnpj_<?php echo $code; ?>").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -361,7 +371,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             }
         });
         <?php endif; ?>
-        <?php if(strlen($customer_taxvat) > 11) : ?>
+        <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
         document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onkeypress = function (event) {
             var key = event.which || event.keyCode || event.charCode;
             if (!onlyNumber(key)) {
@@ -376,7 +386,7 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
 
         $('cpf_resp_compra_<?php echo $code; ?>').observe('blur', function (e) {
             var RegExp = /^[0-9]{11,14}$/;
-            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_cnpj_<?php echo $code; ?>");
+            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
             var valor = cpf_resp_compra_<?php echo $code; ?>.value.replace(/\D/g, "");
             if (RegExp.test(valor) == false && valor.length > 0) {
                 alert('Informe corretamente o CPF');
@@ -439,6 +449,41 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                     e.checked = true;
                 }
             });
+        }
+
+        function isAbleCpfRespCnpj() {
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-bankslip");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                return true;
+            }
+            return false;
+        }
+        
+        function hideCpfRespCnpj() {
+            var fieldCpfResp = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
+            fieldCpfResp.disabled = true;
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-bankslip");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className + " b-hide";
+            }
+            if(hasClass(divCpfResp, 'validate-cpf-resp-bankslip')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bvalidate-cpf-resp-bankslip\b/, '');
+            }
+            if(hasClass(divCpfResp, 'validation-failed')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bvalidation-failed\b/, '');
+            }
+        }
+
+        function showCpfRespCnpj() {
+            var fieldCpfResp = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
+            fieldCpfResp.disabled = false;
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-bankslip");
+            if (hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bb-hide\b/, '');
+            }
+            if(!hasClass(divCpfResp, 'validate-cpf-resp-bankslip')) {
+                divCpfResp.className = divCpfResp.className + " validate-cpf-resp-bankslip";                
+            }
         }
 
         var paymentsOptions = document.getElementsByClassName("bandeira-<?php echo $code; ?>");

@@ -148,8 +148,9 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
         $this->cards = array(PaymentMethodEnum::VISA, PaymentMethodEnum::MASTERCARD, PaymentMethodEnum::AMERICAN_EXPRESS, PaymentMethodEnum::AURA, PaymentMethodEnum::DINERS, PaymentMethodEnum::HIPERCARD, PaymentMethodEnum::ELO);
         $this->boleto = PaymentMethodEnum::BANK_SLIP;
         $this->tefs = array(PaymentMethodEnum::BB_ONLINE_TRANSFER, PaymentMethodEnum::BRADESCO_ONLINE_TRANSFER, PaymentMethodEnum::ITAU_ONLINE_TRANSFER, PaymentMethodEnum::BANRISUL_ONLINE_TRANSFER, PaymentMethodEnum::HSBC_ONLINE_TRANSFER);
-        $payment_method_request = Mage::app()->getRequest()->getPost('payment')['method'];
-        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method_' . $payment_method_request);
+        $payment_method_request = Mage::app()->getRequest()->getPost();    
+        $payment_method_name = $payment_method_request['payment']['method'];    
+        $this->payment_method = Mage::app()->getRequest()->getPost('bcash-payment-method_' . $payment_method_name);
         $this->installments = Mage::app()->getRequest()->getPost('installments_bcash', 1);
 
     }
@@ -180,10 +181,12 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 'installments' => $this->installments
             );
             if (isset($response->cancellationCode) && $response->cancellationCode) {
+                $responseMessage = urldecode($arRet['response']->message);
+                Mage::helper("bcash")->saveLog($responseMessage);
                 if ($response->cancellationCode == "700001") {
                     Mage::throwException("A transação não pode ser processada utilizando este cartão. Por favor, selecione outro meio de pagamento.");
                 } else {
-                    Mage::throwException(Mage::helper('sales')->__(urldecode($arRet['response']->message)));
+                    Mage::throwException(Mage::helper('sales')->__($responseMessage));
                 }
             } else {
                 return $arRet;
@@ -206,9 +209,6 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
                 $messages .= "\n- " . urldecode($err->description) . " (" . $err->code . ")";
             }
             Mage::throwException($messages);
-        } catch (Exception $e) {
-            Mage::helper("bcash")->saveLog($e->getMessage());
-            Mage::throwException($e->getMessage());
         }
     }
 
@@ -309,7 +309,7 @@ class Bcash_Pagamento_Helper_Transaction extends Mage_Payment_Helper_Data
             $buyer->setName($name);
             if (strlen($cpf_cnpj_bcash) > 11) {
                 // Cnpj
-                $buyer->setCnpj($cpf_cnpj_bcash);
+                $buyer->setCnpj($cpf_cnpj_bcash);                           
                 // Cpf do responsável pela compra na empresa
                 $cpf_resp_compra = $mage_request['cpf_resp_compra_' . $payment_method];
                 $cpf_resp_compra = preg_replace('/[^0-9]+/', '', $cpf_resp_compra);

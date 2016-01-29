@@ -9,12 +9,21 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
     <div class="form-list" id="payment_form_<?php echo $code; ?>" style="display:none;">
         <div class="payment-group" >
             <div class="b-row" style="padding-left:15px; margin-bottom:10px">
-                <?php if($this->getCpf()) : ?>
+                <?php if($this->getCpf() || empty($customer_taxvat)) : ?>
                     <div class="" style="float:left; width:40%; margin:2px; margin-right: 10px;">
                         <label>CPF/CNPJ do titular</label>
                         <input type="text" class="b-form-control validate-cpf-cnpj-onlinetransfer" id="cpf_cnpj_<?php echo $code; ?>"
                                name="cpf_cnpj_<?php echo $code; ?>" value=""
                                maxlength="18" autocomplete="off"/>
+                    </div>
+                <?php endif; ?>
+                <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
+                    <div id="cpf-resp-cnpj-onlinetransfer" class="" style="float:left; width:53%; margin:3px; margin-right: 10px;">
+                        <label>CPF da pessoa respons&aacute;vel pela compra</label>
+                        <input type="text" class="b-form-control validate-cpf-resp-onlinetransfer" id="cpf_resp_compra_<?php echo $code; ?>"
+                               name="cpf_resp_compra_<?php echo $code; ?>" value=""
+                               maxlength="14" autocomplete="off"/>
+                        <desc><i>(<?php echo ((empty($customer_taxvat) || $this->getCpf())  ? 'somente para compra com CNPJ' : 'para o CNPJ ' . $customer_taxvat); ?> )</i></desc>
                     </div>
                 <?php endif; ?>
                 <?php if($this->getPhone()) : ?>
@@ -154,6 +163,269 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
             }
         }
 
+        Validation.add('validate-cpf-cnpj-onlinetransfer', 'Documento inválido.', function (v) {
+            return isCpfCnpj(v);
+        });
+
+        Validation.add('validate-cpf-resp-onlinetransfer', 'Documento inválido.', function (v) {
+            if(isAbleCpfRespCnpj()) {
+                return isCpf(unformatNumber(v));
+            }
+            return true;
+        });
+
+        Validation.add('validate-ddd-onlinetransfer', 'Preencha o ddd.', function (v) {
+            return v.length == 2;
+        });
+
+        Validation.add('validate-phone-onlinetransfer', 'Preencha o telefone.', function (v) {
+            return v.length == 8 || v.length == 9;
+        });
+
+        function mascaraCpfCnpj() {
+            var str = document.getElementById('cpf_cnpj_<?php echo $code; ?>');
+            var $value = str.value.replace(/\D/g, "");
+            /* Caso passe de 14 caracteres será formatado como CNPJ */
+            if ($value.length < 12){
+                str.value = cpf($value);
+                hideCpfRespCnpj();
+            }
+            else if ($value.length >= 12 && $value.length < 15){
+                str.value = cnpj($value);
+                showCpfRespCnpj();
+            }
+            else {
+                str.value = cnpj(cut($value));
+                showCpfRespCnpj();
+            }
+        }
+
+        function mascaraCpfResp() {
+            var str = document.getElementById('cpf_resp_compra_<?php echo $code; ?>');
+            var $value = str.value.replace(/\D/g, "");
+            if ($value.length < 12)
+                str.value = cpf($value);
+        }
+
+        function cut(str) {
+            return str.substring(0, 14);
+        }
+
+        /* Funcao de formatacao CPF */
+        function cpf(valor) {
+            /* Remove qualquer caracter digitado que não seja numero */
+            valor = valor.replace(/\D/g, "");
+            /* Adiciona um ponto entre o terceiro e o quarto digito */
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            /* Adiciona um ponto entre o terceiro e o quarto dígitos */
+            /* desta vez para o segundo bloco */
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            /* Adiciona um hifen entre o terceiro e o quarto dígitos */
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            return valor;
+        }
+
+        /* Funcao de formatacao CNPJ */
+        function cnpj(valor) {
+            /* Remove qualquer caracter digitado que não seja numero */
+            valor = valor.replace(/\D/g, "");
+            /* Adiciona um ponto entre o segundo e o terceiro dígitos */
+            valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+            /* Adiciona um ponto entre o quinto e o sexto dígitos */
+            valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+            /* Adiciona uma barra entre o oitavaloro e o nono dígitos */
+            valor = valor.replace(/\.(\d{3})(\d)/, ".$1/$2");
+            /* Adiciona um hífen depois do bloco de quatro dígitos */
+            valor = valor.replace(/(\d{4})(\d)/, "$1-$2");
+            return valor;
+        }
+
+        function onlyNumber(key) {
+            if (key == 8 || key == 46 || key == 37 || key == 39 || key == 9 || key == 35 || key == 36) {
+                return true;
+            }
+            else if (key < 48 || key > 57) {
+                return false;
+            }
+            return true;
+        }
+
+        function unformatNumber(pNum) {
+            return String(pNum).replace(/\D/g, "").replace(/^0+/, "");
+        }
+
+        function isCpf(cpf) {
+            var soma;
+            var resto;
+            var i;
+            if ((cpf.length != 11) ||
+                (cpf == "00000000000") || (cpf == "11111111111") ||
+                (cpf == "22222222222") || (cpf == "33333333333") ||
+                (cpf == "44444444444") || (cpf == "55555555555") ||
+                (cpf == "66666666666") || (cpf == "77777777777") ||
+                (cpf == "88888888888") || (cpf == "99999999999")) {
+                return false;
+            }
+            soma = 0;
+            for (i = 1; i <= 9; i++) {
+                soma += Math.floor(cpf.charAt(i - 1)) * (11 - i);
+            }
+            resto = 11 - (soma - (Math.floor(soma / 11) * 11));
+            if ((resto == 10) || (resto == 11)) {
+                resto = 0;
+            }
+            if (resto != Math.floor(cpf.charAt(9))) {
+                return false;
+            }
+            soma = 0;
+            for (i = 1; i <= 10; i++) {
+                soma += cpf.charAt(i - 1) * (12 - i);
+            }
+            resto = 11 - (soma - (Math.floor(soma / 11) * 11));
+            if ((resto == 10) || (resto == 11)) {
+                resto = 0;
+            }
+            if (resto != Math.floor(cpf.charAt(10))) {
+                return false;
+            }
+            return true;
+        }
+
+        function isCnpj(s) {
+            var i;
+            var c = s.substr(0, 12);
+            var dv = s.substr(12, 2);
+            var d1 = 0;
+            for (i = 0; i < 12; i++) {
+                d1 += c.charAt(11 - i) * (2 + (i % 8));
+            }
+            if (d1 == 0) return false;
+            d1 = 11 - (d1 % 11);
+            if (d1 > 9) d1 = 0;
+            if (dv.charAt(0) != d1) {
+                return false;
+            }
+            d1 *= 2;
+            for (i = 0; i < 12; i++) {
+                d1 += c.charAt(11 - i) * (2 + ((i + 1) % 8));
+            }
+            d1 = 11 - (d1 % 11);
+            if (d1 > 9) d1 = 0;
+            if (dv.charAt(1) != d1) {
+                return false;
+            }
+            return true;
+        }
+
+        function isCpfCnpj(valor) {
+            var retorno = false;
+            var numero = valor;
+            numero = unformatNumber(numero);
+            if (numero.length > 11) {
+                if (isCnpj(numero)) {
+                    retorno = true;
+                }
+            } else {
+                if (isCpf(numero)) {
+                    retorno = true;
+                }
+            }
+            return retorno;
+        }
+
+        function validateNumber(event) {
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
+            }
+        }
+
+        <?php if($this->getCpf()) : ?>
+        hideCpfRespCnpj();
+        document.getElementById("cpf_cnpj_<?php echo $code; ?>").onkeypress = function (event) {
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
+            }
+            mascaraCpfCnpj();
+        };
+
+        document.getElementById("cpf_cnpj_<?php echo $code; ?>").onblur = function (event) {
+            mascaraCpfCnpj();
+        };
+
+        $('cpf_cnpj_<?php echo $code; ?>').observe('blur', function (e) {
+            var RegExp = /^[0-9]{11,14}$/;
+            var cpf_cnpj_<?php echo $code; ?> = document.getElementById("cpf_cnpj_<?php echo $code; ?>");
+            var valor = cpf_cnpj_<?php echo $code; ?>.value.replace(/\D/g, "");
+            if (RegExp.test(valor) == false && valor.length > 0) {
+                alert('Informe corretamente seu CPF/CNPJ ');
+                cpf_cnpj_<?php echo $code; ?>.value = '';
+            }
+            else if (valor.length > 0) {
+                var id = document.getElementById("cpf_cnpj_<?php echo $code; ?>").value;
+                new Ajax.Request(requestUrl, {
+                    method: 'POST',
+                    parameters: 'pid=' + id + '&input=cpf'
+                });
+            }
+        });
+        <?php endif; ?>
+        <?php if((strlen($customer_taxvat) > 11) || $this->getCpf() || empty($customer_taxvat)) : ?>
+        document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onkeypress = function (event) {
+            var key = event.which || event.keyCode || event.charCode;
+            if (!onlyNumber(key)) {
+                return false;
+            }
+            mascaraCpfResp();
+        };
+
+        document.getElementById("cpf_resp_compra_<?php echo $code; ?>").onblur = function (event) {
+            mascaraCpfResp();
+        };
+
+        $('cpf_resp_compra_<?php echo $code; ?>').observe('blur', function (e) {
+            var RegExp = /^[0-9]{11,14}$/;
+            var cpf_resp_compra_<?php echo $code; ?> = document.getElementById("cpf_resp_compra_<?php echo $code; ?>");
+            var valor = cpf_resp_compra_<?php echo $code; ?>.value.replace(/\D/g, "");
+            if (RegExp.test(valor) == false && valor.length > 0) {
+                alert('Informe corretamente o CPF');
+                cpf_resp_compra_<?php echo $code; ?>.value = '';
+            }
+            else if (valor.length > 0) {
+                var id = document.getElementById("cpf_resp_compra_<?php echo $code; ?>").value;
+                new Ajax.Request(requestUrl, {
+                    method: 'POST',
+                    parameters: 'pid=' + id + '&input=cpfresp'
+                });
+            }
+        });
+        <?php endif; ?>
+        <?php if($this->getPhone()) : ?>
+        document.getElementById("ddd_<?php echo $code; ?>").onkeypress = function (event) {
+            return validateNumber(event);
+        };
+
+        document.getElementById("phone_<?php echo $code; ?>").onkeypress = function (event) {
+            return validateNumber(event);
+        };
+        $('ddd_<?php echo $code; ?>').observe('blur', function (e) {
+            var id = document.getElementById("ddd_<?php echo $code; ?>").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=ddd'
+            });
+        });
+
+        $('phone_<?php echo $code; ?>').observe('blur', function (e) {
+            var id = document.getElementById("phone_<?php echo $code; ?>").value;
+            new Ajax.Request(requestUrl, {
+                method: 'POST',
+                parameters: 'pid=' + id + '&input=telefone'
+            });
+        });
+        <?php endif; ?>
+
         function clickFlagOnlinetransfer(e) {
             var elem, evt = e ? e : event;
             if (evt.srcElement) {
@@ -177,6 +449,36 @@ $customer_taxvat = $this->getCurrentCustomerTaxvat();
                     e.checked = true;
                 }
             });
+        }
+
+        function isAbleCpfRespCnpj() {
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-onlinetransfer");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                return true;
+            }
+            return false;
+        }
+
+        function hideCpfRespCnpj() {
+            document.getElementById("cpf_resp_compra_<?php echo $code; ?>").disabled = true;         
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-onlinetransfer");
+            if (!hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className + " b-hide";
+            }
+            if(hasClass(divCpfResp, 'validate-cpf-resp-onlinetransfer')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bvalidate-cpf-resp-onlinetransfer\b/, '');
+            }                    
+        }
+
+        function showCpfRespCnpj() {
+            document.getElementById("cpf_resp_compra_<?php echo $code; ?>").disabled = false;
+            var divCpfResp = document.getElementById("cpf-resp-cnpj-onlinetransfer");
+            if (hasClass(divCpfResp, 'b-hide')) {
+                divCpfResp.className = divCpfResp.className.replace(/\bb-hide\b/, '');
+            }
+            if(!hasClass(divCpfResp, 'validate-cpf-resp-onlinetransfer')) {
+                divCpfResp.className = divCpfResp.className + " validate-cpf-resp-onlinetransfer";                
+            }
         }
 
         var paymentsOptions = document.getElementsByClassName("bandeira-<?php echo $code; ?>");
