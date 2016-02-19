@@ -140,29 +140,36 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
 
         switch ($statusId) {
             case NotificationStatusEnum::APPROVED:
-            case NotificationStatusEnum::COMPLETED:
-                    $BaseGrandtotal = $order->getBaseGrandTotal();
-                    $payment = $order->getPayment();
-                    $payment->setTransactionId($transactionId)
-                            ->setCurrencyCode($order->getBaseCurrencyCode())
-                            ->setPreparedMessage("Pagamento aprovado.")
-                            ->setIsTransactionClosed(1)
-                            ->registerCaptureNotification($BaseGrandtotal);
-                    $order->save();
-
+					if ($order->getState() == Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
+						$BaseGrandtotal = $order->getBaseGrandTotal();
+						$payment = $order->getPayment();
+						$payment->setTransactionId($transactionId)
+								->setCurrencyCode($order->getBaseCurrencyCode())
+								->setPreparedMessage("Pagamento aprovado.")
+								->setIsTransactionClosed(1)
+								->registerCaptureNotification($BaseGrandtotal);
+						$order->save();
+					}
                     // Atualiza status na transação
                     $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
                     $quote->setStatusBcash($statusId)
                           ->setDescriptionStatusBcash("Aprovada");
                     $quote->save();
+            case NotificationStatusEnum::COMPLETED:                    
+                    // Atualiza status na transação
+                    $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+                    $quote->setStatusBcash($statusId)
+                          ->setDescriptionStatusBcash("Concluída");
+                    $quote->save();
                 break;
             case NotificationStatusEnum::IN_PROGRESS:
-                    $payment = $order->getPayment();
-                    $payment->setTransactionId($transactionId);
-                    $payment->setIsTransactionClosed(0);
-                    $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, array('Status'=>'Em andamento'));
-                    $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
-
+					if ($order->getState() != Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
+						$payment = $order->getPayment();
+						$payment->setTransactionId($transactionId);
+						$payment->setIsTransactionClosed(0);
+						$payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, array('Status'=>'Em andamento'));
+						$order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
+					}
                     // Atualiza status na transação
                     $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
                     $quote->setStatusBcash($statusId)
