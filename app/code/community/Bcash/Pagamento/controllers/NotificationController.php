@@ -155,6 +155,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                     $quote->setStatusBcash($statusId)
                           ->setDescriptionStatusBcash("Aprovada");
                     $quote->save();
+				break;
             case NotificationStatusEnum::COMPLETED:                    
                     // Atualiza status na transação
                     $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
