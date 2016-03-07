@@ -106,8 +106,7 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
                 $validNotification = $notification->verify($transactionValue);
 
                 if ($validNotification == true) {
-                    // Checa se o código da transação está relacionado com o pedido
-                    $transactionId = "111";
+                    // Checa se o código da transação está relacionado com o pedido                
                     if ($this->isValidTransactionForOrder($order, $transactionId)) {
                         Mage::helper("bcash")->saveLog("Step 3 - Notificacao pode ser processada no pedido.");
 
