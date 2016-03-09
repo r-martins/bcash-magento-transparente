@@ -257,12 +257,29 @@ class Bcash_Pagamento_NotificationController extends Mage_Core_Controller_Front_
     private function isValidTransactionForOrder($order, $transactionId)
     {
         try {
+            /*
+             * Order data
+             */
             $orderTransactionId = $order->getTransactionIdBcash();
             if ($orderTransactionId == $transactionId) {
                 return true;
             }
             // Comparação de string segura para binário
             if (strcmp($orderTransactionId, $transactionId) == 0) {
+                return true;
+            }
+
+            /*
+             * Quote data
+             */
+            $quoteId = $order->getQuoteId();
+            $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($quoteId);
+            $quoteTransactionId =  $quote->getTransactionIdBcash();
+            if ($quoteTransactionId == $transactionId) {
+                return true;
+            }
+            // Comparação de string segura para binário
+            if (strcmp($quoteTransactionId, $transactionId) == 0) {
                 return true;
             }
         } catch (Exception $e) {
