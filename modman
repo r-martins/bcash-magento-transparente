@@ -1,0 +1,6 @@
+app/code/community/Bcash/Pagamento/* app/code/community/Bcash/Pagamento/
+app/design/adminhtml/default/default/template/bcash/pagamento/* app/design/adminhtml/default/default/template/bcash/pagamento/
+app/design/frontend/base/default/layout/bcash/pagamento/* app/design/frontend/base/default/layout/bcash/pagamento/
+app/etc/modules/Bcash_Pagamento.xml app/etc/modules/Bcash_Pagamento.xml
+lib/Bcash/* lib/Bcash/
+skin/frontend/base/default/bcash/pagamento/* skin/frontend/base/default/bcash/pagamento/
